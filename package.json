@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev": "concurrently -n BACKEND,FRONTEND -c blue,green \"npm run api\" \"npm run web\"",
+    "web": "cd client && pnpm run dev",
+    "api": "cd service && bash scripts/api.sh"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
