@@ -229,13 +229,13 @@ const DebtsTable = () => {
                     </Typography>
                   </td>
                   <td className={classes}>
-                    <Typography
+                    {/* <Typography
                       variant='small'
                       color='blue-gray'
                       className='font-normal text-center'
-                    >
+                    > */}
                       <Checkbox color='blue' defaultChecked />
-                    </Typography>
+                    {/* </Typography> */}
                   </td>
                 </tr>
               );

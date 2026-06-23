@@ -1,7 +1,14 @@
-import { useMemo } from "react";
-import { Input, List, ListItem, Typography, Chip, IconButton } from "@material-tailwind/react";
-import { MagnifyingGlassIcon, XMarkIcon} from "@heroicons/react/24/outline";
-import { NeighborType } from "../../interfaces/neighborsInterfaces";
+import { useMemo } from 'react';
+import {
+  Input,
+  List,
+  ListItem,
+  Typography,
+  Chip,
+  IconButton,
+} from '@material-tailwind/react';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { NeighborType } from '../../interfaces/neighborsInterfaces';
 import { UserPlusIcon, UserIcon } from '@heroicons/react/24/outline';
 
 interface NeighborListProps {
@@ -19,13 +26,13 @@ export const NeighborList: React.FC<NeighborListProps> = ({
   neighborSelected,
   // onSelectNeighbor,
 }) => {
-
   const filteredData = useMemo(() => {
     return neighborsData.filter((neighbor) => {
-      const fullName = `${neighbor.first_name} ${neighbor.second_name} ${neighbor.last_name}`.toLowerCase();
-      return fullName.includes(searchTerm.toLocaleLowerCase())
-    })
-  }, [searchTerm, neighborsData])
+      const fullName =
+        `${neighbor.first_name} ${neighbor.second_name} ${neighbor.last_name}`.toLowerCase();
+      return fullName.includes(searchTerm.toLocaleLowerCase());
+    });
+  }, [searchTerm, neighborsData]);
 
   return (
     <div className='h-full flex flex-col min-h-0'>
@@ -61,9 +68,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
         // searchTerm && (
         // absolute z-20  w-full mt-1 max-h-60  max-h-screen
         <div className='overflow-y-auto flex-1 min-h-0'>
-          
-          {
-          filteredData.length > 0 ? (
+          {filteredData.length > 0 ? (
             <List className='w-full px-0 '>
               {filteredData.map((neighbor, index) => (
                 <ListItem
@@ -79,7 +84,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
                     <UserIcon className='w-5 h-5' />
                   </span>
                   <div className='flex flex-1 justify-between w-max'>
-                    <p className='flex flex-col'>
+                    <div className='flex flex-col'>
                       {/* <span className='text-sm'>{index + 1}</span> */}
                       <Typography variant='lead' className='font-semibold'>
                         {`${neighbor.last_name}`}
@@ -87,7 +92,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
                       <Typography variant='small'>
                         {`${neighbor.first_name} ${neighbor.second_name}`}
                       </Typography>
-                    </p>
+                    </div>
                     <Chip value={123} color='blue' />
                   </div>
                 </ListItem>
@@ -97,8 +102,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
             <div className='flex items-center justify-center h-16'>
               <Typography variant='h5'>No existe este nombre</Typography>
             </div>
-          )
-          }
+          )}
         </div>
         // )
       }
