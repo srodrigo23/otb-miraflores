@@ -5,4 +5,4 @@ const config = {
   environment: import.meta.env.VITE_ENVIRONMENT,
 }
 
-export const apiLink = config.environment === "PRODUCTION"? "" : config.frontURL_DEV
+export const apiLink = config.environment === "PRODUCTION"? "/api" : config.frontURL_DEV

@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+   {
+      "source": "/api/:path*",
+      "destination": "https://otb-miraflores-service.onrender.com/:path*"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
