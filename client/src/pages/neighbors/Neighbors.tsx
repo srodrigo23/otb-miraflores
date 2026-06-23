@@ -27,9 +27,9 @@ const Neighbors = () => {
       {loading ? (
         <LoaderAnimation isLoading={loading} />
       ) : (
-        <div className='mx-auto container w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
+        <div className='mx-auto container w-full flex flex-col gap-6 h-full py-7 px-3 lg:px-3'>
           <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-shrink-0'>
-            <Typography variant='h2'>Detalle General de Vecinos</Typography>
+            <Typography variant='h4'>Detalle General de Vecinos</Typography>
           </div>
           <div className='flex flex-row gap-3 flex-1 min-h-0'>
             <NeighborList

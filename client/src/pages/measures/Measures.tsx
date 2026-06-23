@@ -201,7 +201,7 @@ const Measures = () => {
           />
         </div>
       ) : (
-        <div className=''>
+        <div className='mx-auto container w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
           <div className='flex justify-between py-3 flex-shrink-0'>
             <Typography className='text-center mb-2' variant='h3' color='black'>
               Mediciones
