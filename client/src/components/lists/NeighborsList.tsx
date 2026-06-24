@@ -76,11 +76,11 @@ export const NeighborList: React.FC<NeighborListProps> = ({
         // absolute z-20  w-full mt-1 max-h-60  max-h-screen
         <div className='overflow-y-auto flex-1 min-h-0'>
           {filteredData.length > 0 ? (
-            <List className='w-full px-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+            <List className='w-full px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 py-4'>
               {filteredData.map((neighbor, index) => (
                 <ListItem
                   key={`${neighbor.id}-${index}`}
-                  className='flex gap-3 bg-blue-gray-50 '
+                  className='flex gap-3 bg-blue-gray-50 shadow-lg'
                   selected={neighborSelected?.id === neighbor.id}
                   onClick={() => {
                     navigate(`/vecinos/${neighbor.id}`);

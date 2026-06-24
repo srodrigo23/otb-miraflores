@@ -40,7 +40,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pathName }) => {
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={`relative px-1 py-1 text-xl  font-medium transition-colors ${
+                  className={`relative px-1 py-1 text-xl font-bold transition-colors ${
                     isActive
                       ? 'text-yellow-400'
                       : 'text-gray-300 hover:text-white'
@@ -48,7 +48,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pathName }) => {
                 >
                   {item.label}
                   {isActive && (
-                    <span className='absolute bottom-1 left-0 right-0 h-0.5 bg-yellow-400 rounded-full' />
+                    <span className='absolute bottom-1 left-0 right-0 h-0.5 mx-2 bg-yellow-400 rounded-full' />
                   )}
                 </NavLink>
               );
