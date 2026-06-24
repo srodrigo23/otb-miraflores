@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declared_attr
 
 from app.core.settings import settings
 
@@ -13,7 +13,15 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+class BaseModel:
+  def __repr__(self):
+    cols = []
+    for c in self.__table__.columns:
+      val = getattr(self, c.name, None)
+      cols.append(f"{c.name}={val!r}")
+    return f"{self.__class__.__name__}({', '.join(cols)})"
+
+Base = declarative_base(cls=BaseModel)
 
 def get_db():
   db = SessionLocal()

@@ -7,12 +7,12 @@ from app.enums import UserType
 import pandas as pd
 
 from datetime import datetime
-from app.settings import settings
+from app.core.settings import settings
 
 import bcrypt
 
 # here url database
-engine=sqlalchemy.create_engine(settings.db_url_supabase)
+engine=sqlalchemy.create_engine(settings.DB_URL_SQLITE)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
@@ -80,9 +80,9 @@ def parse_date(date_str):
 ### create system admyn's users
 password = hash_password(b'qwerty').decode('utf-8')
 users = [
-  User(username="sergio.cardenas", password_hash=password, role=UserType.ADMIN), 
-  User(username="miriam.lucana", password_hash=password, role=UserType.ADMIN), 
-  User(username="reynaldo.perez", password_hash=password, role=UserType.ADMIN)
+  User(username="sergio.cardenas", first_name="sergio", last_name="cardenas", password_hash=password, role=UserType.ADMIN), 
+  User(username="miriam.lucana", first_name="miriam", last_name="lucana", password_hash=password, role=UserType.ADMIN), 
+  User(username="reynaldo.perez", first_name="reynaldo", last_name="perez", password_hash=password, role=UserType.ADMIN)
 ]
 [db.add(user) for user in users ]
 
