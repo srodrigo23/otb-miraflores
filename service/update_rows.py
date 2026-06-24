@@ -8,7 +8,7 @@ import app.models as models
 import sqlalchemy
 # from datetime import datetime, timedelta
 
-def get_user_by_id(db:Session, id:str):
+def get_user_by_id(db:Session, id:int):
   user = db.query(models.User).filter(models.User.id == id).first()
   if not user:
     return None # improve to error management
@@ -23,21 +23,21 @@ db = SessionLocal()
 
 users  = [
   {
-    "id":'1',
+    "id":4,
     "update":{
       "fn":"SERGIO", 
       "ln":"CARDENAS"
     }
   },
   {
-    "id":'2',
+    "id":5,
     "update":{
       "fn":"MIRIAM", 
       "ln":"LUCANA"
     }
   },
   {
-    "id":'3',
+    "id":6,
     "update":{
       "fn":"REYNALDO", 
       "ln":"PEREZ"
@@ -47,10 +47,9 @@ users  = [
 
 for el in users:
   user = get_user_by_id(db=db, id=el['id'])
-
   user_to_update = schema.UserUpdate(
     first_name=el['update']['fn'],
-    last_name=el['update']['sn'],
+    last_name=el['update']['ln'],
     is_active=True
   )
 
