@@ -10,9 +10,11 @@ from app.dependencies import get_current_user
 from ..schemas.auth import LoginSchema
 from app.db.database import get_db
 
+from app.schemas import schema
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-@router.post("/login")
+@router.post("/login", response_model=schema.User)
 def login(credentials: LoginSchema, response: Response, db: Session = Depends(get_db)):
   user = verify_credentials(credentials.username, credentials.password, db)
   if not user:

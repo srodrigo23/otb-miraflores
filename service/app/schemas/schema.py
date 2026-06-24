@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from ..enums import UserType
 from datetime import datetime
@@ -328,10 +328,10 @@ class CollectDebt(BaseModel):
     from_attributes = True 
 
 class User(BaseModel):
-  name:str
-  password:str
-  user_type: UserType
-
+  username:str
+  password_hash:str = Field(exclude=True)
+  role: UserType
+  model_config = ConfigDict(from_attributes=True)
 
 class LoginRequest(BaseModel):
   username:str

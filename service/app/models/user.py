@@ -10,6 +10,8 @@ class User(Base):
   __tablename__ = "users"
   id = Column(Integer, primary_key=True, index=True)
   username = Column(String(64))
+  first_name= Column(String, nullable=True, default='')
+  last_name= Column(String, nullable=True, default='')
   password_hash = Column(String(128))
   role = Column(Enum(UserType), nullable=False)
   
