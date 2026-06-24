@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import useFetchData from "./useFetchData"
 import { apiLink } from "../config"
-import { NeighborType } from "../interfaces/neighborsInterfaces"
+import { NeighborType, NeighborWithDetailsType } from "../interfaces/neighborsInterfaces"
 
 export const useNeighborsData = () => {
   
@@ -25,7 +25,7 @@ export const useNeighborsData = () => {
 }
 
 export const useNeighborDetailsData = (neighborId:string|undefined)=>{
-  const { data, isLoading, error, execute } = useFetchData<NeighborType>();
+  const { data, isLoading, error, execute } = useFetchData<NeighborWithDetailsType>();
   const apiLinkNeightbor = `${apiLink}/neighbors/${neighborId}`
 
   useEffect(() => {

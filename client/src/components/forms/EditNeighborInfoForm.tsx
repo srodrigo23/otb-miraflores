@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Typography, IconButton, Input } from "@material-tailwind/react";
 import { XMarkIcon, PencilIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { NeighborWithDetailsType } from "../../interfaces/neighborsInterfaces";
 
 
-export const EditNeighborInfoForm = ()=>{
-
+export const EditNeighborInfoForm: React.FC<{
+  dataNeighbor: NeighborWithDetailsType | undefined;
+}> = ({ dataNeighbor }) => {
   const [edit, setEdit] = useState<boolean>(false);
 
   return (
@@ -45,7 +47,7 @@ export const EditNeighborInfoForm = ()=>{
         </div>
         <div className='col-span-4'>
           <Input
-            value={'JUAN'}
+            value={dataNeighbor?.first_name}
             disabled={!edit}
             // crossOrigin={undefined}
           />
@@ -107,5 +109,5 @@ export const EditNeighborInfoForm = ()=>{
       </div>
     </div>
   );
-}
+};
 

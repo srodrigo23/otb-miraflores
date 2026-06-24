@@ -7,3 +7,10 @@ export interface NeighborType {
   phone_number: string;
   email: string;
 }
+
+export interface NeighborWithDetailsType extends NeighborType{
+  birth_day:string|null;
+  created_at:string
+  updated_at:string
+  section:string
+}
