@@ -20,17 +20,26 @@ def create_neighbor(neighbor: schemas.NeighborCreate, db: Session = Depends(get_
       raise HTTPException(status_code=400, detail="Email already registered")
   return crud.create_neighbor(db=db, neighbor=neighbor)
 
-@router.get("")
-def read_neighbors(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-  neighbors = crud.get_neighbors(db, skip=skip, limit=limit)
-  if neighbors:
-    return {
-      "data": neighbors,
-      # "total": len(neighbors),
-      # "page": skip // limit + 1 if limit > 0 else 1,
-      # "size": limit
-    }
-  return {'success': 'True'}
+@router.get("", response_model=list[schemas.Neighbor])
+def read_neighbors( db: Session = Depends(get_db)):
+  neighbors = crud.get_neighbors(db=db)
+  return neighbors if len(neighbors)>0 else []
+  # if len(neig):
+  #   return {
+  #     "data": neighbors,
+  #     # "total": len(neighbors),
+  #     # "page": skip // limit + 1 if limit > 0 else 1,
+  #     # "size": limit
+  #   }
+  return {'Error': 'No Neighbors'}
+
+@router.get("/{neighbor_id}", response_model=schemas.NeighborDetail)
+def read_neighbor_detail(neighbor_id:int, db:Session= Depends(get_db)):
+  neighbor = crud.get_neighbor(db, neighbor_id=neighbor_id)
+  if neighbor is None:
+    raise HTTPException(status_code=404, detail="Neighbor not found")
+  return neighbor
+  
 
 @router.get("/users/{user_id}", response_model=schemas.User)
 def read_user(user_id: int, db: Session = Depends(get_db)):

@@ -23,3 +23,19 @@ export const useNeighborsData = () => {
 
   return { data, isLoading, error, refetch }
 }
+
+export const useNeighborDetailsData = (neighborId:string|undefined)=>{
+  const { data, isLoading, error, execute } = useFetchData<NeighborType>();
+  const apiLinkNeightbor = `${apiLink}/neighbors/${neighborId}`
+
+  useEffect(() => {
+    execute(apiLinkNeightbor,{
+      method: 'GET',
+      credentials:'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }, []);
+
+  return { data, isLoading, error }
+
+}

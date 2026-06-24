@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from ..enums import UserType
+from pydantic import BaseModel, ConfigDict
 
+from ..enums import UserType
+from datetime import datetime
 class ItemBase(BaseModel):
   title: str
   # description: str | None = None
@@ -44,14 +45,22 @@ class Neighbor(BaseModel):
   id: int
   first_name: str
   second_name: str | None = None
-  email: str | None = None
   last_name: str
-  ci: int
-  phone_number: int
+  email: str | None = None
+  ci: int | None = None
+  phone_number: int | None = None
 
   class Config:
     from_attributes = True
 
+class NeighborDetail(Neighbor):
+  birth_day:datetime | None= None
+  section:str
+  is_active:bool
+  created_at:datetime # date
+  updated_at:datetime # date
+  
+  model_config = ConfigDict(from_attributes=True)
 
 # Schemas para DebtType
 class DebtTypeBase(BaseModel):
