@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNeighborDetailsData } from '../../hooks/useNeighborsData';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
@@ -12,15 +12,15 @@ import { ArrowLongLeftIcon } from '@heroicons/react/24/outline';
 
 import { Typography, IconButton } from '@material-tailwind/react';
 import { XMarkIcon, PencilIcon, CheckIcon } from '@heroicons/react/24/outline';
-// import { NeighborWithDetailsType } from '../../interfaces/neighborsInterfaces';
+import { useUpdateNeighbor } from '../../hooks/useUpdateNeighbor';
+import { UpdateNeighborPayloadType } from '../../interfaces/neighborsInterfaces';
 
-
-function InfoField({ label, value, isInput }: { label: string; value?: string | number | undefined | readonly string[]; isInput: boolean}) {
+function InfoField({ label, value, isInput, onChange }: { label: string; value?: string | number | undefined | readonly string[]; isInput: boolean; onChange?: (e: ChangeEvent<HTMLInputElement>) => void }) {
   return (
     <div>
       <div className='font-semibold  text-gray-500'>{label}</div>
       {isInput ? (
-        <input type='text' className='text-2xl border border-blue-600 rounded-lg px-2' defaultValue={value}/>
+        <input type='text' className='text-2xl border border-blue-600 rounded-lg px-2' value={value} onChange={onChange}/>
       ) : (
         <div className='text-2xl '>{value || '-'}</div>
       )}
@@ -35,8 +35,28 @@ export default function NeighborDetails() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
-
   const { data, isLoading, error} = useNeighborDetailsData(id);
+  const [toUpdateDataNeighbor, setToUpdateDataNeighbor] = useState<UpdateNeighborPayloadType>();
+
+  useEffect(() => {
+    if (data) {
+      const { id:_, ...rest } = data;
+      setToUpdateDataNeighbor(rest);
+    }
+  }, [data]);
+
+  const {update} = useUpdateNeighbor(id)
+
+  const handleFieldChange = (field: keyof UpdateNeighborPayloadType) =>
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setToUpdateDataNeighbor(prev => prev ? { ...prev, [field]: e.target.value } : prev);
+    };
+
+  const updateNeighborDetail = async () => {
+    if (!toUpdateDataNeighbor) return;
+    await update(toUpdateDataNeighbor);
+    setEdit(false);
+  };
 
   if(isLoading) return <LoaderAnimation isLoading />;
   if(error) return<>{error}</>
@@ -107,7 +127,7 @@ export default function NeighborDetails() {
                       >
                         <XMarkIcon className='h-5 w-5' />
                       </IconButton>
-                      <IconButton size='sm' variant='filled' color='green'>
+                      <IconButton size='sm' variant='filled' color='green' onClick={updateNeighborDetail}>
                         <CheckIcon className='h-5 w-5' />
                       </IconButton>
                     </div>
@@ -116,30 +136,35 @@ export default function NeighborDetails() {
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4 px-6'>
                   <InfoField
                     label='Primer Nombre'
-                    value={data?.first_name}
+                    value={toUpdateDataNeighbor?.first_name}
                     isInput={edit}
+                    onChange={handleFieldChange('first_name')}
                   />
                   <InfoField
                     label='Segundo Nombre'
-                    value={data?.second_name}
+                    value={toUpdateDataNeighbor?.second_name}
                     isInput={edit}
+                    onChange={handleFieldChange('second_name')}
                   />
                   <InfoField
                     label='Apellido'
-                    value={data?.last_name}
+                    value={toUpdateDataNeighbor?.last_name}
                     isInput={edit}
+                    onChange={handleFieldChange('last_name')}
                   />
                   <InfoField
                     label='Cédula de Identidad'
-                    value={data?.ci}
+                    value={toUpdateDataNeighbor?.ci}
                     isInput={edit}
+                    onChange={handleFieldChange('ci')}
                   />
                   <InfoField
                     label='Teléfono'
-                    value={data?.phone_number}
+                    value={toUpdateDataNeighbor?.phone_number}
                     isInput={edit}
+                    onChange={handleFieldChange('phone_number')}
                   />
-                  <InfoField label='Email' value={data?.email} isInput={edit} />
+                  <InfoField label='Email' value={toUpdateDataNeighbor?.email} isInput={edit} onChange={handleFieldChange('email')} />
                   <InfoField
                     label='Fecha de Nacimiento'
                     value={
@@ -147,12 +172,12 @@ export default function NeighborDetails() {
                         ? new Date(data.birth_day).toLocaleDateString('es-ES')
                         : '-'
                     }
-                    isInput={edit}
+                    isInput={false}
                   />
                   <InfoField
                     label='Sección'
                     value={data?.section}
-                    isInput={edit}
+                    isInput={false}
                   />
                 </div>
               </AccordionBody>

@@ -14,3 +14,5 @@ export interface NeighborWithDetailsType extends NeighborType{
   updated_at:string
   section:string
 }
+
+export type UpdateNeighborPayloadType = Omit<NeighborWithDetailsType, 'id'>;

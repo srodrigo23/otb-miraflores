@@ -9,7 +9,7 @@ import {
 } from '@material-tailwind/react';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { NeighborType } from '../../interfaces/neighborsInterfaces';
-import { UserPlusIcon, UserIcon } from '@heroicons/react/24/outline';
+import { UserPlusIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 interface NeighborListProps {
   neighborsData: NeighborType[];
