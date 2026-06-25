@@ -4,14 +4,11 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '@material-tailwind/react';
 import { UserIcon } from '@heroicons/react/24/outline';
-interface TopNavBarProps {
-  pathName: string;
-}
 
-const TopNavBar: React.FC<TopNavBarProps> = ({ pathName }) => {
+const TopNavBar: React.FC<{pathName: string}> = ({ pathName }) => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const handleLogout =  async () => {
     await logout();
@@ -58,7 +55,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pathName }) => {
             <p className='flex gap-2 items-center text-sm font-bold cursor-pointer select-none'>
               <span className='flex gap-2 border rounded-xl p-2'>
                 <UserIcon className='w-5 h-5' />
-                {'MIRIAM LUCANA'}
+                {`${user?.first_name} ${user?.last_name}`}
               </span>
               <Button
                 onClick={handleLogout}
@@ -70,18 +67,24 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pathName }) => {
               </Button>
             </p>
           </div>
+          <div className='md:hidden flex gap-1'>
+            <span className='flex gap-2 border rounded-xl p-2 text-xs items-center'>
+              <UserIcon className='w-5 h-5' />
+              {`${user?.first_name} ${user?.last_name}`}
+            </span>
 
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className='md:hidden p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 transition-colors'
-            aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
-          >
-            {isMobileMenuOpen ? (
-              <XMarkIcon className='h-6 w-6' />
-            ) : (
-              <Bars3Icon className='h-6 w-6' />
-            )}
-          </button>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className=' p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 transition-colors'
+              aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            >
+              {isMobileMenuOpen ? (
+                <XMarkIcon className='h-6 w-6' />
+              ) : (
+                <Bars3Icon className='h-6 w-6' />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -109,14 +112,25 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pathName }) => {
               );
             })}
           </div>
-          <div className='border-t border-gray-700 px-4 py-3'>
+          <span className='w-px h-5 bg-gray-600' />
+          <p className='flex gap-2 items-center text-sm font-bold cursor-pointer select-none'>
+            <Button
+              onClick={handleLogout}
+              variant='text'
+              size='sm'
+              className='rounded-full text-red-400'
+            >
+              Cerrar sesión
+            </Button>
+          </p>
+          {/* <div className='border-t border-gray-700 px-4 py-3'>
             <button
               onClick={handleLogout}
               className='flex items-center gap-1.5 text-red-400 hover:text-red-300 text-sm font-medium transition-colors'
             >
               Cerrar sesión
             </button>
-          </div>
+          </div> */}
         </div>
       )}
     </nav>

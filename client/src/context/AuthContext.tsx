@@ -6,15 +6,13 @@ import {
   ReactNode,
 } from 'react';
 import useFetchData from '../hooks/useFetchData';
+import { UserType } from '../types/UserTypes';
 
 import { apiLink } from '../config';
-interface User {
-  userName: string;
-}
 
 const AuthContext = createContext<{
   isAuthenticated: boolean;
-  user: User | null;
+  user: UserType | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
@@ -22,7 +20,7 @@ const AuthContext = createContext<{
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
   const apiUserActive = `${apiLink}/auth/me`;
@@ -39,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const result = await execute(apiUserActive,{
       credentials: 'include',
     });
-    if (result?.ok && result.data) {
+    if (result?.ok && result?.data) {
       setUser(result.data);
       setIsAuthenticated(true);
     }

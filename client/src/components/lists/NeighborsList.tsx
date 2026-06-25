@@ -86,21 +86,26 @@ export const NeighborList: React.FC<NeighborListProps> = ({
                     navigate(`/vecinos/${neighbor.id}`);
                   }}
                 >
-                  <span className='border rounded-full p-2 bg-blue-gray-200'>
-                    <UserIcon className='w-5 h-5' />
-                  </span>
+                  {/* <span className='border rounded-full '> */}
+                  <div className='w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-lg font-bold shadow-md'>
+                    {neighbor?.first_name?.[0]}
+                    {neighbor?.last_name?.[0]}
+                  </div>
+
+                  {/* <UserIcon className='w-5 h-5' /> */}
+                  {/* </span> */}
                   <div className='flex flex-1 justify-between w-max'>
                     <div className='flex flex-col'>
                       {/* <span className='text-sm'>{index + 1}</span> */}
-                      <Typography variant='lead' className='font-semibold'>
-                        {`${neighbor.last_name}`}
-                      </Typography>
                       <Typography variant='small'>
                         {`${neighbor.first_name} ${neighbor.second_name}`}
                       </Typography>
+                      <Typography variant='lead' className='font-semibold'>
+                        {`${neighbor.last_name}`}
+                      </Typography>
                     </div>
-                    <Chip value={123} color='blue' />
                   </div>
+                  <Chip value={2} color='yellow' />
                 </ListItem>
               ))}
             </List>
