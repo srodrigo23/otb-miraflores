@@ -4,25 +4,37 @@ import { useNeighborDetailsData } from '../../hooks/useNeighborsData';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 
 import {
-  Button, Card, CardBody, Typography, Chip,
+  Button, Card, CardBody, Chip,
   Accordion, AccordionHeader, AccordionBody,
 } from '@material-tailwind/react';
 import { NeighborDebtsPayments } from '../../components/NeighborDebtsPayments';
 import { ArrowLongLeftIcon } from '@heroicons/react/24/outline';
 
-function InfoField({ label, value }: { label: string; value?: string | null }) {
+import { Typography, IconButton } from '@material-tailwind/react';
+import { XMarkIcon, PencilIcon, CheckIcon } from '@heroicons/react/24/outline';
+// import { NeighborWithDetailsType } from '../../interfaces/neighborsInterfaces';
+
+
+function InfoField({ label, value, isInput }: { label: string; value?: string | number | undefined | readonly string[]; isInput: boolean}) {
   return (
     <div>
       <div className='font-semibold  text-gray-500'>{label}</div>
-      <div className='text-2xl '>{value || '-'}</div>
+      {isInput ? (
+        <input type='text' className='text-2xl border border-blue-600 rounded-lg px-2' defaultValue={value}/>
+      ) : (
+        <div className='text-2xl '>{value || '-'}</div>
+      )}
     </div>
   );
 }
 
 export default function NeighborDetails() {
   const [openInfo, setOpenInfo] = useState(false);
+  const [edit, setEdit] = useState<boolean>(false);
+
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+
 
   const { data, isLoading, error} = useNeighborDetailsData(id);
 
@@ -45,7 +57,10 @@ export default function NeighborDetails() {
             <Accordion open={openInfo} className='py-0'>
               <AccordionHeader
                 className='flex  justify-center '
-                onClick={() => setOpenInfo(!openInfo)}
+                onClick={() => {
+                  setOpenInfo(!openInfo)
+                  setEdit(false)
+                }}
               >
                 <div className='flex items-center gap-5 py-3'>
                   <div className='w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-lg font-bold shadow-md'>
@@ -71,13 +86,60 @@ export default function NeighborDetails() {
                 </div>
               </AccordionHeader>
               <AccordionBody>
+                <div className='flex justify-between pb-3 px-6'>
+                  <Typography variant='h4'>Datos personales</Typography>
+                  {!edit ? (
+                    <IconButton
+                      size='sm'
+                      variant='outlined'
+                      color='blue-gray'
+                      onClick={() => setEdit(true)}
+                    >
+                      <PencilIcon className='h-5 w-5' />
+                    </IconButton>
+                  ) : (
+                    <div className='flex gap-1'>
+                      <IconButton
+                        size='sm'
+                        variant='filled'
+                        color='red'
+                        onClick={() => setEdit(false)}
+                      >
+                        <XMarkIcon className='h-5 w-5' />
+                      </IconButton>
+                      <IconButton size='sm' variant='filled' color='green'>
+                        <CheckIcon className='h-5 w-5' />
+                      </IconButton>
+                    </div>
+                  )}
+                </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4 px-6'>
-                  <InfoField label='Primer Nombre' value={data?.first_name} />
-                  <InfoField label='Segundo Nombre' value={data?.second_name} />
-                  <InfoField label='Apellido' value={data?.last_name} />
-                  <InfoField label='Cédula de Identidad' value={data?.ci} />
-                  <InfoField label='Teléfono' value={data?.phone_number} />
-                  <InfoField label='Email' value={data?.email} />
+                  <InfoField
+                    label='Primer Nombre'
+                    value={data?.first_name}
+                    isInput={edit}
+                  />
+                  <InfoField
+                    label='Segundo Nombre'
+                    value={data?.second_name}
+                    isInput={edit}
+                  />
+                  <InfoField
+                    label='Apellido'
+                    value={data?.last_name}
+                    isInput={edit}
+                  />
+                  <InfoField
+                    label='Cédula de Identidad'
+                    value={data?.ci}
+                    isInput={edit}
+                  />
+                  <InfoField
+                    label='Teléfono'
+                    value={data?.phone_number}
+                    isInput={edit}
+                  />
+                  <InfoField label='Email' value={data?.email} isInput={edit} />
                   <InfoField
                     label='Fecha de Nacimiento'
                     value={
@@ -85,42 +147,22 @@ export default function NeighborDetails() {
                         ? new Date(data.birth_day).toLocaleDateString('es-ES')
                         : '-'
                     }
+                    isInput={edit}
                   />
-                  <InfoField label='Sección' value={data?.section} />
+                  <InfoField
+                    label='Sección'
+                    value={data?.section}
+                    isInput={edit}
+                  />
                 </div>
               </AccordionBody>
             </Accordion>
-
-            {/* <Accordion open={openInfo}>
-            <AccordionHeader onClick={() => setOpenInfo(!openInfo)}>
-              Información Personal
-            </AccordionHeader>
-            <AccordionBody>
-              <div className='grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4'>
-                <InfoField label='Primer Nombre' value={data?.first_name} />
-                <InfoField label='Segundo Nombre' value={data?.second_name} />
-                <InfoField label='Apellido' value={data?.last_name} />
-                <InfoField label='Cédula de Identidad' value={data?.ci} />
-                <InfoField label='Teléfono' value={data?.phone_number} />
-                <InfoField label='Email' value={data?.email} />
-                <InfoField
-                  label='Fecha de Nacimiento'
-                  value={
-                    data?.birth_day
-                      ? new Date(data.birth_day).toLocaleDateString('es-ES')
-                      : '-'
-                  }
-                />
-                <InfoField label='Sección' value={data?.section} />
-              </div>
-            </AccordionBody>
-          </Accordion> */}
           </CardBody>
         </Card>
       </div>
 
       {/* <div className='border rounded-xl lg:flex-1 lg:min-h-0'> */}
-        <NeighborDebtsPayments />
+      <NeighborDebtsPayments />
       {/* </div> */}
     </div>
   );
