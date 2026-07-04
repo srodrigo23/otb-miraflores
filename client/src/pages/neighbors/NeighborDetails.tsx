@@ -59,7 +59,7 @@ export const NeighborDetails:React.FC<{neighborId:number|undefined; refetchNeigh
     setEdit(false);
   };
 
-  if(isLoading) return <LoaderAnimation isLoading />;
+  if(isLoading) return <LoaderAnimation/>;
   if(error) return<>{error}</>
   
   return (

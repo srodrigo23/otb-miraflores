@@ -21,7 +21,7 @@ const Neighbors = () => {
   return (
     <>
       {loading ? (
-        <LoaderAnimation isLoading={loading} />
+        <LoaderAnimation/>
       ) : neighborId !== null ? (
         <NeighborDetails
           neighborId={selectedNeighbor?.id || parseInt(neighborId)}

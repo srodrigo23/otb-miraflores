@@ -45,12 +45,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (username:string, password:string) => {
+    setLoading(true);
     const result = await execute(apiLogin,{
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
+    setLoading(false)
     if(result?.data && result?.ok){
       setUser(result.data);
       setIsAuthenticated(true);

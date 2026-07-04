@@ -11,6 +11,7 @@ import { Droplets, User, Lock, LogIn } from 'lucide-react';
 // import useFetchData from '../../hooks/useFetchData';
 // import { apiLink } from '../../config';
 import type { LoginFormInputsType } from '../../types/LoginTypes';
+import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 
 export function Login() {
   const {
@@ -32,13 +33,11 @@ export function Login() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200'>
-        <div className='inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-gray-900 border-r-transparent'></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <LoaderAnimation/>
+  //   );
+  // }
 
   if (isAuthenticated) {
     return <Navigate to='/vecinos' replace />;
@@ -79,6 +78,7 @@ export function Login() {
               label='Usuario'
               icon={<User size={20} className='text-gray-400' />}
               containerProps={{ className: 'min-w-0' }}
+              disabled={loading}
               {...register('username', {
                 required: true,
                 onChange: () => setLoginError(''),
@@ -95,6 +95,7 @@ export function Login() {
             <Input
               type='password'
               label='Contraseña'
+              disabled={loading}
               icon={<Lock size={20} className='text-gray-400' />}
               {...register('password', {
                 required: true,
@@ -112,8 +113,9 @@ export function Login() {
             className='bg-gray-900 text-white hover:bg-gray-800 flex items-center justify-center gap-3'
             fullWidth
             type='submit'
+            disabled={loading}
           >
-            <LogIn size={20} />
+            {loading? <LoaderAnimation fullScreen={false} size={5} color='border-white' />:<LogIn size={20} />}
             Iniciar Sesión
           </Button>
         </form>
