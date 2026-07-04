@@ -14,7 +14,7 @@ from app.core.settings import settings
 import bcrypt
 
 # here url database
-engine=sqlalchemy.create_engine(settings.DB_URL_SUPABASE)
+engine=sqlalchemy.create_engine(settings.DB_URL_SQLITE)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 
@@ -23,12 +23,7 @@ def hash_password(text:str):
 
 def create_neighbors(path:str)->None:
   df = pd.read_csv(path)
-  total_rows = len(df)
-  created_count = 0
-  skipped_count = 0
-  meter_count = 0
-  print(f"\n[INFO] Leyendo {total_rows} registros desde: {path}")
-  for idx, (_, row) in enumerate(df.iterrows(), start=1):
+  for _, row in df.iterrows():
     nombres = str(row['Nombres']).strip() if pd.notna(row['Nombres']) else ''
     apellido_paterno = str(row['Apellido Paterno']).strip() if pd.notna(row['Apellido Paterno']) else ''
     apellido_materno = str(row['Apellido Materno']).strip() if pd.notna(row['Apellido Materno']) else ''
@@ -40,8 +35,6 @@ def create_neighbors(path:str)->None:
     
     meter_code = str(row['Cod. medidor'])
     section = str(row['Seccion'])
-    
-    print(f"\n[{idx}/{total_rows}] Procesando: {first_name} {last_name} | Medidor: {meter_code} | Sección: {section}")
     
     neighbor_exist = db.query(Neighbor).filter(Neighbor.first_name == first_name, Neighbor.last_name == last_name).all()
     
@@ -58,8 +51,6 @@ def create_neighbors(path:str)->None:
       db.add(neighbor)
       db.commit()
       db.refresh(neighbor)
-      created_count += 1
-      print(f"  -> Vecino creado (ID: {neighbor.id})")
       
       meter = NeighborMeter(
         neighbor_id=neighbor.id,
@@ -69,11 +60,8 @@ def create_neighbors(path:str)->None:
       db.add(meter)
       db.commit()
       db.refresh(meter)
-      meter_count += 1
-      print(f"  -> Medidor registrado (ID: {meter.id})")
       
     else: 
-      print(f"  -> Vecino ya existe (ID: {neighbor_exist[0].id}), registrando solo medidor")
       meter = NeighborMeter(
         neighbor_id=neighbor_exist[0].id,
         meter_code = meter_code,
@@ -82,17 +70,8 @@ def create_neighbors(path:str)->None:
       db.add(meter)
       db.commit()
       db.refresh(meter)
-      meter_count += 1
-      skipped_count += 1
-      print(f"  -> Medidor registrado (ID: {meter.id})")
 
-  print(f"\n{'='*50}")
-  print(f"RESUMEN DE CARGA:")
-  print(f"  Total registros leídos: {total_rows}")
-  print(f"  Vecinos creados: {created_count}")
-  print(f"  Vecinos ya existentes (omitidos): {skipped_count}")
-  print(f"  Medidores registrados: {meter_count}")
-  print(f"{'='*50}\n")
+  # print(f"\nTotal de vecinos agregados: {len(df)}")
 
 
 def create_system_users()->None:
@@ -103,13 +82,10 @@ def create_system_users()->None:
     User(username="miriam.lucana", first_name="miriam", last_name="lucana", password_hash=password, role=UserType.ADMIN), 
     User(username="reynaldo.perez", first_name="reynaldo", last_name="perez", password_hash=password, role=UserType.ADMIN)
   ]
-  print(f"\n[INFO] Creando {len(users)} usuarios del sistema...")
-  for user in users:
-    db.add(user)
-    print(f"  -> Usuario creado: {user.username} ({user.role})")
+  [db.add(user) for user in users ]
 
   db.commit()
   # db.refresh()
-  print(f"\n[OK] Usuarios creados exitosamente: {len(users)}" )
+  print(f"Usuarios creados: {len(users)}" )
 create_neighbors(path='data/vecinos_of.csv')
 create_system_users()

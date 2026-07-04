@@ -39,14 +39,13 @@ class Neighbor(Base):
   id = Column(Integer, primary_key=True, index=True)
 
   first_name = Column(String(30), unique=False, nullable=False)
-  second_name = Column(String(30), default="")
-  last_name = Column(String(30))
+  second_name = Column(String(30), unique=False, default="", nullable=True)
+  last_name = Column(String(30), unique=False, nullable=False)
 
   ci = Column(Integer, nullable=True)
   phone_number = Column(Integer, nullable=True)
   email = Column(String(50), nullable=True)
-  birth_day = Column(Date)
-  section = Column(String(50), nullable=True)
+  birth_day = Column(Date, nullable=True)
 
   is_active = Column(Boolean, default=True)  # Si el vecino está activo
   created_at = Column(DateTime, default=datetime.utcnow)
