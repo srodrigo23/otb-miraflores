@@ -16,9 +16,9 @@ class Measure(Base):
   reader_name = Column(String(100))  # Nombre de la persona que realizó la lectura
   status = Column(String(20), default="in_progress")  # in_progress, completed, cancelled
 
-  total_meters = Column(Integer, default=0)  # Total de medidores a leer
-  meters_read = Column(Integer, default=0)  # Medidores ya leídos
-  meters_pending = Column(Integer, default=0)  # Medidores pendientes
+  # total_meters = Column(Integer, default=0)  # Total de medidores a leer
+  # meters_read = Column(Integer, default=0)  # Medidores ya leídos
+  # meters_pending = Column(Integer, default=0)  # Medidores pendientes
 
   notes = Column(String(200))  # Observaciones generales de la jornada
   created_at = Column(DateTime, default=datetime.utcnow)

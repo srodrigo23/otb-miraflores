@@ -16,7 +16,7 @@ class MeterReading(Base):
   # previous_reading = Column(Integer, default=0)  # Lectura anterior
   # consumption = Column(Integer)  # Consumo calculado (current_reading - previous_reading)
 
-  reading_date = Column(DateTime, default=datetime.utcnow)  # Fecha y hora exacta de la lectura
+  # reading_date = Column(DateTime, default=datetime.utcnow)  # Fecha y hora exacta de la lectura
   # reader_name = Column(String(100))  # Persona que realizó esta lectura específica
 
   status = Column(String(20), default="normal")  # normal, estimated, not_read, meter_error

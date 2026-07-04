@@ -1,19 +1,13 @@
-from fastapi import Depends, FastAPI, HTTPException, Response, status, Cookie
-from sqlalchemy.orm import Session
-
-from .services import crud
-from . import models
-from .schemas import schema as schemas
-from .db.database import SessionLocal, engine, Base, get_db
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth
+# from .services import crud
+from app.db.database import engine, Base
 from app.core.settings import settings
-from .schemas.schema import LoginRequest
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
 
-from app.routers import neighbors, meets, measures, collect_debts, debts
+from app.routers import neighbors #, meets, measures, collect_debts, debts
+from app.routers import auth
+from . import models # for create models
 
 Base.metadata.create_all(bind=engine)
 
@@ -34,20 +28,20 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(neighbors.router)
-app.include_router(meets.router)
-app.include_router(measures.router) 
-app.include_router(collect_debts.router)
-app.include_router(debts.router)
+# app.include_router(meets.router)
+# app.include_router(measures.router) 
+# app.include_router(collect_debts.router)
+# app.include_router(debts.router)
 
 @app.get("/")
 async def root():
   return {"message": "Hello World"}
 
-def create_access_token(data: dict):
-  to_encode = data.copy()
-  expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-  to_encode.update({"exp": expire})
-  return jwt.encode(to_encode, settings.ALGORITHM, algorithm=settings.ALGORITHM)
+# def create_access_token(data: dict):
+#   to_encode = data.copy()
+#   expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+#   to_encode.update({"exp": expire})
+#   return jwt.encode(to_encode, settings.ALGORITHM, algorithm=settings.ALGORITHM)
 
   
 # @app.post("/login")
@@ -71,14 +65,14 @@ def create_access_token(data: dict):
 #     'success':False
 #   }
   
-@app.get("/me")
-def get_me(access_token: str = Cookie(None)):
-  if not access_token:
-    raise HTTPException(status_code=401, detail="Not authenticated")
-  try:
-    payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-    username = payload.get("sub")
-    return {"username": username}
-  except JWTError:
-    raise HTTPException(status_code=401, detail="Invalid token")
+# @app.get("/me")
+# def get_me(access_token: str = Cookie(None)):
+#   if not access_token:
+#     raise HTTPException(status_code=401, detail="Not authenticated")
+#   try:
+#     payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+#     username = payload.get("sub")
+#     return {"username": username}
+#   except JWTError:
+#     raise HTTPException(status_code=401, detail="Invalid token")
   

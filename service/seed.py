@@ -17,8 +17,8 @@ engine=sqlalchemy.create_engine(settings.DB_URL_SQLITE)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 
-# Leer el archivo CSV
-# df = pd.read_csv('data/vecinos_of.csv')
+# Leer el archivo CSV6
+df = pd.read_csv('data/vecinos_of.csv')
 
 def hash_password(text:str):
   return bcrypt.hashpw(text, bcrypt.gensalt())
@@ -86,7 +86,6 @@ users = [
 ]
 [db.add(user) for user in users ]
 
-# db.add()
-# db.add()
 db.commit()
+db.refresh()
 print(f"Usuarios creados: {len(users)}" )
