@@ -23,25 +23,25 @@ df = pd.read_csv('data/vecinos_of.csv')
 def hash_password(text:str):
   return bcrypt.hashpw(text, bcrypt.gensalt())
 
-def parse_date(date_str):
-  """Convierte fechas en formato DD/MM/YYYY a objeto date"""
-  if pd.isna(date_str) or date_str == '':
-    return None
-  try:
-    # Manejar fechas con años de 4 dígitos incorrectos (como 2967)
-    parts = str(date_str).split('/')
-    if len(parts) == 3:
-      day, month, year = parts
-      # Corregir años que obviamente son errores (ej: 2967 -> 1967)
-      if len(year) == 4 and int(year) > 2025:
-        year = '19' + year[2:]
-      elif len(year) == 2:
-        # Asumir que años de 2 dígitos >= 25 son 1900s, sino 2000s
-        year = '19' + year if int(year) >= 25 else '20' + year
-      return datetime.strptime(f"{day}/{month}/{year}", "%d/%m/%Y").date()
-  except:
-    return None
-  return None
+# def parse_date(date_str):
+#   """Convierte fechas en formato DD/MM/YYYY a objeto date"""
+#   if pd.isna(date_str) or date_str == '':
+#     return None
+#   try:
+#     # Manejar fechas con años de 4 dígitos incorrectos (como 2967)
+#     parts = str(date_str).split('/')
+#     if len(parts) == 3:
+#       day, month, year = parts
+#       # Corregir años que obviamente son errores (ej: 2967 -> 1967)
+#       if len(year) == 4 and int(year) > 2025:
+#         year = '19' + year[2:]
+#       elif len(year) == 2:
+#         # Asumir que años de 2 dígitos >= 25 son 1900s, sino 2000s
+#         year = '19' + year if int(year) >= 25 else '20' + year
+#       return datetime.strptime(f"{day}/{month}/{year}", "%d/%m/%Y").date()
+#   except:
+#     return None
+#   return None
 
 # Iterar sobre cada fila del CSV
 # for index, row in df.iterrows():
@@ -87,5 +87,5 @@ users = [
 [db.add(user) for user in users ]
 
 db.commit()
-db.refresh()
+# db.refresh()
 print(f"Usuarios creados: {len(users)}" )

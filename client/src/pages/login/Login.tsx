@@ -19,19 +19,17 @@ export function Login() {
     formState: { errors },
   } = useForm<LoginFormInputsType>();
 
-  // const navigate = useNavigate();
-
   const { login, isAuthenticated, loading } = useAuth();
   const [loginError, setLoginError] = useState<string>('');
-
-  // const apiLinkLogin = `${apiLink}/auth/login`;
-  // const { execute } = useFetchData(apiLinkLogin);
 
   const onSubmit: SubmitHandler<LoginFormInputsType> = async ({
     username,
     password,
   }) => {
-    await login(username, password);
+    const success = await login(username, password);
+    if (!success) {
+      setLoginError('Credenciales inválidas');
+    }
   };
 
   if (loading) {

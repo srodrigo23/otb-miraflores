@@ -11,10 +11,15 @@ const useFetchData = <T> () => {
     try {
       const response = await fetch(url, options);
       const json = await response.json();
+      if (!response.ok) {
+        setError(json);
+        return { ok: false, data: json };
+      }
       setData(json);
-      return { ok: response.ok, data: json };
+      return { ok: true, data: json };
     } catch (err) {
       setError(err);
+      return { ok: false, data: null };
     } finally {
       setIsLoading(false);
     }

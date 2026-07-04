@@ -13,7 +13,7 @@ import { apiLink } from '../config';
 const AuthContext = createContext<{
   isAuthenticated: boolean;
   user: UserType | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   loading: boolean;
 } | null>(null);
@@ -51,10 +51,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
-    if(result?.data){
+    if(result?.data && result?.ok){
       setUser(result.data);
       setIsAuthenticated(true);
+      return true;
     }
+    return false;
   };
 
   const logout = async () => {
@@ -70,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loading }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loading}}>
       {children}
     </AuthContext.Provider>
   );
