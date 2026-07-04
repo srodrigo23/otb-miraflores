@@ -97,7 +97,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
                     <div className='flex flex-col'>
                       {/* <span className='text-sm'>{index + 1}</span> */}
                       <Typography variant='small'>
-                        {`${neighbor.first_name} ${neighbor.second_name}`}
+                        {`${neighbor.first_name} ${neighbor.second_name || ''}`}
                       </Typography>
                       <Typography variant='lead' className='font-semibold'>
                         {`${neighbor.last_name}`}

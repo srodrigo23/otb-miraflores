@@ -35,10 +35,25 @@ def read_neighbors( db: Session = Depends(get_db)):
 
 @router.get("/{neighbor_id}", response_model=schemas.NeighborDetail)
 def read_neighbor_detail(neighbor_id:int, db:Session= Depends(get_db)):
-  neighbor = crud.get_neighbor(db, neighbor_id=neighbor_id)
-  if neighbor is None:
+  neighbor_answer = crud.get_neighbor_by_id(db, neighbor_id=neighbor_id)
+  if neighbor_answer is None:
     raise HTTPException(status_code=404, detail="Neighbor not found")
-  return neighbor
+  neighbor = neighbor_answer[0][0]
+  meters = []
+  for _, meter in neighbor_answer:
+    meters.append(meter)
+  return {
+    "id":neighbor.id,
+    "first_name":neighbor.first_name,
+    "second_name":neighbor.second_name,
+    "last_name":neighbor.last_name,
+    "email":neighbor.email,
+    "ci":neighbor.ci,
+    "phone_number": neighbor.phone_number,
+    "birth_day":neighbor.birth_day,
+    "is_active":neighbor.is_active,
+    "meters":meters
+  } 
   
 
 @router.get("/users/{user_id}", response_model=schemas.User)

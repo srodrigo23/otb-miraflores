@@ -4,7 +4,8 @@ import { useNeighborDetailsData } from '../../hooks/useNeighborsData';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 
 import {
-  Button, Card, CardBody, Chip,
+  Button, Card, CardBody, 
+  // Chip,
   Accordion, AccordionHeader, AccordionBody,
 } from '@material-tailwind/react';
 import { NeighborDebtsPayments } from '../../components/NeighborDebtsPayments';
@@ -92,12 +93,12 @@ export const NeighborDetails:React.FC<{neighborId:number|undefined; refetchNeigh
                       {data?.first_name} {data?.second_name} {data?.last_name}
                     </div>
                     <div className='flex items-center gap-2 mt-1'>
-                      <Chip
+                      {/* <Chip
                         size='sm'
                         value={data?.section || 'Sin sección'}
                         color='blue'
                         variant='ghost'
-                      />
+                      /> */}
                       <Typography variant='small' color='gray'>
                         CI: {data?.ci}
                       </Typography>
@@ -142,7 +143,7 @@ export const NeighborDetails:React.FC<{neighborId:number|undefined; refetchNeigh
                   />
                   <InfoField
                     label='Segundo Nombre'
-                    value={toUpdateDataNeighbor?.second_name}
+                    value={toUpdateDataNeighbor?.second_name||''}
                     isInput={edit}
                     onChange={handleFieldChange('second_name')}
                   />
@@ -179,11 +180,11 @@ export const NeighborDetails:React.FC<{neighborId:number|undefined; refetchNeigh
                     }
                     isInput={false}
                   />
-                  <InfoField
+                  {/* <InfoField
                     label='Sección'
                     value={data?.section}
                     isInput={false}
-                  />
+                  /> */}
                 </div>
               </AccordionBody>
             </Accordion>

@@ -55,7 +55,7 @@ const TopNavBar: React.FC<{pathName: string}> = ({ pathName }) => {
             <p className='flex gap-2 items-center text-sm font-bold cursor-pointer select-none'>
               <span className='flex gap-2 border rounded-xl p-2'>
                 <UserIcon className='w-5 h-5' />
-                {`${user?.first_name} ${user?.last_name}`}
+                {`${user?.first_name.toUpperCase()} ${user?.last_name.toUpperCase()}`}
               </span>
               <Button
                 onClick={handleLogout}
@@ -70,7 +70,7 @@ const TopNavBar: React.FC<{pathName: string}> = ({ pathName }) => {
           <div className='md:hidden flex gap-1'>
             <span className='flex gap-2 border rounded-xl p-2 text-xs items-center'>
               <UserIcon className='w-5 h-5' />
-              {`${user?.first_name} ${user?.last_name}`}
+              {`${user?.first_name.toUpperCase()} ${user?.last_name.toUpperCase()}`}
             </span>
 
             <button

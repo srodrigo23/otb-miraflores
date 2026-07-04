@@ -35,7 +35,7 @@ class NeighborCreate(BaseModel):
 
 class NeighborUpdate(BaseModel):
   first_name: str 
-  second_name: str
+  second_name: str | None=None
   last_name: str
   ci: int | None=None
   phone_number: int | None=None
@@ -54,12 +54,18 @@ class Neighbor(BaseModel):
   class Config:
     from_attributes = True
 
-class NeighborDetail(Neighbor):
-  birth_day:datetime | None= None
+class NeighborMeter(BaseModel):
+  id: int
+  meter_code:str
   section:str
   is_active:bool
-  created_at:datetime # date
-  updated_at:datetime # date
+
+class NeighborDetail(Neighbor):
+  birth_day:datetime | None= None
+  meters:list[NeighborMeter]
+  is_active:bool
+  # created_at:datetime # date
+  # updated_at:datetime # date
   
   model_config = ConfigDict(from_attributes=True)
 
