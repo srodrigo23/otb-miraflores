@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd service
+# cd service
 # source .venv/bin/activate
 
 

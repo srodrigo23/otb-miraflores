@@ -37,9 +37,9 @@ class NeighborUpdate(BaseModel):
   first_name: str 
   second_name: str
   last_name: str
-  ci: str | int
-  phone_number: str | int
-  email: str
+  ci: int | None=None
+  phone_number: int | None=None
+  email: str | None=None
 
 
 class Neighbor(BaseModel):

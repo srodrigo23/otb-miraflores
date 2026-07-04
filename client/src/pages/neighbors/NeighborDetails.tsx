@@ -1,5 +1,5 @@
 import { useState, useEffect, ChangeEvent } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useNeighborDetailsData } from '../../hooks/useNeighborsData';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 
@@ -15,7 +15,7 @@ import { XMarkIcon, PencilIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useUpdateNeighbor } from '../../hooks/useUpdateNeighbor';
 import { UpdateNeighborPayloadType } from '../../interfaces/neighborsInterfaces';
 
-function InfoField({ label, value, isInput, onChange }: { label: string; value?: string | number | undefined | readonly string[]; isInput: boolean; onChange?: (e: ChangeEvent<HTMLInputElement>) => void }) {
+function InfoField({ label, value, isInput, onChange }: { label: string; value?: number |string| undefined; isInput: boolean; onChange?: (e: ChangeEvent<HTMLInputElement>) => void }) {
   return (
     <div>
       <div className='font-semibold  text-gray-500'>{label}</div>
@@ -28,14 +28,13 @@ function InfoField({ label, value, isInput, onChange }: { label: string; value?:
   );
 }
 
-export default function NeighborDetails() {
+export const NeighborDetails:React.FC<{neighborId:number|undefined; refetchNeighbors:()=>void}>=({neighborId, refetchNeighbors}) =>{
+  
   const [openInfo, setOpenInfo] = useState(false);
   const [edit, setEdit] = useState<boolean>(false);
-
-  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
 
-  const { data, isLoading, error} = useNeighborDetailsData(id);
+  const { data, isLoading, error } = useNeighborDetailsData(neighborId);
   const [toUpdateDataNeighbor, setToUpdateDataNeighbor] = useState<UpdateNeighborPayloadType>();
 
   useEffect(() => {
@@ -45,16 +44,17 @@ export default function NeighborDetails() {
     }
   }, [data]);
 
-  const {update} = useUpdateNeighbor(id)
+  const {update} = useUpdateNeighbor(data?.id)
 
   const handleFieldChange = (field: keyof UpdateNeighborPayloadType) =>
     (e: ChangeEvent<HTMLInputElement>) => {
-      setToUpdateDataNeighbor(prev => prev ? { ...prev, [field]: e.target.value } : prev);
+      setToUpdateDataNeighbor(prev => prev ? { ...prev, [field]: e.target?.value || null } : prev);
     };
 
   const updateNeighborDetail = async () => {
     if (!toUpdateDataNeighbor) return;
     await update(toUpdateDataNeighbor);
+    refetchNeighbors();
     setEdit(false);
   };
 
@@ -154,17 +154,22 @@ export default function NeighborDetails() {
                   />
                   <InfoField
                     label='Cédula de Identidad'
-                    value={toUpdateDataNeighbor?.ci}
+                    value={toUpdateDataNeighbor?.ci||''}
                     isInput={edit}
                     onChange={handleFieldChange('ci')}
                   />
                   <InfoField
                     label='Teléfono'
-                    value={toUpdateDataNeighbor?.phone_number}
+                    value={toUpdateDataNeighbor?.phone_number||''}
                     isInput={edit}
                     onChange={handleFieldChange('phone_number')}
                   />
-                  <InfoField label='Email' value={toUpdateDataNeighbor?.email} isInput={edit} onChange={handleFieldChange('email')} />
+                  <InfoField 
+                    label='Email' 
+                    value={toUpdateDataNeighbor?.email||''} 
+                    isInput={edit} 
+                    onChange={handleFieldChange('email')} 
+                  />
                   <InfoField
                     label='Fecha de Nacimiento'
                     value={

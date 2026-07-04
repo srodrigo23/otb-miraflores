@@ -24,7 +24,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
   searchTerm,
   onSearchChange,
   neighborSelected,
-  // onSelectNeighbor,
+  onSelectNeighbor,
 }) => {
 
   const navigate = useNavigate()
@@ -39,9 +39,7 @@ export const NeighborList: React.FC<NeighborListProps> = ({
   return (
     <div className='h-full flex flex-col min-h-0 gap-4 '>
       <div className='flex justify-between'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-shrink-0'>
-          <Typography variant='h2'>Lista General de Vecinos</Typography>
-        </div>
+        
         <div className='flex gap-2 flex-shrink-0 justify-end'>
           <Input
             label='Buscar vecino'
@@ -83,7 +81,8 @@ export const NeighborList: React.FC<NeighborListProps> = ({
                   className='flex gap-3 bg-blue-gray-50 shadow-lg'
                   selected={neighborSelected?.id === neighbor.id}
                   onClick={() => {
-                    navigate(`/vecinos/${neighbor.id}`);
+                    navigate(`/vecinos?id=${neighbor.id}`);
+                    onSelectNeighbor(filteredData[index]);
                   }}
                 >
                   {/* <span className='border rounded-full '> */}

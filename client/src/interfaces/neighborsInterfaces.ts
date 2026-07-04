@@ -2,10 +2,11 @@ export interface NeighborType {
   id: number;
   first_name: string;
   second_name: string;
+
   last_name: string;
-  ci: string;
-  phone_number: string;
-  email: string;
+  ci: number|null;
+  phone_number: number|null;
+  email: string|null;
 }
 
 export interface NeighborWithDetailsType extends NeighborType{

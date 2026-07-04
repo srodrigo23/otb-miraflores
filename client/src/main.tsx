@@ -16,7 +16,8 @@ import ProtectedRoute from './components/shared/ProtectedRoute.tsx';
 
 import { Login } from './pages/login/Login.tsx';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import NeighborDetails from './pages/neighbors/NeighborDetails.tsx';
+// import NeighborDetails from './pages/neighbors/NeighborDetails.tsx';
+import NeighborsLayout from './layouts/NeighborsLayout.tsx';
 
 // import App from './App.tsx';
 
@@ -33,8 +34,12 @@ createRoot(document.getElementById('root')!).render(
             <Route element={<ProtectedRoute />}>
               <Route path='/' element={<Navigate to='vecinos' replace />} />
 
-              <Route path='/vecinos' element={<Neighbors />} />
-              <Route path='/vecinos/:id' element={<NeighborDetails />} />
+              <Route path='vecinos' element={<NeighborsLayout />}>
+                <Route index element={<Neighbors/>} />
+              </Route>
+
+              {/* <Route path='/vecinos/:id' element={<NeighborDetails />} /> */}
+
               <Route path='/mediciones' element={<Measures />} />
             </Route>
 

@@ -24,7 +24,7 @@ export const useNeighborsData = () => {
   return { data, isLoading, error, refetch }
 }
 
-export const useNeighborDetailsData = (neighborId:string|undefined)=>{
+export const useNeighborDetailsData = (neighborId:number|undefined)=>{
   const { data, isLoading, error, execute } = useFetchData<NeighborWithDetailsType>();
   const apiLinkNeightbor = `${apiLink}/neighbors/${neighborId}`
 

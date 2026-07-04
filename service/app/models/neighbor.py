@@ -13,11 +13,11 @@ class Neighbor(Base):
   second_name = Column(String(30), default="")
   last_name = Column(String(30))
 
-  ci = Column(Integer)
-  phone_number = Column(Integer)
-  email = Column(String(50))
+  ci = Column(Integer, nullable=True)
+  phone_number = Column(Integer, nullable=True)
+  email = Column(String(50), nullable=True)
   birth_day = Column(Date)
-  section = Column(String(50))
+  section = Column(String(50), nullable=True)
 
   is_active = Column(Boolean, default=True)  # Si el vecino está activo
   created_at = Column(DateTime, default=datetime.utcnow)

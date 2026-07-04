@@ -6,7 +6,7 @@ import useFetchData from './useFetchData';
 import { UpdateNeighborPayloadType } from '../interfaces/neighborsInterfaces';
 
 
-export const useUpdateNeighbor = (neighborId:string|undefined) => {
+export const useUpdateNeighbor = (neighborId:number|undefined) => {
 
   const { data, isLoading, error, execute } = useFetchData<NeighborType>();
   const apiLinkEditDataNeightbor = `${apiLink}/neighbors/${neighborId}`
@@ -14,6 +14,7 @@ export const useUpdateNeighbor = (neighborId:string|undefined) => {
   // const [error, setError] = useState<unknown>(null);
   // payload:UpdateNeighborPayload
   const update = async(payload:UpdateNeighborPayloadType)=> {
+    console.log(payload, 'payload')
     return execute(apiLinkEditDataNeightbor, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
