@@ -42,12 +42,28 @@ export const NeighborDetails: React.FC<{
     }
   }, [data]);
 
+  const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]*$/;
+  const digitsRegex = /^\d*$/;
+
+  const sanitize = (field: keyof UpdateNeighborPayloadType, raw: string) => {
+    if (['first_name', 'second_name', 'last_name'].includes(field)) {
+      return nameRegex.test(raw) ? raw : null;
+    }
+    if (['ci', 'phone_number'].includes(field)) {
+      return digitsRegex.test(raw) ? raw : null;
+    }
+    return raw;
+  };
+
   const handleFieldChange =
     (field: keyof UpdateNeighborPayloadType) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
+      const raw = e.target.value;
+      const sanitized = sanitize(field, raw);
+      if (sanitized === null) return;
       setToUpdateDataNeighbor((prev) =>
-        prev ? { ...prev, [field]: e.target?.value || null } : prev,
+        prev ? { ...prev, [field]: sanitized || null } : prev,
       );
     };
 
@@ -59,6 +75,25 @@ export const NeighborDetails: React.FC<{
     }
     if (!toUpdateDataNeighbor?.last_name?.trim()) {
       newErrors.last_name = 'El apellido es requerido';
+    }
+
+    if (toUpdateDataNeighbor?.first_name && !nameRegex.test(toUpdateDataNeighbor.first_name)) {
+      newErrors.first_name = 'Solo se permiten letras y espacios';
+    }
+    if (toUpdateDataNeighbor?.second_name && !nameRegex.test(toUpdateDataNeighbor.second_name)) {
+      newErrors.second_name = 'Solo se permiten letras y espacios';
+    }
+    if (toUpdateDataNeighbor?.last_name && !nameRegex.test(toUpdateDataNeighbor.last_name)) {
+      newErrors.last_name = 'Solo se permiten letras y espacios';
+    }
+
+    const ciStr = toUpdateDataNeighbor?.ci?.toString() ?? '';
+    if (ciStr && !digitsRegex.test(ciStr)) {
+      newErrors.ci = 'Solo se permiten números';
+    }
+    const phoneStr = toUpdateDataNeighbor?.phone_number?.toString() ?? '';
+    if (phoneStr && !digitsRegex.test(phoneStr)) {
+      newErrors.phone_number = 'Solo se permiten números';
     }
 
     setErrors(newErrors);
@@ -130,6 +165,7 @@ export const NeighborDetails: React.FC<{
                     value={toUpdateDataNeighbor?.second_name || ''}
                     isInput={edit}
                     onChange={handleFieldChange('second_name')}
+                    error={errors.second_name}
                   />
                   <InfoField
                     label='Apellido'
@@ -143,12 +179,14 @@ export const NeighborDetails: React.FC<{
                     value={toUpdateDataNeighbor?.ci || ''}
                     isInput={edit}
                     onChange={handleFieldChange('ci')}
+                    error={errors.ci}
                   />
                   <InfoField
                     label='Teléfono'
                     value={toUpdateDataNeighbor?.phone_number || ''}
                     isInput={edit}
                     onChange={handleFieldChange('phone_number')}
+                    error={errors.phone_number}
                   />
                   <InfoField
                     label='Email'
