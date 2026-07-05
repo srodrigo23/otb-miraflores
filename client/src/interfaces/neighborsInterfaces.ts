@@ -9,7 +9,14 @@ export interface NeighborType {
   email: string|null;
 }
 
+interface MetersI {
+  id:number;
+  meter_code: string,
+  section: string,
+  is_active: boolean
+}
 export interface NeighborWithDetailsType extends NeighborType{
+  meters:MetersI[]
   birth_day:string|null;
   created_at:string
   updated_at:string
