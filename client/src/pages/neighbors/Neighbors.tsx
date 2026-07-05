@@ -8,6 +8,7 @@ import { NeighborType } from '../../interfaces/neighborsInterfaces';
 import { NeighborDetails } from './NeighborDetails';
 
 
+
 const Neighbors = () => {
   const [ searchParams ] = useSearchParams();
   const neighborId = searchParams.get('id');

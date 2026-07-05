@@ -2,6 +2,8 @@ import { useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNeighborDetailsData } from '../../hooks/useNeighborsData';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
+import { toast } from 'react-toastify';
+
 
 import {
   Button, Card, CardBody, 
@@ -54,7 +56,15 @@ export const NeighborDetails:React.FC<{neighborId:number|undefined; refetchNeigh
 
   const updateNeighborDetail = async () => {
     if (!toUpdateDataNeighbor) return;
-    await update(toUpdateDataNeighbor);
+    await update(toUpdateDataNeighbor).then(
+      (data)=>{
+        if(data?.ok){
+          toast.success('Datos del vecino editados correctamente');
+        }else{
+          toast.error('A ocurrido un error al editar los datos');
+        }
+      }
+    );
     refetchNeighbors();
     setEdit(false);
   };

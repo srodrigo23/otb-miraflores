@@ -14,7 +14,6 @@ export const useUpdateNeighbor = (neighborId:number|undefined) => {
   // const [error, setError] = useState<unknown>(null);
   // payload:UpdateNeighborPayload
   const update = async(payload:UpdateNeighborPayloadType)=> {
-    console.log(payload, 'payload')
     return execute(apiLinkEditDataNeightbor, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
