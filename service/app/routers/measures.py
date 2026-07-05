@@ -6,6 +6,8 @@ from ..schemas import schema as schemas
 from ..services import crud
 from ..db.database import get_db
 
+import app.services.measures as measures_service
+
 router = APIRouter(
   prefix="/measures", 
   tags=['Measures'], 
@@ -17,26 +19,25 @@ def read_measures(db: Session = Depends(get_db)):
   """
   Obtiene todas las mediciones ordenadas por fecha de creación
   """
-  measures = crud.get_measures(db)
-
+  measures = measures_service.get_measures(db=db)
   # Convertir las fechas a string para la respuesta
-  measures_data = []
-  for measure in measures:
-    measures_data.append({
-      "id": measure.id,
-      "measure_date": str(measure.measure_date),
-      "period": measure.period,
-      "reader_name": measure.reader_name,
-      "status": measure.status,
-      "total_meters": measure.total_meters,
-      "meters_read": measure.meters_read,
-      "meters_pending": measure.meters_pending,
-      "notes": measure.notes,
-      "created_at": str(measure.created_at),
-      "updated_at": str(measure.updated_at)
-    })
-
-  return measures_data
+  # measures_data = []
+  # for measure in measures:
+  #   measures_data.append({
+  #     "id": measure.id,
+  #     "measure_date": str(measure.measure_date),
+  #     "period": measure.period,
+  #     "reader_name": measure.reader_name,
+  #     "status": measure.status,
+  #     "total_meters": measure.total_meters,
+  #     "meters_read": measure.meters_read,
+  #     "meters_pending": measure.meters_pending,
+  #     "notes": measure.notes,
+  #     "created_at": str(measure.created_at),
+  #     "updated_at": str(measure.updated_at)
+  #   })
+  # return measures_data
+  return measures
 
 
 @router.get("/{measure_id}", response_model=schemas.Measure)

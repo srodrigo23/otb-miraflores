@@ -23,4 +23,4 @@ class NeighborMeter(Base):
 
   # Relaciones
   neighbor = relationship("Neighbor", back_populates="meters")
-  # readings = relationship("MeterReading", back_populates="meter", cascade="all, delete-orphan")
+  readings = relationship("MeterReading", back_populates="meter", cascade="all, delete-orphan")

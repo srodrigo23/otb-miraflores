@@ -11,9 +11,9 @@
 # from .collect_debt import CollectDebt
 # from .debt_item import DebtItem
 # from .debt_type import DebtType
-# from .measure import Measure
+from .measure import Measure
 # from .meet import Meet
-# from .meter_reading import MeterReading
+from .meter_reading import MeterReading
 from .neighbor_meter import NeighborMeter
 from .neighbor import Neighbor
 from .user import User
