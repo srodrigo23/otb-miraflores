@@ -7,10 +7,11 @@ const EditNeighborDataControls: React.FC<{
   edit: boolean;
   setEdit: (el: boolean) => void;
   updateNeighborDetail: () => void;
-}> = ({ edit, setEdit, updateNeighborDetail }) => {
+  onCancel?: () => void;
+}> = ({ edit, setEdit, updateNeighborDetail, onCancel }) => {
   return (
-    <div className='flex justify-between pb-3 px-6'>
-      <Typography variant='h4'>Datos personales</Typography>
+    <div className='flex justify-between pb-3 px-4 lg:px-6'>
+      <Typography variant='h5' className='text-lg lg:text-xl'>Datos personales</Typography>
       {!edit ? (
         <IconButton
           size='sm'
@@ -26,7 +27,7 @@ const EditNeighborDataControls: React.FC<{
             size='sm'
             variant='filled'
             color='red'
-            onClick={() => setEdit(false)}
+            onClick={() => onCancel?.()}
           >
             <XMarkIcon className='h-5 w-5' />
           </IconButton>
