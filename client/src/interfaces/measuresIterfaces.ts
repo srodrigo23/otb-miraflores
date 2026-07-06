@@ -2,8 +2,9 @@ export interface MeasureType {
   id: number;
   measure_date: string;
   period: string;
-  reader_name: string | null;
+  reader_name: string;
   status: string;
+  notes:string | null;
 
   // total_meters: number;
   // meters_read: number;

@@ -3,7 +3,7 @@ import { MeasureType } from "../interfaces/measuresIterfaces";
 export type MeasureTableProps = {
   tableData: MeasureType[];
   // onEdit?: (measure: MeasureType) => void;
-  // onDelete?: (measure: MeasureType) => void;
+  onDelete: (measure: MeasureType) => void;
   // onCreate?: (data: any) => void;
   // onView?: (measure: MeasureType) => void;
   // onViewReadings?: (measure: MeasureType) => void;
@@ -16,7 +16,7 @@ export type InputsNewMeasureForm = {
   measure_date: string;
   period: string;
   reader_name: string;
-  notes: string;
+  notes: string|null;
 };
 
 export type NewMeasureModalFormType = {

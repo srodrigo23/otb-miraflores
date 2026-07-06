@@ -125,7 +125,7 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
                   onChange={(val) => onChange(val || '')}
                   error={!!errors.period}
                 >
-                  {periods.map((period, index) => (
+                  {periods.map((period) => (
                     <Option key={period} value={period}>
                       {period}
                     </Option>

@@ -20,6 +20,9 @@ import { useMeasuresData } from '../../hooks/measures/useMeasuresData';
 import useNewMeasure from '../../hooks/measures/useNewMeasure';
 import MeasureTable from '../../components/tables/MeasureTable';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
+import { MeasureType } from '../../interfaces/measuresIterfaces';
+import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
+import useDeleteMeasure from '../../hooks/measures/useDeleteMeasure';
 
 const Measures = () => {
   const {
@@ -35,6 +38,18 @@ const Measures = () => {
     createNewMeasure,
     isLoading: loadingMeasureCreated,
   } = useNewMeasure();
+
+  const {deleteMeasure} = useDeleteMeasure()
+
+  const handlerDelete = async (measure:MeasureType) =>{
+    await deleteMeasure(measure)
+    refetchMeasures()
+  }
+
+  const handlerNewMeasure = async (data: InputsNewMeasureForm) => {
+    await createNewMeasure(data);
+    refetchMeasures();
+  };
 
   return (
     <>
@@ -146,18 +161,14 @@ const Measures = () => {
         {loadingMeasuresData ? (
           <LoaderAnimation />
         ) : (
-          <MeasureTable tableData={measuresData} />
+          <MeasureTable tableData={measuresData} onDelete={handlerDelete} />
         )}
       </div>
 
       <NewMeasureModalForm
         openModalState={openNewMeasureModal}
         handleCloseModal={handleOpenModal}
-        onSubmit={(data) => {
-          createNewMeasure(data).then(() => {
-            refetchMeasures();
-          });
-        }}
+        onSubmit={handlerNewMeasure}
       />
     </>
   );

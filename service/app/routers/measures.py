@@ -99,7 +99,7 @@ def delete_measure(measure_id: int, db: Session = Depends(get_db)):
   """
   Elimina una medición
   """
-  success = crud.delete_measure(db, measure_id=measure_id)
+  success = measures_service.delete_measure(db, measure_id=measure_id)
   if not success:
     raise HTTPException(status_code=404, detail="Measure not found")
   return {"message": "Measure deleted successfully", "id": measure_id}

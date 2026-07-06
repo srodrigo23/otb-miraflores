@@ -10,7 +10,7 @@ const useNewMeasure = () => {
   const apiLinkNewMeasure = `${apiLink}/measures`
 
   const createNewMeasure = async (payload:InputsNewMeasureForm) => {
-    execute(apiLinkNewMeasure, {
+    await execute(apiLinkNewMeasure, {
       method:'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

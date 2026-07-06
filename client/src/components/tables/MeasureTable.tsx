@@ -9,13 +9,15 @@ import {
   ChevronUpDownIcon,
   // PencilIcon,
   // TrashIcon,
-  // EyeIcon,
+  EyeIcon,
   // DocumentMagnifyingGlassIcon,
-  CurrencyDollarIcon,
-  XCircleIcon,
+  // CurrencyDollarIcon,
+  // XCircleIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 
 import { MeasureTableProps } from '../../types/MeasuresTypes';
+import { redirect } from 'react-router-dom';
 
 type SortField = 'id' | 'measure_date' | 'period' | 'reader_name' | 'status' | 'created_at';
 type SortOrder = 'asc' | 'desc';
@@ -26,8 +28,6 @@ const TABLE_HEAD = [
   { label: 'Fecha de Medición', field: 'measure_date' as SortField, sortable: true },
   { label: 'Responsable', field: 'reader_name' as SortField, sortable: false },
   { label: 'Estado', field: 'status' as SortField, sortable: false},
-  // { label: 'Núm. de Medidores', field: null, sortable: false },
-  // { label: 'Fecha Creación', field: 'created_at' as SortField, sortable: true },
   { label: 'Acciones', field: null, sortable: false },
 ];
 
@@ -44,9 +44,9 @@ const STATUS_LABELS: { [key: string]: string } = {
 };
 
 const MeasureTable: React.FC<MeasureTableProps> = ({
-  tableData,
+  tableData,  
   // onEdit,
-  // onDelete,
+  onDelete,
   // onCreate,
   // onView,
   // onViewReadings,
@@ -134,7 +134,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((measure, index) => {
+            {sortedData.map((measure) => {
               // const isLast = index === sortedData.length - 1;
               const classes = 'p-3 border border-blue-gray-50 py-1';
               
@@ -186,70 +186,21 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                       />
                     </div>
                   </td>
-                  
-                  
+
                   <td className={classes}>
                     <div className='flex justify-center gap-2'>
                       {
-                      // onGenerateDebts && 
-                      (
-                        <IconButton
-                          size='sm'
-                          variant='text'
-                          color='green'
-                          // onClick={() => onGenerateDebts(measure)}
-                          title='Generar deudas'
-                        >
-                          <CurrencyDollarIcon className='h-4 w-4' />
-                        </IconButton>
-                      )}
-                      {
-                      // onDeleteDebts && 
-                      (
-                        <IconButton
-                          size='sm'
-                          variant='text'
-                          color='orange'
-                          // onClick={() => onDeleteDebts(measure)}
-                          title='Eliminar deudas'
-                        >
-                          <XCircleIcon className='h-4 w-4' />
-                        </IconButton>
-                      )}
-                      {/* {onViewReadings && (
-                        <IconButton
-                          size='sm'
-                          variant='text'
-                          color='purple'
-                          onClick={() => onViewReadings(measure)}
-                          title='Ver lecturas'
-                        >
-                          <DocumentMagnifyingGlassIcon className='h-4 w-4' />
-                        </IconButton>
-                      )} */}
-                      {/* {onView && (
                         <IconButton
                           size='sm'
                           variant='text'
                           color='blue'
-                          onClick={() => onView(measure)}
+                          onClick={() => redirect('')}
                           title='Ver detalles'
                         >
                           <EyeIcon className='h-4 w-4' />
                         </IconButton>
-                      )} */}
-                      {/* {onEdit && (
-                        <IconButton
-                          size='sm'
-                          variant='text'
-                          color='blue'
-                          onClick={() => onEdit(measure)}
-                          title='Editar'
-                        >
-                          <PencilIcon className='h-4 w-4 text-black' />
-                        </IconButton>
-                      )} */}
-                      {/* {onDelete && (
+                      }
+                      { (
                         <IconButton
                           size='sm'
                           variant='text'
@@ -259,7 +210,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                         >
                           <TrashIcon className='h-4 w-4' />
                         </IconButton>
-                      )} */}
+                      )}
                     </div>
                   </td>
                 </tr>
