@@ -14,7 +14,7 @@ from app.core.settings import settings
 import bcrypt
 
 # here url database
-engine=sqlalchemy.create_engine(settings.DB_URL_SUPABASE)
+engine=sqlalchemy.create_engine(settings.DB_URL_SQLITE)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 

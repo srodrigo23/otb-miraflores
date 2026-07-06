@@ -5,7 +5,7 @@ from datetime import datetime
 from app.db.database import Base
 
 class MeterReading(Base):
-  """Lecturas individuales de medidores en una medición"""
+  
   __tablename__ = "meter_readings"
 
   id = Column(Integer, primary_key=True, index=True)

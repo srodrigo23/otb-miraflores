@@ -1,13 +1,9 @@
 from sqlalchemy.orm import Session
 from app.models.measure import Measure
-
+from app.enums import MeasureType
 from app.schemas.schema import MeasureCreate, MeasureUpdate
 
-# ========== MEDICIONES ==========
 def get_measures(db: Session):
-  """
-  Obtiene todas las mediciones ordenadas por fecha de creación (más recientes primero)
-  """
   return db.query(Measure).order_by(Measure.created_at.desc()).all()
 
 def get_measure(db: Session, measure_id: int):
@@ -26,7 +22,7 @@ def create_measure(db: Session, measure: MeasureCreate):
     period=measure.period,
     reader_name=measure.reader_name,
     notes=measure.notes,
-    status="in_progress",
+    status=MeasureType.CREATED,
   )
   db.add(db_measure)
   db.commit()

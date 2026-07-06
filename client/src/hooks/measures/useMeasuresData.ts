@@ -14,5 +14,11 @@ export const useMeasuresData = () => {
     });
   }, []);
 
-  return { data, isLoading, error }
+  const refetchMeasures = async ()=>{
+    await execute(apiMeasures, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return { data, isLoading, error, refetchMeasures }
 }

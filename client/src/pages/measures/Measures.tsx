@@ -1,242 +1,162 @@
-import { CSSProperties, useState, useEffect } from 'react';
-import MeasureReadingsTable from '../../components/tables/MeasureReadingsTable';
-import { ClipLoader } from 'react-spinners';
+import { useState } from 'react';
+
 import NewMeasureModalForm from '../../components/forms/NewMeasureModalForm';
 
-import { Typography, Button, Select, Option } from '@material-tailwind/react';
+import {
+  Button,
+  Card,
+  CardBody,
+  Typography,
+} from '@material-tailwind/react';
 
-import { MeasureType } from '../../interfaces/measuresIterfaces';
+import {
+  ClipboardDocumentListIcon,
+  CheckCircleIcon,
+  ArrowPathIcon,
+  LockClosedIcon,
+} from '@heroicons/react/24/outline';
 
 import { useMeasuresData } from '../../hooks/measures/useMeasuresData';
-import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
 import useNewMeasure from '../../hooks/measures/useNewMeasure';
-
-const override: CSSProperties = {
-  display: 'block',
-  margin: '0 auto',
-  borderColor: 'yellow',
-};
+import MeasureTable from '../../components/tables/MeasureTable';
+import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 
 const Measures = () => {
-  const { data: measuresData = [], isLoading: loadingMeasuresData } =
-    useMeasuresData();
-  const [selectedMeasure, setSelectedMeasure] = useState<MeasureType | null>(
-    null,
-  );
+  const {
+    data: measuresData = [],
+    isLoading: loadingMeasuresData,
+    refetchMeasures,
+  } = useMeasuresData();
 
   const [openNewMeasureModal, setOpenNewMeasureModal] = useState(false);
   const handleOpenModal = () => setOpenNewMeasureModal(!openNewMeasureModal);
 
-  const { createNewMeasure, isLoading, data, error } = useNewMeasure();
-
-  // const fetchReadings = async () => {
-  //   if (!measure) return;
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(`${apiLink}/${measure.id}/meter-readings`);
-  //     const data = await response.json();
-  //     // setReadings(data);
-  //   } catch (error) {
-  //     console.error('Error al cargar lecturas:', error);
-  //     toast.error('Error al cargar las lecturas de medidores');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (measuresData.length > 0) {
-  //     setSelectedMeasure(measuresData[0]);
-  //   }
-  // }, [measuresData]);
-
-  const handleCreateMeasure = (formData: InputsNewMeasureForm) => {
-
-    console.log(formData)
-    createNewMeasure(formData);
-
-    // fetch(apiLink, {
-    //   method: 'POST',
-
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     measure_date: formData.measureDate,
-    //     period: formData.period,
-    //     reader_name: formData.readerName,
-    //     notes: formData.notes,
-    //   }),
-    // })
-    //   .then((response) => response.json())
-    //   .then(() => {
-    //     // fetchMeasures();
-    //     // toast.success('Medición creada exitosamente');
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error al crear medición:', error);
-    //     // toast.error('Error al crear la medición');
-    //   });
-  };
-
-  // Handler para eliminar
-  // const handleDeleteMeasure = (measure: MeasureType) => {
-  //   if (window.confirm(`¿Está seguro de eliminar la medición del ${measure.measure_date}?`)) {
-  //     fetch(`${apiLink}/${measure.id}`, {
-  //       method: 'DELETE',
-  //     })
-  //       .then(() => {
-  //         fetchMeasures();
-  //         toast.success('Medición eliminada exitosamente');
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error al eliminar medición:', error);
-  //         toast.error('Error al eliminar la medición');
-  //       });
-  //   }
-  // };
-
-  // Handler para ver lecturas
-  // const handleViewReadings = (measure: MeasureType) => {
-  //   setSelectedMeasure(measure);
-  //   setOpenReadingsModal(true);
-  // };
-
-  // // Handler para cerrar modal de lecturas
-  // const handleCloseReadingsModal = () => {
-  //   setOpenReadingsModal(false);
-  //   setSelectedMeasure(null);
-  // };
-
-  // // Handler para generar deudas
-  // const handleGenerateDebts = async (measure: MeasureType) => {
-  //   if (!window.confirm(`¿Está seguro de generar deudas para la medición del ${measure.measure_date}?`)) {
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch(`http://127.0.0.1:8000/measures/${measure.id}/generate-debts`, {
-  //       method: 'POST',
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       toast.success(
-  //         `Deudas generadas exitosamente: ${data.debts_created} creadas, ${data.debts_skipped} omitidas`
-  //       );
-  //     } else {
-  //       toast.error(data.detail || 'Error al generar deudas');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al generar deudas:', error);
-  //     toast.error('Error al generar deudas');
-  //   }
-  // };
-
-  // // Handler para eliminar deudas
-  // const handleDeleteDebts = async (measure: MeasureType) => {
-  //   if (!window.confirm(`¿Está seguro de eliminar las deudas pendientes de la medición del ${measure.measure_date}?\nSolo se eliminarán las deudas que no hayan sido pagadas.`)) {
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await fetch(`http://127.0.0.1:8000/measures/${measure.id}/debts`, {
-  //       method: 'DELETE',
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (response.ok) {
-  //       toast.success(
-  //         `Deudas eliminadas exitosamente: ${data.debts_deleted} deudas pendientes eliminadas`
-  //       );
-  //     } else {
-  //       toast.error(data.detail || 'Error al eliminar deudas');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al eliminar deudas:', error);
-  //     toast.error('Error al eliminar deudas');
-  //   }
-  // };
-
-  const getMeasureByPeriod = (period: string = '') => {
-    return measuresData.filter((measure) => measure.period === period)[0];
-  };
+  const {
+    createNewMeasure,
+    isLoading: loadingMeasureCreated,
+  } = useNewMeasure();
 
   return (
     <>
-      {loadingMeasuresData ? (
-        <div className='flex justify-center items-center py-20'>
-          <ClipLoader
-            loading={loadingMeasuresData}
-            cssOverride={override}
-            size={150}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
-        </div>
-      ) : (
-        <div className='mx-auto container w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
-          <div className='flex justify-between py-3 flex-shrink-0'>
-            <Typography className='text-center mb-2' variant='h3' color='black'>
-              Mediciones
-            </Typography>
-
-            <div className='flex gap-2 items-center'>
-              {measuresData.length > 0 ? (
-                <Select
-                  label='Seleccionar medición'
-                  value={selectedMeasure?.period}
-                  onChange={(val) => {
-                    const measureToChange = getMeasureByPeriod(val);
-                    if (measureToChange) {
-                      setSelectedMeasure(measureToChange);
-                    }
-                  }}
-                >
-                  {measuresData?.map((el, index) => (
-                    <Option key={index} value={el.period}>
-                      {el.period}
-                    </Option>
-                  ))}
-                </Select>
-              ) : (
-                <></>
-                // <Typography
-                //   className='text-center h-fit mr-5 text-xl font-bold'
-                //   // variant='h5'
-                //   color='red'
-                // >
-                //   No hay mediciones
-                // </Typography>
-              )}
-              <Button className='w-60' onClick={handleOpenModal}>
-                NUEVA MEDICIÓN
-              </Button>
-            </div>
+      <div className='mx-auto container w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
+        <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>
+          <div className='grid grid-cols-2 lg:grid-cols-4 gap-3'>
+            <Card className='shadow-sm'>
+              <CardBody className='p-3 lg:p-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='p-2 rounded-lg bg-blue-gray-50'>
+                    <ClipboardDocumentListIcon className='w-5 h-5 lg:w-6 lg:h-6 text-blue-gray-700' />
+                  </div>
+                  <div>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-medium leading-tight'
+                    >
+                      Total
+                    </Typography>
+                    <Typography variant='h4' color='blue-gray'>
+                      {measuresData.length}
+                    </Typography>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+            <Card className='shadow-sm'>
+              <CardBody className='p-3 lg:p-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='p-2 rounded-lg bg-green-50'>
+                    <CheckCircleIcon className='w-5 h-5 lg:w-6 lg:h-6 text-green-700' />
+                  </div>
+                  <div>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-medium leading-tight'
+                    >
+                      Creadas
+                    </Typography>
+                    <Typography variant='h4' color='green'>
+                      {
+                        measuresData.filter((el) => el.status === 'CREATED')
+                          .length
+                      }
+                    </Typography>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+            <Card className='shadow-sm'>
+              <CardBody className='p-3 lg:p-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='p-2 rounded-lg bg-blue-50'>
+                    <ArrowPathIcon className='w-5 h-5 lg:w-6 lg:h-6 text-blue-700' />
+                  </div>
+                  <div>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-medium leading-tight'
+                    >
+                      En Progreso
+                    </Typography>
+                    <Typography variant='h4' color='blue'>
+                      {
+                        measuresData.filter((el) => el.status === 'IN_PROGRESS')
+                          .length
+                      }
+                    </Typography>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+            <Card className='shadow-sm'>
+              <CardBody className='p-3 lg:p-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='p-2 rounded-lg bg-red-50'>
+                    <LockClosedIcon className='w-5 h-5 lg:w-6 lg:h-6 text-red-700' />
+                  </div>
+                  <div>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-medium leading-tight'
+                    >
+                      Cerradas
+                    </Typography>
+                    <Typography variant='h4' color='red'>
+                      {
+                        measuresData.filter((el) => el.status === 'CLOSED')
+                          .length
+                      }
+                    </Typography>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
           </div>
+          <Button
+            className='w-60 h-fit'
+            onClick={handleOpenModal}
+            disabled={loadingMeasuresData && loadingMeasureCreated}
+          >
+            NUEVA MEDICIÓN
+          </Button>
         </div>
-      )}
-      {!selectedMeasure ? (
-        <div className='flex justify-center items-center py-20'>
-          <ClipLoader
-            loading={loadingMeasuresData}
-            cssOverride={override}
-            size={150}
-            aria-label='Loading Spinner'
-            data-testid='loader'
-          />
-        </div>
-      ) : (
-        <MeasureReadingsTable measure={selectedMeasure} />
-      )}
+        {loadingMeasuresData ? (
+          <LoaderAnimation />
+        ) : (
+          <MeasureTable tableData={measuresData} />
+        )}
+      </div>
 
       <NewMeasureModalForm
         openModalState={openNewMeasureModal}
         handleCloseModal={handleOpenModal}
         onSubmit={(data) => {
-          handleCreateMeasure(data);
+          createNewMeasure(data).then(() => {
+            refetchMeasures();
+          });
         }}
       />
     </>

@@ -17,7 +17,7 @@ router = APIRouter(
 @router.get("")
 def read_measures(db: Session = Depends(get_db)):
   """
-  Obtiene todas las mediciones ordenadas por fecha de creación
+  Get all meassures sorted by creation date
   """
   measures = measures_service.get_measures(db=db)
   return measures
@@ -47,9 +47,7 @@ def read_measure(measure_id: int, db: Session = Depends(get_db)):
   }
 
 
-@router.post("", 
-            #  response_model=schemas.Measure
-             )
+@router.post("", response_model=schemas.Measure)
 def create_measure(measure: schemas.MeasureCreate, db: Session = Depends(get_db)):
   """
   Crea una nueva medición

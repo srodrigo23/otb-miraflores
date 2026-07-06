@@ -4,7 +4,7 @@ import { apiLink } from "../../config";
 import { toast } from 'react-toastify';
 import { InputsNewMeasureForm } from "../../types/MeasuresTypes";
 
-const useNewMeasure =()=> {
+const useNewMeasure = () => {
   
   const {data, isLoading, error, execute} = useFetchData<MeasureType>();
   const apiLinkNewMeasure = `${apiLink}/measures`
@@ -16,7 +16,10 @@ const useNewMeasure =()=> {
       body: JSON.stringify(payload),
     }).then(
       (data)=>{
-        if(data?.ok) toast.success('Exitoso')
+        if(data?.ok) {
+          toast.success('Exitoso')
+          return true;
+        }
       }
     )
   }
