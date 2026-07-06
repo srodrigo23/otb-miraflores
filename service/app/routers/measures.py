@@ -1,10 +1,10 @@
 # ========== MEDICIONES ==========
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
-from .. import models
-from ..schemas import schema as schemas
-from ..services import crud
-from ..db.database import get_db
+from app import models
+from app.schemas import schema as schemas
+from app.services import crud
+from app.db.database import get_db
 
 import app.services.measures as measures_service
 
@@ -20,23 +20,6 @@ def read_measures(db: Session = Depends(get_db)):
   Obtiene todas las mediciones ordenadas por fecha de creación
   """
   measures = measures_service.get_measures(db=db)
-  # Convertir las fechas a string para la respuesta
-  # measures_data = []
-  # for measure in measures:
-  #   measures_data.append({
-  #     "id": measure.id,
-  #     "measure_date": str(measure.measure_date),
-  #     "period": measure.period,
-  #     "reader_name": measure.reader_name,
-  #     "status": measure.status,
-  #     "total_meters": measure.total_meters,
-  #     "meters_read": measure.meters_read,
-  #     "meters_pending": measure.meters_pending,
-  #     "notes": measure.notes,
-  #     "created_at": str(measure.created_at),
-  #     "updated_at": str(measure.updated_at)
-  #   })
-  # return measures_data
   return measures
 
 
@@ -64,26 +47,29 @@ def read_measure(measure_id: int, db: Session = Depends(get_db)):
   }
 
 
-@router.post("", response_model=schemas.Measure)
+@router.post("", 
+            #  response_model=schemas.Measure
+             )
 def create_measure(measure: schemas.MeasureCreate, db: Session = Depends(get_db)):
   """
   Crea una nueva medición
   """
-  db_measure = crud.create_measure(db=db, measure=measure)
+  db_measure = measures_service.create_measure(db=db, measure=measure)
 
-  return {
-    "id": db_measure.id,
-    "measure_date": str(db_measure.measure_date),
-    "period": db_measure.period,
-    "reader_name": db_measure.reader_name,
-    "status": db_measure.status,
-    "total_meters": db_measure.total_meters,
-    "meters_read": db_measure.meters_read,
-    "meters_pending": db_measure.meters_pending,
-    "notes": db_measure.notes,
-    "created_at": str(db_measure.created_at),
-    "updated_at": str(db_measure.updated_at)
-  }
+  return db_measure
+  # return {
+  #   "id": db_measure.id,
+  #   "measure_date": str(db_measure.measure_date),
+  #   "period": db_measure.period,
+  #   "reader_name": db_measure.reader_name,
+  #   "status": db_measure.status,
+  #   "total_meters": db_measure.total_meters,
+  #   "meters_read": db_measure.meters_read,
+  #   "meters_pending": db_measure.meters_pending,
+  #   "notes": db_measure.notes,
+  #   "created_at": str(db_measure.created_at),
+  #   "updated_at": str(db_measure.updated_at)
+  # }
 
 
 @router.put("/{measure_id}", response_model=schemas.Measure)

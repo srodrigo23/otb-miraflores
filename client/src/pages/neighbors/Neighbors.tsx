@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useSearchParams } from 'react-router-dom';
-import { useNeighborsData } from '../../hooks/useNeighborsData';
+import { useNeighborsData } from '../../hooks/neighbors/useNeighborsData';
 import { NeighborList } from '../../components/neighbors/NeighborsList';
 import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 import { NeighborType } from '../../interfaces/neighborsInterfaces';

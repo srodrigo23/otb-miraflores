@@ -1,9 +1,9 @@
 // import { useState } from 'react';
-import { apiLink } from '../config';
-import { NeighborType } from '../interfaces/neighborsInterfaces';
+import { apiLink } from '../../config';
+import { NeighborType } from '../../interfaces/neighborsInterfaces';
 
-import useFetchData from './useFetchData';
-import { UpdateNeighborPayloadType } from '../interfaces/neighborsInterfaces';
+import useFetchData from '../useFetchData';
+import { UpdateNeighborPayloadType } from '../../interfaces/neighborsInterfaces';
 
 
 export const useUpdateNeighbor = (neighborId:number|undefined) => {

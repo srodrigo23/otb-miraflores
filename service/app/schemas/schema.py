@@ -135,10 +135,8 @@ class MeasureBase(BaseModel):
   reader_name: str | None = None
   notes: str | None = None
 
-
 class MeasureCreate(MeasureBase):
   pass
-
 
 class MeasureUpdate(BaseModel):
   measure_date: str | None = None
@@ -157,13 +155,9 @@ class Measure(BaseModel):
   period: str | None = None
   reader_name: str | None = None
   status: str
-  total_meters: int
-  meters_read: int
-  meters_pending: int
   notes: str | None = None
   created_at: str
   updated_at: str
-
   class Config:
     from_attributes = True
 

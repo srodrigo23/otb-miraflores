@@ -1,8 +1,7 @@
-
 import {
   Typography,
-  // Button, 
-  Chip
+  // Button,
+  Chip,
 } from '@material-tailwind/react';
 import { ClipLoader } from 'react-spinners';
 
@@ -33,7 +32,7 @@ import {
   MeasureType,
   MeterReadingType,
 } from '../../interfaces/measuresIterfaces';
-import { useMeasureReadings } from '../../hooks/useMeasureReadings';
+import { useMeasureReadings } from '../../hooks/measures/useMeasureReadings';
 
 const STATUS_COLORS: { [key: string]: color } = {
   normal: 'green',
@@ -49,9 +48,12 @@ const STATUS_LABELS: { [key: string]: string } = {
   meter_error: 'Error Medidor',
 };
 
-const MeasureReadingsTable: React.FC<{measure:MeasureType|null}> = ({ measure }) => {
-  
-  const { data:readings = [], isLoading:loading } = useMeasureReadings(measure?.id || 0);
+const MeasureReadingsTable: React.FC<{ measure: MeasureType | null }> = ({
+  measure,
+}) => {
+  const { data: readings = [], isLoading: loading } = useMeasureReadings(
+    measure?.id || 0,
+  );
 
   const getFullName = (reading: MeterReadingType) => {
     return `${reading.neighbor_last_name || ''} ${reading.neighbor_first_name || ''} ${reading.neighbor_second_name || ''}`.trim();
@@ -256,7 +258,7 @@ const MeasureReadingsTable: React.FC<{measure:MeasureType|null}> = ({ measure })
                               color='blue-gray'
                               className='font-normal'
                             >
-                              {index+1}
+                              {index + 1}
                             </Typography>
                           </td>
                           <td className={classes}>

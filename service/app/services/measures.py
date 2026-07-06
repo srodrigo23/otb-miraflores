@@ -21,18 +21,12 @@ def create_measure(db: Session, measure: MeasureCreate):
   Crea una nueva medición
   """
   from datetime import datetime
-  # Convertir la fecha de string a objeto Date
-  measure_date = datetime.strptime(measure.measure_date, "%Y-%m-%d").date()
-
   db_measure = Measure(
-    measure_date=measure_date,
+    measure_date=datetime.strptime(measure.measure_date, "%Y-%m-%d").date(),
     period=measure.period,
     reader_name=measure.reader_name,
     notes=measure.notes,
     status="in_progress",
-    total_meters=0,
-    meters_read=0,
-    meters_pending=0
   )
   db.add(db_measure)
   db.commit()

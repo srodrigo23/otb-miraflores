@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import useFetchData from "./useFetchData"
-import { MeasureType } from "../interfaces/measuresIterfaces"
-import { apiLink } from '../config';
+import useFetchData from "../useFetchData"
+import { MeasureType } from "../../interfaces/measuresIterfaces"
+import { apiLink } from '../../config';
 
 export const useMeasuresData = () => {
 

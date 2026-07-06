@@ -1,7 +1,7 @@
 import { useEffect } from "react"
-import useFetchData from "./useFetchData"
-import { apiLink } from "../config"
-import { NeighborType, NeighborWithDetailsType } from "../interfaces/neighborsInterfaces"
+import useFetchData from "../useFetchData"
+import { apiLink } from "../../config"
+import { NeighborType, NeighborWithDetailsType } from "../../interfaces/neighborsInterfaces"
 import { toast } from 'react-toastify';
 
 export const useNeighborsData = () => {

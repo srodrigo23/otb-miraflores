@@ -10,22 +10,11 @@ import {
   Select, Option, Typography
 } from '@material-tailwind/react';
 
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { getTodayDate } from '../../utils/dates';
-// import useFormNewMeasure from '../../hooks/useFormNewMeasure';
-
-type InputsNewMeasureForm = {
-  measureDate: string;
-  period: string;
-  readerName: string;
-  notes: string;
-};
-
-type NewMeasureModalFormType = {
-  openModalState: boolean;
-  handleCloseModal: () => void;
-  onSubmit: (data: InputsNewMeasureForm) => void;
-};
+import { useAuth } from '../../context/AuthContext';
+import { NewMeasureModalFormType } from '../../types/MeasuresTypes';
+import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
 
 const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
   openModalState,
@@ -36,10 +25,13 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<InputsNewMeasureForm>();
 
-  const periods = ["ENERO-FEBRERO", "MARZO-ABRIL", "MAYO-JUNIO", "JULIO-AGOSTO", "SEPTIEMBRE-OCTUBRE", "NOVIEMBRE-DICIEMBRE"]  
+  const {user} = useAuth()
+
+  const periods = ["ENERO-FEBRERO", "MARZO-ABRIL", "MAYO-JUNIO", "JULIO-AGOSTO", "SEPTIEMBRE-OCTUBRE", "NOVIEMBRE-DICIEMBRE"]
   const [selectedDate, setSelectedDate] = useState<string>(getTodayDate())
   const [selectedPeriod, setSelectedPeriod] = useState<number>(0)
 
@@ -77,7 +69,9 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
             <Typography variant='h3' color='black'>
               Nueva Medición
             </Typography>
-            <Typography color='black'>Gestión - {new Date().getFullYear()}</Typography>
+            <Typography color='black'>
+              Gestión - {new Date().getFullYear()}
+            </Typography>
           </DialogHeader>
           <div className='flex flex-col sm:flex-row  gap-3'>
             <Input
@@ -85,47 +79,67 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
               label='Fecha de Medición'
               defaultValue={selectedDate}
               crossOrigin={undefined}
-              {...register('measureDate', { required: true })}
+              {...register('measure_date', { required: true })}
               onChange={(event) => {
                 setSelectedDate(event.target.value);
               }}
             />
-            {errors.measureDate && (
+            {errors.measure_date && (
               <span className='text-red-400 text-xs'>Campo requerido</span>
             )}
 
-            <Select
-              label='Periodo'
-              value={periods[selectedPeriod]}
-              onChange={() => {
-                // const measureToChange = getMeasureByPeriod(val);
-                // if (measureToChange) {
-                //   setSelectedMeasure(measureToChange);
-                // }
-              }}
-            >
-              {periods.map((period, index) => (
-                <Option key={index} value={period}>
-                  {`${index + 1}.- ${period}`}
-                </Option>
-              ))}
-            </Select>
+            <Controller
+              name='period'
+              control={control}
+              defaultValue={periods[selectedPeriod]}
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  label='Periodo'
+                  value={value}
+                  onChange={(val) => {
+                    onChange(val || '');
+                  }}
+                >
+                  {periods.map((period, index) => (
+                    <Option key={index} value={period}>
+                      {`${index + 1}.- ${period}`}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            />
           </div>
 
           <div>
             <Input
               label='Nombre del Responsable'
               crossOrigin={undefined}
-              {...register('readerName', { required: true })}
+              value={`${user?.first_name.toUpperCase()} ${user?.last_name.toUpperCase()}`}
+              {...register('reader_name', { required: true })}
             />
-            {errors.readerName && (
+            {errors.reader_name && (
               <span className='text-red-400 text-xs pl-2'>
                 Nombre requerido
               </span>
             )}
           </div>
-
-          <Textarea label='Observaciones' {...register('notes')} />
+          <div className='flex flex-col gap-0'>
+            <Textarea
+              label='Observaciones'
+              {...register('notes', {
+                maxLength: {
+                  value: 200,
+                  message:
+                    'Las observaciones no deben exceder de 200 caracteres',
+                },
+              })}
+            />
+            {errors.notes && (
+              <span className='text-red-400 text-xs pl-2'>
+                {errors.notes.message}
+              </span>
+            )}
+          </div>
 
           <DialogFooter className='px-0 py-0'>
             <Button

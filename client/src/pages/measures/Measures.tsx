@@ -3,15 +3,13 @@ import MeasureReadingsTable from '../../components/tables/MeasureReadingsTable';
 import { ClipLoader } from 'react-spinners';
 import NewMeasureModalForm from '../../components/forms/NewMeasureModalForm';
 
-import {
-  Typography,
-  Button,
-  Select, Option
-} from '@material-tailwind/react';
+import { Typography, Button, Select, Option } from '@material-tailwind/react';
 
 import { MeasureType } from '../../interfaces/measuresIterfaces';
 
-import { useMeasuresData } from '../../hooks/useMeasuresData';
+import { useMeasuresData } from '../../hooks/measures/useMeasuresData';
+import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
+import useNewMeasure from '../../hooks/measures/useNewMeasure';
 
 const override: CSSProperties = {
   display: 'block',
@@ -19,25 +17,17 @@ const override: CSSProperties = {
   borderColor: 'yellow',
 };
 
-type FormNewMeasureType = {
-  measureDate: string,
-  period: string,
-  readerName: string,
-  notes: string,
-};
-
 const Measures = () => {
-  
-  const {data:measuresData = [], isLoading:loadingMeasuresData} = useMeasuresData()  
+  const { data: measuresData = [], isLoading: loadingMeasuresData } =
+    useMeasuresData();
   const [selectedMeasure, setSelectedMeasure] = useState<MeasureType | null>(
     null,
   );
 
-  /** 
-   * Code for new measure 
-  */
   const [openNewMeasureModal, setOpenNewMeasureModal] = useState(false);
   const handleOpenModal = () => setOpenNewMeasureModal(!openNewMeasureModal);
+
+  const { createNewMeasure, isLoading, data, error } = useNewMeasure();
 
   // const fetchReadings = async () => {
   //   if (!measure) return;
@@ -54,53 +44,39 @@ const Measures = () => {
   //   }
   // };
 
-  // const fetchMeasures = () => {
-  //   setLoading(true);
-  //   fetch(apiLink, {
-  //     method: 'GET',
-  //   })
-  //     .then((response) => response.json())
-  //     .then((json) => {
-  //       setData(json);
-  //       setLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //       setLoading(false);
-  //       toast.error('Error al cargar las mediciones');
-  //     });
-  // };
+  // useEffect(() => {
+  //   if (measuresData.length > 0) {
+  //     setSelectedMeasure(measuresData[0]);
+  //   }
+  // }, [measuresData]);
 
-  useEffect(() => {
-    if(measuresData.length>0){
-      setSelectedMeasure(measuresData[0])
-    }
-  }, [measuresData]);
+  const handleCreateMeasure = (formData: InputsNewMeasureForm) => {
 
-  // Handler para crear nueva medición
-  const apiLink = ""
-  const handleCreateMeasure = (formData: FormNewMeasureType) => {
-    fetch(apiLink, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        measure_date: formData.measureDate,
-        period: formData.period,
-        reader_name: formData.readerName,
-        notes: formData.notes,
-      }),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        // fetchMeasures();
-        // toast.success('Medición creada exitosamente');
-      })
-      .catch((error) => {
-        console.error('Error al crear medición:', error);
-        // toast.error('Error al crear la medición');
-      });
+    console.log(formData)
+    createNewMeasure(formData);
+
+    // fetch(apiLink, {
+    //   method: 'POST',
+
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     measure_date: formData.measureDate,
+    //     period: formData.period,
+    //     reader_name: formData.readerName,
+    //     notes: formData.notes,
+    //   }),
+    // })
+    //   .then((response) => response.json())
+    //   .then(() => {
+    //     // fetchMeasures();
+    //     // toast.success('Medición creada exitosamente');
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error al crear medición:', error);
+    //     // toast.error('Error al crear la medición');
+    //   });
   };
 
   // Handler para eliminar
@@ -184,9 +160,9 @@ const Measures = () => {
   //   }
   // };
 
-  const getMeasureByPeriod = (period:string='')=>{
+  const getMeasureByPeriod = (period: string = '') => {
     return measuresData.filter((measure) => measure.period === period)[0];
-  }
+  };
 
   return (
     <>
@@ -226,13 +202,14 @@ const Measures = () => {
                   ))}
                 </Select>
               ) : (
-                <Typography
-                  className='text-center h-fit mr-5 text-xl font-bold'
-                  // variant='h5'
-                  color='red'
-                >
-                  No hay mediciones
-                </Typography>
+                <></>
+                // <Typography
+                //   className='text-center h-fit mr-5 text-xl font-bold'
+                //   // variant='h5'
+                //   color='red'
+                // >
+                //   No hay mediciones
+                // </Typography>
               )}
               <Button className='w-60' onClick={handleOpenModal}>
                 NUEVA MEDICIÓN

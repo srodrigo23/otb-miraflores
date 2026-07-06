@@ -1,5 +1,5 @@
 import { useState, useEffect, ChangeEvent } from 'react';
-import { useNeighborDetailsData } from '../../hooks/useNeighborsData';
+import { useNeighborDetailsData } from '../../hooks/neighbors/useNeighborsData';
 import { LoaderAnimation } from '../shared/LoaderAnimation';
 import { toast } from 'react-toastify';
 import { InfoField } from './InfoField';
@@ -13,7 +13,7 @@ import {
 } from '@material-tailwind/react';
 
 import { NeighborDebtsPayments } from '../NeighborDebtsPayments';
-import { useUpdateNeighbor } from '../../hooks/useUpdateNeighbor';
+import { useUpdateNeighbor } from '../../hooks/neighbors/useUpdateNeighbor';
 import { UpdateNeighborPayloadType } from '../../interfaces/neighborsInterfaces';
 import NeighborDataCard from './NeighborDataCard';
 import EditNeighborDataControls from './EditNeighborDataControls';
@@ -24,12 +24,12 @@ export const NeighborDetails: React.FC<{
   neighborId: number | undefined;
   refetchNeighbors: () => void;
 }> = ({ neighborId, refetchNeighbors }) => {
-
   const [openInfo, setOpenInfo] = useState(false);
   const [edit, setEdit] = useState<boolean>(false);
 
   const { data, isLoading, error } = useNeighborDetailsData(neighborId);
-  const [toUpdateDataNeighbor, setToUpdateDataNeighbor] = useState<UpdateNeighborPayloadType>();
+  const [toUpdateDataNeighbor, setToUpdateDataNeighbor] =
+    useState<UpdateNeighborPayloadType>();
   const { update } = useUpdateNeighbor(data?.id);
 
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -77,13 +77,22 @@ export const NeighborDetails: React.FC<{
       newErrors.last_name = 'El apellido es requerido';
     }
 
-    if (toUpdateDataNeighbor?.first_name && !nameRegex.test(toUpdateDataNeighbor.first_name)) {
+    if (
+      toUpdateDataNeighbor?.first_name &&
+      !nameRegex.test(toUpdateDataNeighbor.first_name)
+    ) {
       newErrors.first_name = 'Solo se permiten letras y espacios';
     }
-    if (toUpdateDataNeighbor?.second_name && !nameRegex.test(toUpdateDataNeighbor.second_name)) {
+    if (
+      toUpdateDataNeighbor?.second_name &&
+      !nameRegex.test(toUpdateDataNeighbor.second_name)
+    ) {
       newErrors.second_name = 'Solo se permiten letras y espacios';
     }
-    if (toUpdateDataNeighbor?.last_name && !nameRegex.test(toUpdateDataNeighbor.last_name)) {
+    if (
+      toUpdateDataNeighbor?.last_name &&
+      !nameRegex.test(toUpdateDataNeighbor.last_name)
+    ) {
       newErrors.last_name = 'Solo se permiten letras y espacios';
     }
 
@@ -142,7 +151,7 @@ export const NeighborDetails: React.FC<{
                   handleCancelEdit();
                 }}
               >
-                <NeighborDataCard neighborData={data}/>
+                <NeighborDataCard neighborData={data} />
               </AccordionHeader>
               <AccordionBody>
                 <EditNeighborDataControls
@@ -211,7 +220,6 @@ export const NeighborDetails: React.FC<{
       </div>
 
       <NeighborDebtsPayments />
-
     </div>
   );
 };
