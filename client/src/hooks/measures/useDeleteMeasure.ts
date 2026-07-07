@@ -9,8 +9,8 @@ const useDeleteMeasure = () => {
   
   const {data, isLoading, error, execute} = useFetchData<MeasureType>();
   
-  const deleteMeasure = async (measure: MeasureType) => {
-    const apiLinkDeleteMeasure = `${apiLink}/measures/${measure.id}`
+  const deleteMeasure = async (measure: MeasureType | null) => {
+    const apiLinkDeleteMeasure = `${apiLink}/measures/${measure?.id}`
 
     await execute(apiLinkDeleteMeasure, {
       method:'DELETE',
@@ -18,7 +18,7 @@ const useDeleteMeasure = () => {
     }).then(
       (data)=>{
         if(data?.ok) {
-          toast.success(`Se ha elminado exitosamente la medición : ${measure.period} (${measure.measure_date.split('-')[0]})`)
+          toast.success(`Se ha elminado exitosamente la medición : ${measure?.period} (${measure?.measure_date.split('-')[0]})`)
           return true;
         }
       }

@@ -15,9 +15,11 @@ import {
   // XCircleIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
+import DeleteMeasureConfirmationModal from '../../components/modals/DeleteMeasureConfirmationModal';
 
 import { MeasureTableProps } from '../../types/MeasuresTypes';
 import { redirect } from 'react-router-dom';
+import { MeasureType } from '../../interfaces/measuresIterfaces';
 
 type SortField = 'id' | 'measure_date' | 'period' | 'reader_name' | 'status' | 'created_at';
 type SortOrder = 'asc' | 'desc';
@@ -46,7 +48,7 @@ const STATUS_LABELS: { [key: string]: string } = {
 const MeasureTable: React.FC<MeasureTableProps> = ({
   tableData,  
   // onEdit,
-  onDelete,
+  // onDelete,
   // onCreate,
   // onView,
   // onViewReadings,
@@ -57,6 +59,16 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   // const [currentPage, setCurrentPage] = useState(1);
   // const itemsPerPage = 10;
+
+  const [openDeleteMeasureModal, setDeleteMeasureModal] = useState(false);
+  const handleOpenDeleteMeasureModal = () => setDeleteMeasureModal(!openDeleteMeasureModal);
+
+  const [measureToDelete, setMeasureToDelete] = useState<MeasureType|null>(null);
+
+  const handleDeleteMeasure = (measure:MeasureType)=>{
+    setMeasureToDelete(measure);
+    handleOpenDeleteMeasureModal();
+  }
 
   // Ordenar datos
   const sortedData = useMemo(() => {
@@ -137,7 +149,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
             {sortedData.map((measure) => {
               // const isLast = index === sortedData.length - 1;
               const classes = 'p-3 border border-blue-gray-50 py-1';
-              
+
               return (
                 <tr key={measure.id} className='hover:bg-blue-gray-50/50'>
                   <td className={classes}>
@@ -200,17 +212,17 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                           <EyeIcon className='h-4 w-4' />
                         </IconButton>
                       }
-                      { (
+                      {
                         <IconButton
                           size='sm'
                           variant='text'
                           color='red'
-                          onClick={() => onDelete(measure)}
+                          onClick={() => handleDeleteMeasure(measure)}
                           title='Eliminar'
                         >
                           <TrashIcon className='h-4 w-4' />
                         </IconButton>
-                      )}
+                      }
                     </div>
                   </td>
                 </tr>
@@ -225,6 +237,11 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
           Total: {sortedData.length} mediciones
         </Typography>
       </div> */}
+      <DeleteMeasureConfirmationModal
+        openModalState={openDeleteMeasureModal}
+        handleCloseModal={handleOpenDeleteMeasureModal}
+        measure={measureToDelete}
+      />
     </div>
   );
 };

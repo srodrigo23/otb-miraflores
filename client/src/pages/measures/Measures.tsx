@@ -24,6 +24,7 @@ import { MeasureType } from '../../interfaces/measuresIterfaces';
 import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
 import useDeleteMeasure from '../../hooks/measures/useDeleteMeasure';
 
+
 const Measures = () => {
   const {
     data: measuresData = [],
@@ -39,12 +40,12 @@ const Measures = () => {
     isLoading: loadingMeasureCreated,
   } = useNewMeasure();
 
-  const {deleteMeasure} = useDeleteMeasure()
-
-  const handlerDelete = async (measure:MeasureType) =>{
-    await deleteMeasure(measure)
-    refetchMeasures()
-  }
+  // const {deleteMeasure} = useDeleteMeasure();
+  
+  // const handlerDelete = async (measure:MeasureType) =>{
+  //   await deleteMeasure(measure)
+  //   refetchMeasures()
+  // }
 
   const handlerNewMeasure = async (data: InputsNewMeasureForm) => {
     await createNewMeasure(data);
@@ -161,7 +162,7 @@ const Measures = () => {
         {loadingMeasuresData ? (
           <LoaderAnimation />
         ) : (
-          <MeasureTable tableData={measuresData} onDelete={handlerDelete} />
+          <MeasureTable tableData={measuresData}/>
         )}
       </div>
 
@@ -170,6 +171,7 @@ const Measures = () => {
         handleCloseModal={handleOpenModal}
         onSubmit={handlerNewMeasure}
       />
+
     </>
   );
 };
