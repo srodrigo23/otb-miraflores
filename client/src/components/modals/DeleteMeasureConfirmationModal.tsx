@@ -6,26 +6,20 @@ import {
   Typography,
 } from '@material-tailwind/react';
 import { MeasureType } from '../../interfaces/measuresIterfaces';
-import useDeleteMeasure from '../../hooks/measures/useDeleteMeasure';
 
 type DeleteNeighborModalType = {
   openModalState: boolean;
   handleCloseModal: () => void;
   measure: MeasureType | null;
-  // onConfirmDelete: () => void;
+  onConfirmDelete: () => void;
 };
 
 const DeleteMeasureConfirmationModal: React.FC<DeleteNeighborModalType> = ({
   openModalState,
   handleCloseModal,
   measure,
-  // onConfirmDelete,
+  onConfirmDelete,
 }) => {
-  const {deleteMeasure} = useDeleteMeasure()
-  const handleDelete = async () => {
-    await deleteMeasure(measure)
-    handleCloseModal();
-  };
 
   return (
     <Dialog open={openModalState} handler={handleCloseModal} size='sm'>
@@ -65,7 +59,7 @@ const DeleteMeasureConfirmationModal: React.FC<DeleteNeighborModalType> = ({
         <Button variant='outlined' color='blue-gray' onClick={handleCloseModal}>
           <span>Cancelar</span>
         </Button>
-        <Button variant='gradient' color='red' onClick={handleDelete}>
+        <Button variant='gradient' color='red' onClick={onConfirmDelete}>
           <span>Eliminar</span>
         </Button>
       </DialogFooter>
