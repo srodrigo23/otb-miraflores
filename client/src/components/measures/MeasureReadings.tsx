@@ -11,6 +11,7 @@ export const MeasureReadings:React.FC<{measureId:number}> = ({measureId}) =>{
   return (
     <>
       <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>
+        {measureId}
         <DetailCardsReadings meterReadings={[]} />
         <div className='flex flex-row sm:flex-col gap-2 w-full sm:w-auto'>
           <Button
