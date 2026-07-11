@@ -17,7 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 import { MeasureTableProps } from '../../types/MeasuresTypes';
-import { redirect } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // import { MeasureType } from '../../interfaces/measuresIterfaces';
 
 type SortField = 'id' | 'measure_date' | 'period' | 'reader_name' | 'status' | 'created_at';
@@ -58,6 +58,8 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   // const [currentPage, setCurrentPage] = useState(1);
   // const itemsPerPage = 10;
+  const navigate = useNavigate();
+  
 
   // Ordenar datos
   const sortedData = useMemo(() => {
@@ -195,7 +197,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                           size='sm'
                           variant='text'
                           color='blue'
-                          onClick={() => redirect('')}
+                          onClick={() => navigate(`/mediciones?id=${measure.id}`)}
                           title='Ver detalles'
                         >
                           <EyeIcon className='h-4 w-4' />

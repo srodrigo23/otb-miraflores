@@ -12,8 +12,15 @@ import useDeleteMeasure from '../../hooks/measures/useDeleteMeasure';
 import DeleteMeasureConfirmationModal from '../../components/modals/DeleteMeasureConfirmationModal';
 import { DetailCardsMeasures } from '../../components/measures/DetailCardsMeasures';
 import { Button } from '@material-tailwind/react';
+import { BackButton } from '../../components/shared/BackButton';
+import { useSearchParams } from 'react-router-dom';
+import { MeasureReadings } from '../../components/measures/MeasureReadings';
 
 const Measures = () => {
+
+  const [searchParams] = useSearchParams();
+  const measureId = searchParams.get('id');
+
   const {
     data: measuresData = [],
     isLoading: loadingMeasuresData,
@@ -22,7 +29,6 @@ const Measures = () => {
 
   const [openNewMeasureModal, setOpenNewMeasureModal] = useState(false);
   const handleOpenModal = () => setOpenNewMeasureModal(!openNewMeasureModal);
-
   
   const [openDeleteMeasureModal, setDeleteMeasureModal] = useState(false);
   const handleOpenDeleteMeasureModal = () =>
@@ -66,6 +72,11 @@ const Measures = () => {
     <>
       {loadingMeasuresData ? (
         <LoaderAnimation />
+      ) : measureId !== null ? (
+        <>
+          <BackButton path={'/mediciones'} />
+          <MeasureReadings measureId={parseInt(measureId)} />
+        </>
       ) : (
         <div className='w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
           <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>

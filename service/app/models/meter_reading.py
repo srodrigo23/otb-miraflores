@@ -19,7 +19,7 @@ class MeterReading(Base):
   # reading_date = Column(DateTime, default=datetime.utcnow)  # Fecha y hora exacta de la lectura
   # reader_name = Column(String(100))  # Persona que realizó esta lectura específica
 
-  status = Column(String(20), default="normal")  # normal, estimated, not_read, meter_error
+  status = Column(String(20), default="normal")  # normal, not_read, meter_error
   has_anomaly = Column(Boolean, default=False)  # Si hay alguna anomalía detectada
 
   notes = Column(String(200))  # Observaciones específicas de esta lectura
