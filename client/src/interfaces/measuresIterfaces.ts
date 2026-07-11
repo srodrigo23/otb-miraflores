@@ -5,13 +5,8 @@ export interface MeasureType {
   period: string;
   reader_name: string;
   status: string;
-  notes:string | null;
-
-  // total_meters: number;
-  // meters_read: number;
-  // meters_pending: number;
-  // notes: string | null;
-
+  notes: string | null;
+  is_first_measure:boolean;
   created_at: string;
   updated_at: string;
 }

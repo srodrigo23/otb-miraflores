@@ -28,24 +28,10 @@ def read_measure(measure_id: int, db: Session = Depends(get_db)):
   """
   Obtiene una medición específica
   """
-  measure = crud.get_measure(db, measure_id=measure_id)
+  measure = measures_service.get_measure(db, measure_id=measure_id)
   if measure is None:
     raise HTTPException(status_code=404, detail="Measure not found")
-
-  return {
-    "id": measure.id,
-    "measure_date": str(measure.measure_date),
-    "period": measure.period,
-    "reader_name": measure.reader_name,
-    "status": measure.status,
-    "total_meters": measure.total_meters,
-    "meters_read": measure.meters_read,
-    "meters_pending": measure.meters_pending,
-    "notes": measure.notes,
-    "created_at": str(measure.created_at),
-    "updated_at": str(measure.updated_at)
-  }
-
+  return measure
 
 @router.post("", response_model=schemas.Measure)
 def create_measure(measure: schemas.MeasureCreate, db: Session = Depends(get_db)):
@@ -53,22 +39,7 @@ def create_measure(measure: schemas.MeasureCreate, db: Session = Depends(get_db)
   Crea una nueva medición
   """
   db_measure = measures_service.create_measure(db=db, measure=measure)
-
   return db_measure
-  # return {
-  #   "id": db_measure.id,
-  #   "measure_date": str(db_measure.measure_date),
-  #   "period": db_measure.period,
-  #   "reader_name": db_measure.reader_name,
-  #   "status": db_measure.status,
-  #   "total_meters": db_measure.total_meters,
-  #   "meters_read": db_measure.meters_read,
-  #   "meters_pending": db_measure.meters_pending,
-  #   "notes": db_measure.notes,
-  #   "created_at": str(db_measure.created_at),
-  #   "updated_at": str(db_measure.updated_at)
-  # }
-
 
 @router.put("/{measure_id}", response_model=schemas.Measure)
 def update_measure(measure_id: int, measure: schemas.MeasureUpdate, db: Session = Depends(get_db)):

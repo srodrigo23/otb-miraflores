@@ -134,6 +134,7 @@ class MeasureBase(BaseModel):
   period: str | None = None
   reader_name: str | None = None
   notes: str | None = None
+  is_first_measure:bool
 
 class MeasureCreate(MeasureBase):
   pass
@@ -155,6 +156,7 @@ class Measure(BaseModel):
   period: str | None = None
   reader_name: str | None = None
   status: str
+  is_first_measure:bool
   notes: str | None = None
   created_at: datetime
   updated_at: datetime

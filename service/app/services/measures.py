@@ -21,6 +21,7 @@ def create_measure(db: Session, measure: MeasureCreate):
     measure_date=datetime.strptime(measure.measure_date, "%Y-%m-%d").date(),
     period=measure.period,
     reader_name=measure.reader_name,
+    is_first_measure=measure.is_first_measure,
     notes=measure.notes,
     status=MeasureType.CREATED,
   )

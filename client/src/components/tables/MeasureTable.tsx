@@ -2,23 +2,17 @@ import { useState, useMemo } from 'react';
 import {
   Typography,
   IconButton,
-  // Button,
   Chip,
 } from '@material-tailwind/react';
 import {
   ChevronUpDownIcon,
-  // PencilIcon,
-  // TrashIcon,
   EyeIcon,
-  // DocumentMagnifyingGlassIcon,
-  // CurrencyDollarIcon,
-  // XCircleIcon,
   TrashIcon
 } from '@heroicons/react/24/outline';
 
 import { MeasureTableProps } from '../../types/MeasuresTypes';
 import { useNavigate } from 'react-router-dom';
-// import { MeasureType } from '../../interfaces/measuresIterfaces';
+import { color } from '../../types/commonTypes';
 
 type SortField = 'id' | 'measure_date' | 'period' | 'reader_name' | 'status' | 'created_at';
 type SortOrder = 'asc' | 'desc';
@@ -142,7 +136,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
               const classes = 'p-3 border border-blue-gray-50 py-1';
 
               return (
-                <tr key={measure.id} className='hover:bg-blue-gray-50/50'>
+                <tr key={measure.id} className={`hover:bg-blue-gray-50/50 ${measure.is_first_measure?'bg-green-50':''}`}>
                   <td className={classes}>
                     <Typography
                       variant='small'
@@ -185,7 +179,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                         // className='w-fit'
                         size='sm'
                         value={STATUS_LABELS[measure.status] || measure.status}
-                        color={(STATUS_COLORS[measure.status] || 'gray') as any}
+                        color={(STATUS_COLORS[measure.status] || 'gray') as color}
                       />
                     </div>
                   </td>
@@ -208,6 +202,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                           size='sm'
                           variant='text'
                           color='red'
+                          disabled={measure.is_first_measure}
                           onClick={() => onDelete(measure)}
                           title='Eliminar'
                         >

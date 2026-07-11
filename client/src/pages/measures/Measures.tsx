@@ -12,12 +12,10 @@ import useDeleteMeasure from '../../hooks/measures/useDeleteMeasure';
 import DeleteMeasureConfirmationModal from '../../components/modals/DeleteMeasureConfirmationModal';
 import { DetailCardsMeasures } from '../../components/measures/DetailCardsMeasures';
 import { Button } from '@material-tailwind/react';
-import { BackButton } from '../../components/shared/BackButton';
 import { useSearchParams } from 'react-router-dom';
-import { MeasureReadings } from '../../components/measures/MeasureReadings';
+import { MeterMeasures } from './MeterMeasures';
 
 const Measures = () => {
-
   const [searchParams] = useSearchParams();
   const measureId = searchParams.get('id');
 
@@ -29,39 +27,38 @@ const Measures = () => {
 
   const [openNewMeasureModal, setOpenNewMeasureModal] = useState(false);
   const handleOpenModal = () => setOpenNewMeasureModal(!openNewMeasureModal);
-  
+
   const [openDeleteMeasureModal, setDeleteMeasureModal] = useState(false);
   const handleOpenDeleteMeasureModal = () =>
     setDeleteMeasureModal(!openDeleteMeasureModal);
-  
-  const [measureToDelete, setMeasureToDelete] = useState<MeasureType|null>(null);
 
-  const {
-    createNewMeasure,
-    isLoading: loadingMeasureCreated,
-  } = useNewMeasure();
+  const [measureToDelete, setMeasureToDelete] = useState<MeasureType | null>(
+    null,
+  );
+
+  const { createNewMeasure, isLoading: loadingMeasureCreated } =
+    useNewMeasure();
 
   const { deleteMeasure } = useDeleteMeasure();
-  
+
   /**
    * Open modal to confirm measure deletion
-   * @param measure 
+   * @param measure
    */
-  const handleDeleteWithModal = (measure:MeasureType)=>{
+  const handleDeleteWithModal = (measure: MeasureType) => {
     setMeasureToDelete(measure);
     handleOpenDeleteMeasureModal();
   };
 
   /**
-   * Delete measure and  
+   * Delete measure and
    */
-  const handlerDeleteMeasure = async() => {
+  const handlerDeleteMeasure = async () => {
     await deleteMeasure(measureToDelete);
     refetchMeasures();
     setMeasureToDelete(null);
     handleOpenDeleteMeasureModal();
   };
-
 
   const handlerNewMeasure = async (data: InputsNewMeasureForm) => {
     await createNewMeasure(data);
@@ -72,42 +69,42 @@ const Measures = () => {
     <>
       {loadingMeasuresData ? (
         <LoaderAnimation />
-      ) : measureId !== null ? (
-        <>
-          <BackButton path={'/mediciones'} />
-          <MeasureReadings measureId={parseInt(measureId)} />
-        </>
       ) : (
         <div className='w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
-          <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>
-            <DetailCardsMeasures measures={measuresData} />
-            <Button
-              className='w-60 h-fit'
-              onClick={handleOpenModal}
-              disabled={loadingMeasuresData && loadingMeasureCreated}
-            >
-              NUEVA MEDICIÓN
-            </Button>
-          </div>
-          <MeasureTable
-            tableData={measuresData}
-            onDelete={handleDeleteWithModal}
-          />
+          {measureId !== null ? (
+            <MeterMeasures measureId={measureId}/>
+          ) : (
+            <>
+              <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>
+                <DetailCardsMeasures measures={measuresData} />
+                <Button
+                  className='w-60 h-fit'
+                  onClick={handleOpenModal}
+                  disabled={loadingMeasuresData && loadingMeasureCreated}
+                >
+                  NUEVA MEDICIÓN
+                </Button>
+              </div>
+              <MeasureTable
+                tableData={measuresData}
+                onDelete={handleDeleteWithModal}
+              />
+              <NewMeasureModalForm
+                openModalState={openNewMeasureModal}
+                handleCloseModal={handleOpenModal}
+                onSubmit={handlerNewMeasure}
+              />
+
+              <DeleteMeasureConfirmationModal
+                openModalState={openDeleteMeasureModal}
+                handleCloseModal={handleOpenDeleteMeasureModal}
+                measure={measureToDelete}
+                onConfirmDelete={handlerDeleteMeasure}
+              />
+            </>
+          )}
         </div>
       )}
-
-      <NewMeasureModalForm
-        openModalState={openNewMeasureModal}
-        handleCloseModal={handleOpenModal}
-        onSubmit={handlerNewMeasure}
-      />
-
-      <DeleteMeasureConfirmationModal
-        openModalState={openDeleteMeasureModal}
-        handleCloseModal={handleOpenDeleteMeasureModal}
-        measure={measureToDelete}
-        onConfirmDelete={handlerDeleteMeasure}
-      />
     </>
   );
 };

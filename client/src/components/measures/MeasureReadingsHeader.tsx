@@ -1,18 +1,23 @@
-import { Button } from "@material-tailwind/react";
-import { PlayIcon, PrinterIcon, StopIcon } from "@heroicons/react/24/outline";
-import { DetailCardsReadings } from "./DetailCardsReadings"
-import { useState } from "react";
+import { Button } from '@material-tailwind/react';
+import { PlayIcon, PrinterIcon, StopIcon } from '@heroicons/react/24/outline';
+import { DetailCardsReadings } from './DetailCardsReadings';
+import { useState } from 'react';
+import { MeasureType, MeterReadingType } from '../../interfaces/measuresIterfaces';
 
+export const MeasureReadingsHeader: React.FC<{
+  measure: MeasureType | undefined;
+  meterReadings: MeterReadingType[] | [];
+}> = ({ measure, meterReadings }) => {
 
-export const MeasureReadings:React.FC<{measureId:number}> = ({measureId}) =>{
-
-  const [initFillOutReadings, setInitFillOutReadings] = useState<boolean>(false);
+  const [initFillOutReadings, setInitFillOutReadings] =
+    useState<boolean>(false);
 
   return (
     <>
       <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>
-        {measureId}
-        <DetailCardsReadings meterReadings={[]} />
+
+        <DetailCardsReadings  meterReadings={meterReadings} measure={measure} />
+        
         <div className='flex flex-row sm:flex-col gap-2 w-full sm:w-auto'>
           <Button
             variant='gradient'
@@ -41,5 +46,4 @@ export const MeasureReadings:React.FC<{measureId:number}> = ({measureId}) =>{
       </div>
     </>
   );
-
-}
+};

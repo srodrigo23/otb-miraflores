@@ -10,6 +10,7 @@ import {
   Select,
   Option,
   Typography,
+  Checkbox,
 } from '@material-tailwind/react';
 
 import { ClipLoader } from 'react-spinners';
@@ -185,6 +186,22 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
                 {errors.notes.message}
               </Typography>
             )}
+          </div>
+
+          <div>
+            <Controller
+              name='is_first_measure'
+              control={control}
+              defaultValue={false}
+              render={({ field }) => (
+                <Checkbox
+                  label='Primera Medición'
+                  checked={field.value}
+                  onChange={field.onChange}
+                  crossOrigin={undefined}
+                />
+              )}
+            />
           </div>
 
           <DialogFooter className='flex flex-col-reverse sm:flex-row px-0 pt-2 gap-2'>

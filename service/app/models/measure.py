@@ -9,12 +9,12 @@ class Measure(Base):
   __tablename__ = "measures"
 
   id = Column(Integer, primary_key=True, index=True)
-
   measure_date = Column(Date, nullable=False, index=True)
   period = Column(String)  # Period (ej: "2025-01", "Enero 2025")
 
   reader_name = Column(String)
-  status = Column(Enum(MeasureType), default=MeasureType.CREATED)  
+  status = Column(Enum(MeasureType), default=MeasureType.CREATED)
+  is_first_measure = Column(Boolean, default=False)
 
   notes = Column(String(200))
   created_at = Column(DateTime, default=datetime.utcnow)
