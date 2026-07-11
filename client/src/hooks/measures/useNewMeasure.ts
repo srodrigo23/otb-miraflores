@@ -16,8 +16,9 @@ const useNewMeasure = () => {
       body: JSON.stringify(payload),
     }).then(
       (data)=>{
+        console.log(data)
         if(data?.ok) {
-          toast.success('Exitoso')
+          toast.success(`Medición del periodo (${data.data.period}) creada exitosamente`)
           return true;
         }
       }
