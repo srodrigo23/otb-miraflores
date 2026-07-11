@@ -24,9 +24,8 @@ export interface MeterReadingType {
   meter_id: number;
   measure_id: number;
   current_reading: number;
-  // reading_date: string;
-  // status: string;
-  // has_anomaly: boolean;
+  status: string;
+  has_anomaly: boolean;
   notes: string | null;
   meter_number: string | null;
   created_at: string;
