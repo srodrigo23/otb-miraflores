@@ -1,18 +1,21 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, HTMLInputTypeAttribute } from "react";
 
-export function InfoField({ label, value, isInput, onChange, error }: { 
-  label: string; 
-  value?: number | string | null; 
-  isInput: boolean; 
+export function InfoField({ label, value, isInput, onChange, error, type = 'text', inputMode }: {
+  label: string;
+  value?: number | string | null;
+  isInput: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   error?: string;
+  type?: HTMLInputTypeAttribute;
+  inputMode?: 'text' | 'numeric' | 'tel' | 'email';
 }) {
   return (
     <div className="w-full">
-      <div className='font-semibold text-gray-500 text-sm mb-1'>{label}</div>
+      <label className='font-semibold text-gray-500 text-sm mb-1 block'>{label}</label>
       {isInput ? (
         <input
-          type='text'
+          type={type}
+          inputMode={inputMode}
           className={`w-full text-base border rounded-lg px-3 py-2 transition-colors outline-none ${
             error
               ? 'border-red-500 focus:border-red-500 bg-red-50'
@@ -20,6 +23,7 @@ export function InfoField({ label, value, isInput, onChange, error }: {
           }`}
           value={value ?? ''}
           onChange={onChange}
+          aria-invalid={!!error}
         />
       ) : (
         <div className='text-base lg:text-xl break-words'>{value ?? '-'}</div>

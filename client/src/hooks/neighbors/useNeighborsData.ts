@@ -34,15 +34,16 @@ export const useNeighborsData = () => {
 
 export const useNeighborDetailsData = (neighborId:number|undefined)=>{
   const { data, isLoading, error, execute } = useFetchData<NeighborWithDetailsType>();
-  const apiLinkNeightbor = `${apiLink}/neighbors/${neighborId}`
 
   useEffect(() => {
-    execute(apiLinkNeightbor,{
+    if (neighborId === undefined) return;
+    execute(`${apiLink}/neighbors/${neighborId}`,{
       method: 'GET',
       credentials:'include',
       headers: { 'Content-Type': 'application/json' },
     });
-  }, []);
+    // Refetch whenever the selected neighbor changes.
+  }, [neighborId]);
 
   return { data, isLoading, error }
 

@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { IconButton, Typography } from "@material-tailwind/react";
-import { CheckIcon, PencilIcon } from "lucide-react";
+import { IconButton, Tooltip, Typography } from "@material-tailwind/react";
+import { CheckIcon, Loader2, PencilIcon } from "lucide-react";
 
 
 const EditNeighborDataControls: React.FC<{
@@ -8,37 +8,64 @@ const EditNeighborDataControls: React.FC<{
   setEdit: (el: boolean) => void;
   updateNeighborDetail: () => void;
   onCancel?: () => void;
-}> = ({ edit, setEdit, updateNeighborDetail, onCancel }) => {
+  isSaving?: boolean;
+  canSave?: boolean;
+}> = ({ edit, setEdit, updateNeighborDetail, onCancel, isSaving = false, canSave = true }) => {
   return (
-    <div className='flex justify-between pb-3 px-4 lg:px-6'>
-      <Typography variant='h5' className='text-lg lg:text-xl'>Datos personales</Typography>
+    <div className='flex items-center justify-between pb-3 px-4 lg:px-6'>
+      <div className='flex items-center gap-2'>
+        <Typography variant='h5' className='text-lg lg:text-xl'>Datos personales</Typography>
+        {edit && (
+          <span className='rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800'>
+            Editando
+          </span>
+        )}
+      </div>
+
       {!edit ? (
-        <IconButton
-          size='sm'
-          variant='outlined'
-          color='blue-gray'
-          onClick={() => setEdit(true)}
-        >
-          <PencilIcon className='h-5 w-5' />
-        </IconButton>
+        <Tooltip content='Editar datos'>
+          <IconButton
+            size='sm'
+            variant='outlined'
+            color='blue-gray'
+            onClick={() => setEdit(true)}
+            aria-label='Editar datos del vecino'
+          >
+            <PencilIcon className='h-5 w-5' />
+          </IconButton>
+        </Tooltip>
       ) : (
         <div className='flex gap-1'>
-          <IconButton
-            size='sm'
-            variant='filled'
-            color='red'
-            onClick={() => onCancel?.()}
-          >
-            <XMarkIcon className='h-5 w-5' />
-          </IconButton>
-          <IconButton
-            size='sm'
-            variant='filled'
-            color='green'
-            onClick={updateNeighborDetail}
-          >
-            <CheckIcon className='h-5 w-5' />
-          </IconButton>
+          <Tooltip content='Cancelar'>
+            <IconButton
+              size='sm'
+              variant='outlined'
+              color='red'
+              onClick={() => onCancel?.()}
+              disabled={isSaving}
+              aria-label='Cancelar edición'
+            >
+              <XMarkIcon className='h-5 w-5' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip content={canSave ? 'Guardar cambios' : 'No hay cambios'}>
+            <span>
+              <IconButton
+                size='sm'
+                variant='filled'
+                color='green'
+                onClick={updateNeighborDetail}
+                disabled={isSaving || !canSave}
+                aria-label='Guardar cambios'
+              >
+                {isSaving ? (
+                  <Loader2 className='h-5 w-5 animate-spin' />
+                ) : (
+                  <CheckIcon className='h-5 w-5' />
+                )}
+              </IconButton>
+            </span>
+          </Tooltip>
         </div>
       )}
     </div>

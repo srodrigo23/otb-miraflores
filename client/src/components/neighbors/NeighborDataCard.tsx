@@ -6,7 +6,7 @@ const NeighborDataCard: React.FC<{
 }> = ({ neighborData }) => {
   const meters = neighborData?.meters ?? [];
   return (
-    <div className='flex items-center gap-4 lg:gap-6 py-3 w-fit'>
+    <div className='flex items-center justify-center gap-4 lg:gap-6 py-3 w-full'>
       <div className='w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-lg font-bold shadow-md shrink-0'>
         {neighborData?.first_name?.[0]}
         {neighborData?.last_name?.[0]}

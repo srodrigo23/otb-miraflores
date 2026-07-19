@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, useMemo, ChangeEvent } from 'react';
 import { useNeighborDetailsData } from '../../hooks/neighbors/useNeighborsData';
 import { LoaderAnimation } from '../shared/LoaderAnimation';
 import { toast } from 'react-toastify';
@@ -10,15 +10,59 @@ import {
   Accordion,
   AccordionHeader,
   AccordionBody,
+  Button,
 } from '@material-tailwind/react';
+import {
+  ChevronDownIcon,
+  UserCircleIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline';
 
 import { NeighborDebtsPayments } from '../NeighborDebtsPayments';
 import { useUpdateNeighbor } from '../../hooks/neighbors/useUpdateNeighbor';
-import { UpdateNeighborPayloadType } from '../../interfaces/neighborsInterfaces';
+import {
+  NeighborWithDetailsType,
+  UpdateNeighborPayloadType,
+} from '../../interfaces/neighborsInterfaces';
 import NeighborDataCard from './NeighborDataCard';
 import EditNeighborDataControls from './EditNeighborDataControls';
 
 type FieldErrors = Partial<Record<keyof UpdateNeighborPayloadType, string>>;
+
+const EDITABLE_FIELDS = [
+  'first_name',
+  'second_name',
+  'last_name',
+  'ci',
+  'phone_number',
+  'email',
+] as const;
+
+const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]*$/;
+const digitsRegex = /^\d*$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const norm = (v: unknown) => (v ?? '').toString().trim();
+
+// Drop the read-only `id` to get an editable payload.
+const toPayload = (n: NeighborWithDetailsType): UpdateNeighborPayloadType => {
+  const { id, ...rest } = n;
+  void id;
+  return rest;
+};
+
+// Centered placeholder shell reused by the empty / error states.
+const CenteredState: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+}> = ({ icon, title, subtitle }) => (
+  <div className='flex h-full flex-col items-center justify-center gap-2 px-6 py-16 text-center text-blue-gray-500'>
+    {icon}
+    <p className='text-lg font-semibold text-blue-gray-700'>{title}</p>
+    {subtitle && <p className='text-sm'>{subtitle}</p>}
+  </div>
+);
 
 export const NeighborDetails: React.FC<{
   neighborId: number | undefined;
@@ -26,6 +70,7 @@ export const NeighborDetails: React.FC<{
 }> = ({ neighborId, refetchNeighbors }) => {
   const [openInfo, setOpenInfo] = useState(false);
   const [edit, setEdit] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data, isLoading, error } = useNeighborDetailsData(neighborId);
   const [toUpdateDataNeighbor, setToUpdateDataNeighbor] =
@@ -36,14 +81,19 @@ export const NeighborDetails: React.FC<{
 
   useEffect(() => {
     if (data) {
-      const { id: _, ...rest } = data;
-      setToUpdateDataNeighbor(rest);
+      setToUpdateDataNeighbor(toPayload(data));
       setErrors({});
+      setEdit(false);
     }
   }, [data]);
 
-  const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]*$/;
-  const digitsRegex = /^\d*$/;
+  // Only enable "save" when something actually changed.
+  const isDirty = useMemo(() => {
+    if (!data || !toUpdateDataNeighbor) return false;
+    return EDITABLE_FIELDS.some(
+      (f) => norm(data[f]) !== norm(toUpdateDataNeighbor[f]),
+    );
+  }, [data, toUpdateDataNeighbor]);
 
   const sanitize = (field: keyof UpdateNeighborPayloadType, raw: string) => {
     if (['first_name', 'second_name', 'last_name'].includes(field)) {
@@ -72,37 +122,38 @@ export const NeighborDetails: React.FC<{
 
     if (!toUpdateDataNeighbor?.first_name?.trim()) {
       newErrors.first_name = 'El primer nombre es requerido';
-    }
-    if (!toUpdateDataNeighbor?.last_name?.trim()) {
-      newErrors.last_name = 'El apellido es requerido';
-    }
-
-    if (
-      toUpdateDataNeighbor?.first_name &&
-      !nameRegex.test(toUpdateDataNeighbor.first_name)
-    ) {
+    } else if (!nameRegex.test(toUpdateDataNeighbor.first_name)) {
       newErrors.first_name = 'Solo se permiten letras y espacios';
     }
+
+    if (!toUpdateDataNeighbor?.last_name?.trim()) {
+      newErrors.last_name = 'El apellido es requerido';
+    } else if (!nameRegex.test(toUpdateDataNeighbor.last_name)) {
+      newErrors.last_name = 'Solo se permiten letras y espacios';
+    }
+
     if (
       toUpdateDataNeighbor?.second_name &&
       !nameRegex.test(toUpdateDataNeighbor.second_name)
     ) {
       newErrors.second_name = 'Solo se permiten letras y espacios';
     }
-    if (
-      toUpdateDataNeighbor?.last_name &&
-      !nameRegex.test(toUpdateDataNeighbor.last_name)
-    ) {
-      newErrors.last_name = 'Solo se permiten letras y espacios';
-    }
 
-    const ciStr = toUpdateDataNeighbor?.ci?.toString() ?? '';
-    if (ciStr && !digitsRegex.test(ciStr)) {
+    if (norm(toUpdateDataNeighbor?.ci) && !digitsRegex.test(norm(toUpdateDataNeighbor?.ci))) {
       newErrors.ci = 'Solo se permiten números';
     }
-    const phoneStr = toUpdateDataNeighbor?.phone_number?.toString() ?? '';
-    if (phoneStr && !digitsRegex.test(phoneStr)) {
+    if (
+      norm(toUpdateDataNeighbor?.phone_number) &&
+      !digitsRegex.test(norm(toUpdateDataNeighbor?.phone_number))
+    ) {
       newErrors.phone_number = 'Solo se permiten números';
+    }
+
+    if (
+      toUpdateDataNeighbor?.email &&
+      !emailRegex.test(toUpdateDataNeighbor.email.trim())
+    ) {
+      newErrors.email = 'Correo electrónico no válido';
     }
 
     setErrors(newErrors);
@@ -110,33 +161,72 @@ export const NeighborDetails: React.FC<{
   };
 
   const updateNeighborDetail = async () => {
-    if (!toUpdateDataNeighbor) return;
+    if (!toUpdateDataNeighbor || isSaving) return;
     if (!validate()) {
       toast.warning('Corrige los campos resaltados antes de guardar');
       return;
     }
-    await update(toUpdateDataNeighbor).then((data) => {
-      if (data?.ok) {
+    setIsSaving(true);
+    try {
+      const result = await update(toUpdateDataNeighbor);
+      if (result?.ok) {
         toast.success('Datos del vecino editados correctamente');
+        refetchNeighbors();
+        setEdit(false);
       } else {
-        toast.error('A ocurrido un error al editar los datos');
+        // Keep edit mode open so the user can retry without re-typing.
+        toast.error('Ocurrió un error al editar los datos');
       }
-    });
-    refetchNeighbors();
-    setEdit(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
     setErrors({});
     if (data) {
-      const { id: _, ...rest } = data;
-      setToUpdateDataNeighbor(rest);
+      setToUpdateDataNeighbor(toPayload(data));
     }
     setEdit(false);
   };
 
+  // Keyboard: Esc cancels, Cmd/Ctrl+Enter saves while editing.
+  useEffect(() => {
+    if (!edit) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleCancelEdit();
+      else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') updateNeighborDetail();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [edit, toUpdateDataNeighbor, isSaving]);
+
+  const handleHeaderClick = () => {
+    // Don't collapse while editing — it would silently discard unsaved changes.
+    if (edit) return;
+    setOpenInfo((o) => !o);
+  };
+
+  if (neighborId === undefined) {
+    return (
+      <CenteredState
+        icon={<UserCircleIcon className='h-14 w-14 text-blue-gray-300' />}
+        title='Selecciona un vecino'
+        subtitle='Elige un vecino de la lista para ver sus datos y medidores.'
+      />
+    );
+  }
   if (isLoading) return <LoaderAnimation />;
-  if (error) return <>{error}</>;
+  if (error) {
+    return (
+      <CenteredState
+        icon={<ExclamationTriangleIcon className='h-14 w-14 text-red-400' />}
+        title='No se pudieron cargar los datos'
+        subtitle='Vuelve a seleccionar el vecino o inténtalo más tarde.'
+      />
+    );
+  }
 
   return (
     <div className='mx-auto container w-full flex flex-col gap-4 lg:gap-6 h-full py-3 px-3 lg:px-3'>
@@ -145,13 +235,19 @@ export const NeighborDetails: React.FC<{
           <CardBody className='p-0'>
             <Accordion open={openInfo} className='py-0'>
               <AccordionHeader
-                className='flex justify-center px-4 lg:px-6'
-                onClick={() => {
-                  setOpenInfo(!openInfo);
-                  handleCancelEdit();
-                }}
+                className={`flex items-center justify-between px-4 lg:px-6 ${
+                  edit ? 'cursor-default' : 'cursor-pointer'
+                }`}
+                onClick={handleHeaderClick}
               >
                 <NeighborDataCard neighborData={data} />
+                {!edit && (
+                  <ChevronDownIcon
+                    className={`h-5 w-5 shrink-0 text-blue-gray-500 transition-transform duration-200 ${
+                      openInfo ? 'rotate-180' : ''
+                    }`}
+                  />
+                )}
               </AccordionHeader>
               <AccordionBody>
                 <EditNeighborDataControls
@@ -159,9 +255,11 @@ export const NeighborDetails: React.FC<{
                   setEdit={setEdit}
                   updateNeighborDetail={updateNeighborDetail}
                   onCancel={handleCancelEdit}
+                  isSaving={isSaving}
+                  canSave={isDirty}
                 />
 
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 lg:gap-x-8 gap-y-5 lg:gap-y-4 px-4 lg:px-6 pb-6'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 lg:gap-x-8 gap-y-5 lg:gap-y-4 px-4 lg:px-6 pb-6 text-center'>
                   <InfoField
                     label='Primer Nombre'
                     value={toUpdateDataNeighbor?.first_name}
@@ -189,6 +287,7 @@ export const NeighborDetails: React.FC<{
                     isInput={edit}
                     onChange={handleFieldChange('ci')}
                     error={errors.ci}
+                    inputMode='numeric'
                   />
                   <InfoField
                     label='Teléfono'
@@ -196,12 +295,16 @@ export const NeighborDetails: React.FC<{
                     isInput={edit}
                     onChange={handleFieldChange('phone_number')}
                     error={errors.phone_number}
+                    inputMode='tel'
                   />
                   <InfoField
                     label='Email'
                     value={toUpdateDataNeighbor?.email || ''}
                     isInput={edit}
                     onChange={handleFieldChange('email')}
+                    error={errors.email}
+                    type='email'
+                    inputMode='email'
                   />
                   <InfoField
                     label='Fecha de Nacimiento'
@@ -213,6 +316,27 @@ export const NeighborDetails: React.FC<{
                     isInput={false}
                   />
                 </div>
+
+                {edit && (
+                  <div className='flex justify-end gap-2 px-4 lg:px-6 pb-5'>
+                    <Button
+                      variant='text'
+                      color='blue-gray'
+                      onClick={handleCancelEdit}
+                      disabled={isSaving}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      color='green'
+                      onClick={updateNeighborDetail}
+                      disabled={isSaving || !isDirty}
+                      loading={isSaving}
+                    >
+                      Guardar cambios
+                    </Button>
+                  </div>
+                )}
               </AccordionBody>
             </Accordion>
           </CardBody>
