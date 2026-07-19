@@ -54,7 +54,7 @@ const TopNavBar = () => {
   const LogoutButton = ({ full = false }: { full?: boolean }) => (
     <button
       onClick={handleLogout}
-      className={`flex items-cenokimter justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60 ${
+      className={`flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60 ${
         full ? 'w-full' : ''
       }`}
     >

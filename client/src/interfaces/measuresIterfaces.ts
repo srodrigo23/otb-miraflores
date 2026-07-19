@@ -1,12 +1,14 @@
 
+export type MeasureStatus = "CREATED" | "IN_PROGRESS" | "CLOSED";
+
 export interface MeasureType {
   id: number;
   measure_date: string;
   period: string;
   reader_name: string;
-  status: string;
+  status: MeasureStatus;
   notes: string | null;
-  is_first_measure:boolean;
+  is_first_measure: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
-from ..enums import UserType
+from ..enums import UserType, MeasureType
 from datetime import datetime
 class ItemBase(BaseModel):
   title: str
@@ -155,13 +155,22 @@ class Measure(BaseModel):
   measure_date: datetime
   period: str | None = None
   reader_name: str | None = None
-  status: str
+  status: MeasureType
   is_first_measure:bool
   notes: str | None = None
   created_at: datetime
   updated_at: datetime
+
+  # @field_validator('status', mode='before')
+  # @classmethod
+  # def extract_enum_value(cls, v):
+  #   if isinstance(v, MeasureType):
+  #     return v.value
+  #   return v
+
   class Config:
     from_attributes = True
+    use_enum_values = True
 
 
 # Schemas para MeterReading (Lecturas de medidores)

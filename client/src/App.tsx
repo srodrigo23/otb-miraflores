@@ -10,7 +10,7 @@ import { Footer } from './components/shared/Footer'
 
 function App() {
 
-  const {pathname} = useLocation()
+  // const {pathname} = useLocation()
   // const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   // const toggleSidebar = () => {
@@ -32,8 +32,7 @@ function App() {
         theme='light'
       />
       <div className='flex flex-col h-screen overflow-hidden w-full bg-gray-50 '>
-        <TopNavBar pathName={pathname} />
-        {/* lg:min-h-0 */}
+        <TopNavBar />
         <main className='flex-1 overflow-y-auto'>
           <Outlet />
         </main>

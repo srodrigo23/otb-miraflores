@@ -26,7 +26,7 @@ def read_measures(db: Session = Depends(get_db)):
 @router.get("/{measure_id}", response_model=schemas.Measure)
 def read_measure(measure_id: int, db: Session = Depends(get_db)):
   """
-  Obtiene una medición específica
+  Get a specific measure
   """
   measure = measures_service.get_measure(db, measure_id=measure_id)
   if measure is None:
@@ -36,7 +36,7 @@ def read_measure(measure_id: int, db: Session = Depends(get_db)):
 @router.post("", response_model=schemas.Measure)
 def create_measure(measure: schemas.MeasureCreate, db: Session = Depends(get_db)):
   """
-  Crea una nueva medición
+  Creates a new measure
   """
   db_measure = measures_service.create_measure(db=db, measure=measure)
   return db_measure
@@ -44,7 +44,7 @@ def create_measure(measure: schemas.MeasureCreate, db: Session = Depends(get_db)
 @router.put("/{measure_id}", response_model=schemas.Measure)
 def update_measure(measure_id: int, measure: schemas.MeasureUpdate, db: Session = Depends(get_db)):
   """
-  Actualiza una medición existente
+  Updates a measure
   """
   db_measure = crud.update_measure(db, measure_id=measure_id, measure=measure)
   if db_measure is None:
