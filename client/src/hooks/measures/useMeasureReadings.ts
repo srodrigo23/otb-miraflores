@@ -7,6 +7,8 @@ import { apiLink } from "../../config";
 export const useMeasureReadings = (idMeasure:number)=>{
 
   const apiMeasureReadings = `${apiLink}/measures/${idMeasure}/meter-readings`
+  const apiMeterReadingsByMeasure = `${apiLink}/measures/${idMeasure}/generate-empty-meter-readings`
+
   const { data, isLoading, error, execute } = useFetchData<MeterReadingType[]>();
 
   useEffect(()=>{
@@ -15,5 +17,13 @@ export const useMeasureReadings = (idMeasure:number)=>{
       headers: { 'Content-Type': 'application/json' },
     })
   }, [idMeasure])
-  return { data, isLoading, error }
+// ''
+  const createEmptyMeterReadingsByMeasure = async ()=>{
+    await execute(apiMeterReadingsByMeasure, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  return { data, isLoading, error, createEmptyMeterReadingsByMeasure }
 }

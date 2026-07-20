@@ -31,7 +31,7 @@ def read_neighbors( db: Session = Depends(get_db)):
   #     # "page": skip // limit + 1 if limit > 0 else 1,
   #     # "size": limit
   #   }
-  return {'Error': 'No Neighbors'}
+  # return {'Error': 'No Neighbors'}
 
 @router.get("/{neighbor_id}", response_model=schemas.NeighborDetail)
 def read_neighbor_detail(neighbor_id:int, db:Session= Depends(get_db)):

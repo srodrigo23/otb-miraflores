@@ -27,23 +27,18 @@ def get_neighbors(db: Session):
 
 
 def create_neighbor(db: Session, neighbor: schemas.NeighborCreate):
-    db_neighbor = Neighbor(
-        first_name=neighbor.first_name,
-        second_name=neighbor.second_name or "",
-        last_name=neighbor.last_name,
-        ci=neighbor.ci,
-        phone_number=str(neighbor.phone_number),
-        email=neighbor.email
-    )
-    db.add(db_neighbor)
-    db.commit()
-    db.refresh(db_neighbor)
-    return db_neighbor
-
-
-# def get_neighbor_meters(db: Session, neighbor_id: int):
-#     """Obtiene todos los medidores de un vecino"""
-#     return db.query(NeighborMeter).filter(NeighborMeter.neighbor_id == neighbor_id).all()
+  db_neighbor = Neighbor(
+    first_name=neighbor.first_name,
+    second_name=neighbor.second_name or "",
+    last_name=neighbor.last_name,
+    ci=neighbor.ci,
+    phone_number=str(neighbor.phone_number),
+    email=neighbor.email
+  )
+  db.add(db_neighbor)
+  db.commit()
+  db.refresh(db_neighbor)
+  return db_neighbor
 
 
 # def get_neighbor_payments(db: Session, neighbor_id: int):
@@ -66,23 +61,23 @@ def create_neighbor(db: Session, neighbor: schemas.NeighborCreate):
 
 
 def update_neighbor(db: Session, neighbor_id: int, neighbor: schemas.NeighborUpdate):
-    db_neighbor = db.query(Neighbor).filter(Neighbor.id == neighbor_id).first()
-    if db_neighbor:
-        update_data = neighbor.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_neighbor, key, value)
-        db.commit()
-        db.refresh(db_neighbor)
-    return db_neighbor
+  db_neighbor = db.query(Neighbor).filter(Neighbor.id == neighbor_id).first()
+  if db_neighbor:
+    update_data = neighbor.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+      setattr(db_neighbor, key, value)
+    db.commit()
+    db.refresh(db_neighbor)
+  return db_neighbor
 
 
 def delete_neighbor(db: Session, neighbor_id: int):
-    db_neighbor = db.query(Neighbor).filter(Neighbor.id == neighbor_id).first()
-    if db_neighbor:
-        db.delete(db_neighbor)
-        db.commit()
-        return True
-    return False
+  db_neighbor = db.query(Neighbor).filter(Neighbor.id == neighbor_id).first()
+  if db_neighbor:
+    db.delete(db_neighbor)
+    db.commit()
+    return True
+  return False
 
 
 # ========== DEUDAS ==========

@@ -1,8 +1,9 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, DateTime, Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from app.db.database import Base
+from app.enums import MeterReadingStatus
 
 class MeterReading(Base):
   
@@ -12,15 +13,15 @@ class MeterReading(Base):
   measure_id = Column(Integer, ForeignKey("measures.id"), nullable=False)
   meter_id = Column(Integer, ForeignKey("neighbor_meters.id"), nullable=False)
 
-  current_reading = Column(Integer, nullable=False)  # Lectura actual del medidor
+  current_reading = Column(Integer, nullable=False, default=0) 
   # previous_reading = Column(Integer, default=0)  # Lectura anterior
   # consumption = Column(Integer)  # Consumo calculado (current_reading - previous_reading)
 
   # reading_date = Column(DateTime, default=datetime.utcnow)  # Fecha y hora exacta de la lectura
   # reader_name = Column(String(100))  # Persona que realizó esta lectura específica
 
-  status = Column(String(20), default="normal")  # normal, not_read, meter_error
-  has_anomaly = Column(Boolean, default=False)  # Si hay alguna anomalía detectada
+  status = Column(Enum(MeterReadingStatus), default=MeterReadingStatus.UNREAD)  # normal, not_read, meter_error
+  # has_anomaly = Column(Boolean, default=False)  # Si hay alguna anomalía detectada
 
   notes = Column(String(200))  # Observaciones específicas de esta lectura
   # photo_url = Column(String(200))  # URL de la foto del medidor (opcional)

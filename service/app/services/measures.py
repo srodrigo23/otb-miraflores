@@ -40,15 +40,18 @@ def update_measure(db: Session, measure_id: int, measure: MeasureUpdate):
     update_data = measure.model_dump(exclude_unset=True)
 
     # Si se actualiza la fecha, convertirla
-    if "measure_date" in update_data and update_data["measure_date"]:
-      from datetime import datetime
-      update_data["measure_date"] = datetime.strptime(update_data["measure_date"], "%Y-%m-%d").date()
+    # if "measure_date" in update_data and update_data["measure_date"]:
+    #   from datetime import datetime
+    #   update_data["measure_date"] = datetime.strptime(update_data["measure_date"], "%Y-%m-%d").date()
 
     for key, value in update_data.items():
       setattr(db_measure, key, value)
     db.commit()
     db.refresh(db_measure)
   return db_measure
+
+def create_empty_meter_reading()->None:
+  pass
 
 
 def delete_measure(db: Session, measure_id: int):
