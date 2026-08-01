@@ -64,7 +64,8 @@ def create_neighbors(path:str)->None:
       meter = NeighborMeter(
         neighbor_id=neighbor.id,
         meter_code = meter_code,
-        section = section
+        section = section,
+        initial_reading = 0
       )
       db.add(meter)
       db.commit()
@@ -77,7 +78,8 @@ def create_neighbors(path:str)->None:
       meter = NeighborMeter(
         neighbor_id=neighbor_exist[0].id,
         meter_code = meter_code,
-        section = section
+        section = section,
+        initial_reading = 0
       )
       db.add(meter)
       db.commit()

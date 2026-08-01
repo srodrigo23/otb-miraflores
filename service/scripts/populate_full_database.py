@@ -76,6 +76,7 @@ for index, row in df.iterrows():
         neighbor_id=db_neighbor.id,
         meter_code=meter_code,
         label="Medidor Principal",
+        initial_reading=0,
         is_active=True,
         installation_date=datetime.now().date() - timedelta(days=random.randint(365, 1825))
     )

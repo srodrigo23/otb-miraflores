@@ -1,9 +1,8 @@
-"""Backwards-compatible facade.
+"""Pydantic schemas, one module per entity (mirroring `app/models/`).
 
-Schemas now live in one module per entity (mirroring `app/models/`). This module
-re-exports all of them so existing `from app.schemas import schema as schemas`
-imports and `schemas.X` references keep working. New code should import from the
-entity module directly, e.g. `from app.schemas.neighbor import NeighborCreate`.
+Everything is re-exported here and in `schema.py` (kept as a backwards-compatible
+facade), so both `from app.schemas import NeighborCreate` and the legacy
+`from app.schemas import schema as schemas` style keep working.
 """
 
 from .assistance import Assistance, AssistanceBase, AssistanceCreate, AssistanceUpdate
