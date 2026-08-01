@@ -6,13 +6,31 @@ import { apiLink } from '../../config';
 export const useGetMeasure = (measureId:number) => {
 
   const apiMeasures = `${apiLink}/measures/${measureId}`
+  const apiCloseMeasure = `${apiLink}/measures/${measureId}/close`
 
   const { data, isLoading, error, execute } = useFetchData<MeasureType>();
+
+  // both endpoints answer with the measure, so every call refreshes `data`
+  const refetchMeasure = async () => {
+    await execute(apiMeasures, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const closeMeasure = async () => {
+    await execute(apiCloseMeasure, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   useEffect(() => {
     execute(apiMeasures, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
-  }, []);
-  return { data, isLoading, error}
+  }, [measureId]);
+
+  return { data, isLoading, error, refetchMeasure, closeMeasure }
 }

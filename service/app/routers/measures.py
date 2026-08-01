@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 from app import models
 from app.schemas import schema as schemas
-from app.services import crud
 from app.db.database import get_db
 
 import app.services.measures as measures_service
@@ -48,23 +47,11 @@ def update_measure(measure_id: int, measure: schemas.MeasureUpdate, db: Session 
   """
   Updates a measure
   """
-  db_measure = crud.update_measure(db, measure_id=measure_id, measure=measure)
+  db_measure = measures_service.update_measure(db, measure_id=measure_id, measure=measure)
   if db_measure is None:
     raise HTTPException(status_code=404, detail="Measure not found")
 
-  return {
-    "id": db_measure.id,
-    "measure_date": str(db_measure.measure_date),
-    "period": db_measure.period,
-    "reader_name": db_measure.reader_name,
-    "status": db_measure.status,
-    "total_meters": db_measure.total_meters,
-    "meters_read": db_measure.meters_read,
-    "meters_pending": db_measure.meters_pending,
-    "notes": db_measure.notes,
-    "created_at": str(db_measure.created_at),
-    "updated_at": str(db_measure.updated_at)
-  }
+  return db_measure
 
 
 @router.delete("/{measure_id}")
@@ -76,6 +63,28 @@ def delete_measure(measure_id: int, db: Session = Depends(get_db)):
   if not success:
     raise HTTPException(status_code=404, detail="Measure not found")
   return {"message": "Measure deleted successfully", "id": measure_id}
+
+@router.post("/{measure_id}/close", response_model=schemas.Measure)
+def close_measure(measure_id: int, db: Session = Depends(get_db)):
+  """
+  Closes the readings of a measure (IN_PROGRESS -> CLOSED)
+  """
+  measure = measures_service.get_measure(db, measure_id=measure_id)
+  if not measure:
+    raise HTTPException(status_code=404, detail="Measure not found")
+
+  # Already closed: idempotent, so a repeated click does not fail
+  if measure.status == MeasureType.CLOSED:
+    return measure
+
+  if measure.status != MeasureType.IN_PROGRESS:
+    raise HTTPException(
+      status_code=400,
+      detail="Only a measure in progress can be closed"
+    )
+
+  return measures_service.close_measure(db=db, measure_id=measure_id)
+
 
 @router.post("/{measure_id}/generate-empty-meter-readings", response_model=list[schemas.MeterReadingDetail])
 def generate_debts_from_measure(measure_id: int, db: Session = Depends(get_db)):
@@ -220,7 +229,7 @@ def delete_measure_debts(measure_id: int, db: Session = Depends(get_db)):
   Solo elimina deudas que no hayan sido pagadas (status = pending)
   """
   # Verificar que la medición existe
-  measure = crud.get_measure(db, measure_id=measure_id)
+  measure = measures_service.get_measure(db, measure_id=measure_id)
   if not measure:
     raise HTTPException(status_code=404, detail="Measure not found")
 

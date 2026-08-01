@@ -56,6 +56,19 @@ def create_empty_meter_reading()->None:
   pass
 
 
+def close_measure(db: Session, measure_id: int):
+  """
+  Closes a measure, moving it to its final state (IN_PROGRESS -> CLOSED)
+  """
+  db_measure = get_measure(db, measure_id=measure_id)
+  if db_measure is None:
+    return None
+  db_measure.status = MeasureType.CLOSED
+  db.commit()
+  db.refresh(db_measure)
+  return db_measure
+
+
 def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterReading]:
   """
   Gets the readings of a measure, ordered by neighbor.

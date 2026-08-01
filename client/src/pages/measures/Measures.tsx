@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import NewMeasureModalForm from '../../components/forms/NewMeasureModalForm';
 
@@ -24,6 +24,23 @@ const Measures = () => {
     isLoading: loadingMeasuresData,
     refetchMeasures,
   } = useMeasuresData();
+
+  // The detail view is not a separate route: it is this same component rendering
+  // MeterMeasures when the `id` param is present. Going back only drops the param,
+  // so nothing remounts and useMeasuresData never fetches again — the list would
+  // keep the status the measures had before entering the detail.
+  const isDetailView = measureId !== null;
+  const wasDetailView = useRef(false);
+
+  useEffect(() => {
+    // Only when coming back from the detail, where the status may have changed
+    // (starting the fill moves it to IN_PROGRESS, closing it to CLOSED).
+    // The ref keeps the initial render from firing a second, redundant fetch.
+    if (wasDetailView.current && !isDetailView) {
+      refetchMeasures();
+    }
+    wasDetailView.current = isDetailView;
+  }, [isDetailView]);
 
   const [openNewMeasureModal, setOpenNewMeasureModal] = useState(false);
   const handleOpenModal = () => setOpenNewMeasureModal(!openNewMeasureModal);

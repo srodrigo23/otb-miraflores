@@ -13,18 +13,26 @@ export const MeasureReadingsHeader: React.FC<{
   meterReadings: MeterReadingType[] | [];
   isLoadingMeterReadings?: boolean;
   handlerCreateEmptyMeterReadings: () => void;
+  handlerCloseMeasure: () => void;
 }> = ({
   measure,
   meterReadings,
   isLoadingMeasure,
   isLoadingMeterReadings,
   handlerCreateEmptyMeterReadings,
+  handlerCloseMeasure,
 }) => {
   const statusMeasure = measure?.status;
+  const isCreated = statusMeasure === 'CREATED';
+  const isClosed = statusMeasure === 'CLOSED';
 
   const handlerFillOutReadings = () => {
-    if (statusMeasure === 'CREATED') {
+    if (isCreated) {
       handlerCreateEmptyMeterReadings();
+      return;
+    }
+    if (statusMeasure === 'IN_PROGRESS') {
+      handlerCloseMeasure();
     }
   };
 
@@ -36,18 +44,21 @@ export const MeasureReadingsHeader: React.FC<{
           <div className='flex flex-row sm:flex-col gap-2 w-full sm:w-auto'>
             <Button
               variant='gradient'
-              color={measure?.status === 'CREATED' ? 'blue' : 'red'}
+              color={isCreated ? 'blue' : isClosed ? 'green' : 'red'}
               className='flex items-center justify-center gap-2 h-fit'
+              disabled={isClosed}
               onClick={handlerFillOutReadings}
             >
-              {measure?.status === 'CREATED' ? (
+              {isCreated ? (
                 <PlayIcon className='w-4 h-4' />
               ) : (
                 <StopIcon className='w-4 h-4' />
               )}
-              {measure?.status === 'CREATED'
+              {isCreated
                 ? 'Iniciar Llenado'
-                : 'Cerrar Llenado'}
+                : isClosed
+                  ? 'Llenado Cerrado'
+                  : 'Cerrar Llenado'}
             </Button>
             <Button
               variant='outlined'

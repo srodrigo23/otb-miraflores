@@ -20,9 +20,6 @@ class MeasureUpdate(BaseModel):
   period: str | None = None
   reader_name: str | None = None
   status: str | None = None
-  total_meters: int | None = None
-  meters_read: int | None = None
-  meters_pending: int | None = None
   notes: str | None = None
 
   model_config = ConfigDict(from_attributes=True) # Enables ORM/object casting
