@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import useFetchData from "../useFetchData"
 import { apiLink } from "../../config"
 import { NeighborType, NeighborWithDetailsType } from "../../interfaces/neighborsInterfaces"
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 export const useNeighborsData = () => {
   
@@ -18,7 +18,9 @@ export const useNeighborsData = () => {
       // signal: abortController.signal,
     }).then(
       (result) => {
-        if (result?.ok) toast.success('Lista de vecinos cargada');
+        if (result?.ok) {
+          //toast.success('Lista de vecinos cargada');
+        }
       }
     );
     // return () => abortController.abort();

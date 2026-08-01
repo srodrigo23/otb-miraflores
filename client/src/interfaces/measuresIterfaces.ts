@@ -8,7 +8,6 @@ export interface MeasureType {
   reader_name: string;
   status: MeasureStatus;
   notes: string | null;
-  is_first_measure: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -22,7 +21,8 @@ export interface MeterReadingType {
   measure_id: number;
   current_reading: number;
   status: string;
-  has_anomaly: boolean;
+  // the backend does not expose has_anomaly: the column is still commented out in the model
+  has_anomaly?: boolean;
   notes: string | null;
   meter_number: string | null;
   created_at: string;

@@ -77,7 +77,7 @@ def delete_measure(measure_id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="Measure not found")
   return {"message": "Measure deleted successfully", "id": measure_id}
 
-@router.post("/{measure_id}/generate-empty-meter-readings", response_model=None)
+@router.post("/{measure_id}/generate-empty-meter-readings", response_model=list[schemas.MeterReadingDetail])
 def generate_debts_from_measure(measure_id: int, db: Session = Depends(get_db)):
   """
   Generate meter readings to be edited and generate debts
@@ -86,24 +86,30 @@ def generate_debts_from_measure(measure_id: int, db: Session = Depends(get_db)):
   if not measure:
     raise HTTPException(status_code=404, detail="Measure not found")
   
-  if measure.status != MeasureType.CREATED : return []
-  
+  # Already generated: return the existing readings instead of an empty list,
+  # which left the client table with no data
+  if measure.status != MeasureType.CREATED:
+    return measures_service.get_meter_readings_by_measure(db=db, measure_id=measure_id)
+
   # update state of measure after this
   measure.status = MeasureType.IN_PROGRESS
   measure_pydantic_casted = schemas.MeasureUpdate.model_validate(measure)
   measures_service.update_measure(
-    db=db, 
-    measure_id=measure_id, 
+    db=db,
+    measure_id=measure_id,
     measure=measure_pydantic_casted
   )
 
   meters_with_neighbor = neighbor_meters.get_neighbor_meters(db=db) # Get all meters and then create every meter reading with measure ID
-  return neighbor_meters.\
-    create_meter_readings_by_measure(
-      db=db, 
-      measure=measure, 
-      meters=meters_with_neighbor
-    )
+  neighbor_meters.create_meter_readings_by_measure(
+    db=db,
+    measure=measure,
+    meters=meters_with_neighbor
+  )
+
+  # Re-read: the newly created objects are expired after the commit, and their
+  # meter/neighbor relationships are what the response schema reads from
+  return measures_service.get_meter_readings_by_measure(db=db, measure_id=measure_id)
 
   # # Obtener o crear el tipo de deuda "Consumo de Agua"
   # debt_type = db.query(models.DebtType).filter(models.DebtType.name == "Consumo de Agua").first()
@@ -192,7 +198,7 @@ def generate_debts_from_measure(measure_id: int, db: Session = Depends(get_db)):
   # }
 
 
-@router.get("/{measure_id}/meter-readings")
+@router.get("/{measure_id}/meter-readings", response_model=list[schemas.MeterReadingDetail])
 def get_measure_meter_readings(measure_id: int, db: Session = Depends(get_db)):
   """
   Obtiene todas las lecturas de medidores para una medición específica
@@ -203,40 +209,7 @@ def get_measure_meter_readings(measure_id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="Measure not found")
 
   # Obtener todas las lecturas de esta medición con información del vecino y medidor
-  meter_readings = db.query(models.MeterReading).filter(
-    models.MeterReading.measure_id == measure_id
-  ).join(
-    models.NeighborMeter, models.MeterReading.meter_id == models.NeighborMeter.id
-  ).join(
-    models.Neighbor, models.NeighborMeter.neighbor_id == models.Neighbor.id
-  ).order_by(models.Neighbor.last_name, models.Neighbor.first_name).all()
-
-  # Formatear respuesta con información del vecino
-  readings_data = []
-  for reading in meter_readings:
-    neighbor = reading.meter.neighbor
-    readings_data.append({
-      "id": reading.id,
-      "meter_id": reading.meter_id,
-      "meter_number": reading.meter.meter_code,
-      
-      "measure_id": reading.measure_id,
-      "current_reading": reading.current_reading,
-      # "reading_date": str(reading.reading_date),
-      # "status": reading.status,
-      # "has_anomaly": reading.has_anomaly,
-      "notes": reading.notes,
-      
-      # Información del vecino
-      "neighbor_first_name": neighbor.first_name,
-      "neighbor_second_name": neighbor.second_name,
-      "neighbor_last_name": neighbor.last_name,
-      
-      "created_at": str(reading.created_at),
-      "updated_at": str(reading.updated_at),
-    })
-
-  return readings_data
+  return measures_service.get_meter_readings_by_measure(db=db, measure_id=measure_id)
 
 
 

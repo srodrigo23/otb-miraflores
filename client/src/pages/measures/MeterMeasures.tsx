@@ -4,11 +4,8 @@ import { LoaderAnimation } from '../../components/shared/LoaderAnimation';
 import MeasureReadingsTable from '../../components/tables/MeasureReadingsTable';
 import { useGetMeasure } from '../../hooks/measures/useGetMeasure';
 import { useMeasureReadings } from '../../hooks/measures/useMeasureReadings';
-// import { useMeasureReadings } from '../../hooks/measures/useMeasureReadings';
 
 export const MeterMeasures: React.FC<{measureId:string}> = ({measureId}) => {
-
-  
   
   const { data:dataMeasure, isLoading:loadingMeasure } = useGetMeasure(parseInt(measureId));
   

@@ -13,7 +13,7 @@ from .debt_type import DebtType, DebtTypeBase
 from .item import Item, ItemBase, ItemCreate
 from .measure import Measure, MeasureBase, MeasureCreate, MeasureUpdate
 from .meet import Meet, MeetBase, MeetCreate, MeetUpdate
-from .meter_reading import MeterReading
+from .meter_reading import MeterReadingDetail
 from .neighbor import Neighbor, NeighborBase, NeighborCreate, NeighborDetail, NeighborUpdate
 from .neighbor_meter import NeighborMeter
 from .user import User, UserUpdate
@@ -44,7 +44,7 @@ __all__ = [
   "MeetBase",
   "MeetCreate",
   "MeetUpdate",
-  "MeterReading",
+  "MeterReadingDetail",
   "Neighbor",
   "NeighborBase",
   "NeighborCreate",

@@ -14,7 +14,7 @@ class Measure(Base):
 
   reader_name = Column(String)
   status = Column(Enum(MeasureType), default=MeasureType.CREATED)
-  is_first_measure = Column(Boolean, default=False)
+  # is_first_measure = Column(Boolean, default=False)
 
   notes = Column(String(200))
   created_at = Column(DateTime, default=datetime.utcnow)

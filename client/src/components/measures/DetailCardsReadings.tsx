@@ -55,14 +55,6 @@ export const DetailCardsReadings: React.FC<{
               {measure.reader_name}
             </Typography>
           </div>
-          {measure.is_first_measure && (
-            <Chip
-              size='sm'
-              value='Primera Medición'
-              color='amber'
-              className='font-medium'
-            />
-          )}
         </div>
       )}
 

@@ -1,5 +1,8 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, contains_eager
 from app.models.measure import Measure
+from app.models.meter_reading import MeterReading
+from app.models.neighbor_meter import NeighborMeter
+from app.models.neighbor import Neighbor
 from app.enums import MeasureType
 from app.schemas.schema import MeasureCreate, MeasureUpdate
 
@@ -21,7 +24,6 @@ def create_measure(db: Session, measure: MeasureCreate):
     measure_date=datetime.strptime(measure.measure_date, "%Y-%m-%d").date(),
     period=measure.period,
     reader_name=measure.reader_name,
-    is_first_measure=measure.is_first_measure,
     notes=measure.notes,
     status=MeasureType.CREATED,
   )
@@ -52,6 +54,34 @@ def update_measure(db: Session, measure_id: int, measure: MeasureUpdate):
 
 def create_empty_meter_reading()->None:
   pass
+
+
+def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterReading]:
+  """
+  Gets the readings of a measure, ordered by neighbor.
+  The joins walk the relationships (MeterReading.meter -> NeighborMeter.neighbor)
+  and contains_eager reuses those joined rows to populate the relationships, so
+  the MeterReadingDetail schema reads them without one extra query per reading.
+  """
+  # Previous version, joining on explicit column conditions instead of relationships:
+  # return db.query(MeterReading).filter(
+  #   MeterReading.measure_id == measure_id
+  # ).join(
+  #   NeighborMeter, MeterReading.meter_id == NeighborMeter.id
+  # ).join(
+  #   Neighbor, NeighborMeter.neighbor_id == Neighbor.id
+  # ).order_by(Neighbor.last_name, Neighbor.first_name).all()
+  return db.query(MeterReading).filter(
+    MeterReading.measure_id == measure_id
+  ).join(
+    MeterReading.meter
+  ).join(
+    NeighborMeter.neighbor
+  ).options(
+    contains_eager(MeterReading.meter).contains_eager(NeighborMeter.neighbor)
+  ).order_by(Neighbor.last_name, Neighbor.first_name).all()
+
+
 
 
 def delete_measure(db: Session, measure_id: int):

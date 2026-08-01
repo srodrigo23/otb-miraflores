@@ -136,7 +136,7 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
               const classes = 'p-3 border border-blue-gray-50 py-1';
 
               return (
-                <tr key={measure.id} className={`hover:bg-blue-gray-50/50 ${measure.is_first_measure?'bg-green-50':''}`}>
+                <tr key={measure.id} className='hover:bg-blue-gray-50/50'>
                   <td className={classes}>
                     <Typography
                       variant='small'
@@ -202,7 +202,6 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                           size='sm'
                           variant='text'
                           color='red'
-                          disabled={measure.is_first_measure}
                           onClick={() => onDelete(measure)}
                           title='Eliminar'
                         >

@@ -29,6 +29,7 @@ const MeasureReadingsTable: React.FC<{ readings: MeterReadingType[] }> = ({
   const getFullName = (reading: MeterReadingType) => {
     return `${reading.neighbor_last_name || ''} ${reading.neighbor_first_name || ''} ${reading.neighbor_second_name || ''}`.trim();
   };
+  console.log(readings)
 
   // const formatDate = (dateString: string) => {
   //   const date = new Date(dateString);

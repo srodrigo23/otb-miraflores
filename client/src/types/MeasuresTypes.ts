@@ -17,7 +17,6 @@ export type InputsNewMeasureForm = {
   period: string;
   reader_name: string;
   notes: string|null;
-  is_first_measure:boolean
 };
 
 export type NewMeasureModalFormType = {
