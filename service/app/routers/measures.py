@@ -7,7 +7,8 @@ from app.db.database import get_db
 
 import app.services.measures as measures_service
 import app.services.neighbor_meters as neighbor_meters
-from app.enums import MeasureType
+import app.services.debts as debts_service
+from app.enums import MeasureType, DebtStatus
 
 router = APIRouter(
   prefix="/measures", 
@@ -110,101 +111,19 @@ def generate_debts_from_measure(measure_id: int, db: Session = Depends(get_db)):
   )
 
   meters_with_neighbor = neighbor_meters.get_neighbor_meters(db=db) # Get all meters and then create every meter reading with measure ID
-  neighbor_meters.create_meter_readings_by_measure(
+  created_readings = neighbor_meters.create_meter_readings_by_measure(
     db=db,
     measure=measure,
     meters=meters_with_neighbor
   )
 
+  # One pending debt per reading, still with no amount: it is settled when the
+  # reading is recorded
+  debts_service.create_debts_for_readings(db=db, readings=created_readings)
+
   # Re-read: the newly created objects are expired after the commit, and their
   # meter/neighbor relationships are what the response schema reads from
   return measures_service.get_meter_readings_by_measure(db=db, measure_id=measure_id)
-
-  # # Obtener o crear el tipo de deuda "Consumo de Agua"
-  # debt_type = db.query(models.DebtType).filter(models.DebtType.name == "Consumo de Agua").first()
-  # if not debt_type:
-  #   debt_type = models.DebtType(
-  #     name="Consumo de Agua",
-  #     description="Deuda por consumo de agua mensual"
-  #   )
-  #   db.add(debt_type)
-  #   db.commit()
-  #   db.refresh(debt_type)
-
-  # # Obtener todas las lecturas de esta medición
-  # meter_readings = db.query(models.MeterReading).filter(
-  #   models.MeterReading.measure_id == measure_id
-  # ).join(
-  #   models.NeighborMeter, models.MeterReading.meter_id == models.NeighborMeter.id
-  # ).all()
-
-  # debts_created = 0
-  # debts_skipped = 0
-  # debts_details = []
-
-  # for reading in meter_readings:
-  #   # Verificar si ya existe una deuda para esta lectura
-  #   existing_debt = db.query(models.DebtItem).filter(
-  #     models.DebtItem.meter_reading_id == reading.id
-  #   ).first()
-
-  #   if existing_debt:
-  #     debts_skipped += 1
-  #     continue
-
-  #   # Obtener la lectura anterior del mismo medidor
-  #   previous_reading = db.query(models.MeterReading).filter(
-  #     models.MeterReading.meter_id == reading.meter_id,
-  #     models.MeterReading.id < reading.id
-  #   ).order_by(models.MeterReading.id.desc()).first()
-
-  #   # Calcular consumo
-  #   if previous_reading:
-  #     consumption = reading.current_reading - previous_reading.current_reading
-  #   else:
-  #     # Si no hay lectura anterior, usar la lectura actual como consumo
-  #     consumption = reading.current_reading
-
-  #   # Calcular monto según la lógica (en bolivianos)
-  #   if consumption <= 20:
-  #     amount = 20  # Bs. 20
-  #   else:
-  #     amount = consumption  # Bs. 1 por m3
-
-  #   # Crear la deuda
-  #   from datetime import date
-  #   debt_item = models.DebtItem(
-  #     neighbor_id=reading.meter.neighbor_id,
-  #     debt_type_id=debt_type.id,
-  #     meter_reading_id=reading.id,
-  #     amount=amount,
-  #     amount_paid=0,
-  #     balance=amount,
-  #     reason=f"Consumo de agua - {consumption} m3",
-  #     period=measure.period,
-  #     issue_date=date.today(),
-  #     status="pending"
-  #   )
-  #   db.add(debt_item)
-  #   debts_created += 1
-
-  #   debts_details.append({
-  #     "neighbor_id": reading.meter.neighbor_id,
-  #     "neighbor_name": f"{reading.meter.neighbor.first_name} {reading.meter.neighbor.last_name}",
-  #     "consumption": consumption,
-  #     "amount": amount,
-  #     "meter_reading_id": reading.id
-  #   })
-
-  # db.commit()
-
-  # return {
-  #   "message": f"Debts generated successfully",
-  #   "debts_created": debts_created,
-  #   "debts_skipped": debts_skipped,
-  #   "total_readings": len(meter_readings),
-  #   "details": debts_details
-  # }
 
 
 @router.get("/{measure_id}/meter-readings", response_model=list[schemas.MeterReadingDetail])
@@ -252,9 +171,26 @@ def update_measure_meter_reading(
   if not reading:
     raise HTTPException(status_code=404, detail="Meter reading not found")
 
-  return measures_service.update_meter_reading(
+  updated = measures_service.update_meter_reading(
     db=db, reading=reading, data=reading_update
   )
+
+  # Recorded reading means the consumption and the amount can be settled
+  debts_service.sync_debt_for_reading(db=db, reading=updated)
+
+  return updated
+
+
+@router.get("/{measure_id}/debts", response_model=list[schemas.DebtItemDetail])
+def get_measure_debts(measure_id: int, db: Session = Depends(get_db)):
+  """
+  Obtiene las deudas generadas por una medición
+  """
+  measure = measures_service.get_measure(db, measure_id=measure_id)
+  if not measure:
+    raise HTTPException(status_code=404, detail="Measure not found")
+
+  return debts_service.get_debts_by_measure(db=db, measure_id=measure_id)
 
 
 @router.delete("/{measure_id}/debts")
@@ -278,7 +214,7 @@ def delete_measure_debts(measure_id: int, db: Session = Depends(get_db)):
   # Eliminar solo las deudas pendientes (no pagadas) asociadas a estas lecturas
   debts_deleted = db.query(models.DebtItem).filter(
     models.DebtItem.meter_reading_id.in_(reading_ids),
-    models.DebtItem.status == "pending"
+    models.DebtItem.status == DebtStatus.PENDING
   ).delete(synchronize_session=False)
 
   db.commit()

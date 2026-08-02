@@ -50,7 +50,7 @@ class DebtItem(Base):
   updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
   # Relationships
-  # neighbor = relationship("Neighbor", back_populates="debts")
+  neighbor = relationship("Neighbor", back_populates="debts")
   meter_reading = relationship("MeterReading", back_populates="debt_item")
 
   # Pending models, kept out until they are activated (see models/unused_models/):

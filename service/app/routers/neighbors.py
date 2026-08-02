@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from ..schemas import schema as schemas
 from ..services import crud
+import app.services.debts as debts_service
 from ..db.database import get_db
 
 router = APIRouter(
@@ -36,7 +37,7 @@ def read_neighbors( db: Session = Depends(get_db)):
 @router.get("/{neighbor_id}", response_model=schemas.NeighborDetail)
 def read_neighbor_detail(neighbor_id:int, db:Session= Depends(get_db)):
   neighbor_answer = crud.get_neighbor_by_id(db, neighbor_id=neighbor_id)
-  if neighbor_answer is None:
+  if not neighbor_answer:
     raise HTTPException(status_code=404, detail="Neighbor not found")
   neighbor = neighbor_answer[0][0]
   meters = []
@@ -173,118 +174,42 @@ def get_neighbor_payments(neighbor_id: int, db: Session = Depends(get_db)):
 
 # ========== RUTAS DE DEUDAS ==========
 
+def _neighbor_debts_response(neighbor, debts) -> dict:
+  """
+  Shared payload for both debt listings
+  """
+  neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+  return {
+    "neighbor_id": neighbor.id,
+    "neighbor_name": neighbor_name,
+    "total_debts": len(debts),
+    "total_amount": sum(debt.amount for debt in debts),
+    "total_paid": sum(debt.amount_paid for debt in debts),
+    "debt_details": debts,
+  }
+
+
 @router.get("/{neighbor_id}/debts/active", response_model=schemas.NeighborDebtsResponse)
 def get_neighbor_active_debts(neighbor_id: int, db: Session = Depends(get_db)):
   """
-  Obtiene todas las deudas activas de un vecino (pending, partial, overdue)
+  Obtiene las deudas pendientes de un vecino
   """
-  # Verificar que el vecino existe
   neighbor = crud.get_neighbor(db, neighbor_id=neighbor_id)
   if neighbor is None:
     raise HTTPException(status_code=404, detail="Neighbor not found")
 
-  # Obtener deudas activas
-  debts = crud.get_neighbor_active_debts(db, neighbor_id=neighbor_id)
-
-  # Formatear respuesta
-  debt_details = []
-  total_amount = 0
-  total_balance = 0
-
-  for debt in debts:
-    # Obtener el nombre del tipo de deuda
-    debt_type_name = debt.debt_type.name if debt.debt_type else "Desconocido"
-
-    debt_detail = {
-      "id": debt.id,
-      "neighbor_id": debt.neighbor_id,
-      "debt_type_id": debt.debt_type_id,
-      "debt_type_name": debt_type_name,
-      "meter_reading_id": debt.meter_reading_id,
-      "assistance_id": debt.assistance_id,
-      "amount": debt.amount,
-      "amount_paid": debt.amount_paid,
-      "balance": debt.balance,
-      "reason": debt.reason,
-      "period": debt.period,
-      "issue_date": str(debt.issue_date),
-      "due_date": str(debt.due_date) if debt.due_date else None,
-      "paid_date": str(debt.paid_date) if debt.paid_date else None,
-      "status": debt.status,
-      "is_overdue": debt.is_overdue,
-      "late_fee": debt.late_fee,
-      "discount": debt.discount,
-      "notes": debt.notes
-    }
-    debt_details.append(debt_detail)
-    total_amount += debt.amount
-    total_balance += debt.balance
-
-  neighbor_name = f"{neighbor.first_name} {neighbor.second_name} {neighbor.last_name}".strip()
-
-  return {
-    "neighbor_id": neighbor_id,
-    "neighbor_name": neighbor_name,
-    "total_debts": len(debts),
-    "total_amount": total_amount,
-    "total_balance": total_balance,
-    "debt_details": debt_details
-  }
+  debts = debts_service.get_neighbor_debts(db, neighbor_id=neighbor_id, only_pending=True)
+  return _neighbor_debts_response(neighbor, debts)
 
 
-@router.get("/{neighbor_id}/debts/all")
+@router.get("/{neighbor_id}/debts/all", response_model=schemas.NeighborDebtsResponse)
 def get_neighbor_all_debts(neighbor_id: int, db: Session = Depends(get_db)):
   """
-  Obtiene todas las deudas de un vecino (incluyendo pagadas)
+  Obtiene todas las deudas de un vecino, incluyendo las pagadas
   """
-  # Verificar que el vecino existe
   neighbor = crud.get_neighbor(db, neighbor_id=neighbor_id)
   if neighbor is None:
     raise HTTPException(status_code=404, detail="Neighbor not found")
 
-  # Obtener todas las deudas
-  debts = crud.get_neighbor_all_debts(db, neighbor_id=neighbor_id)
-
-  # Formatear respuesta
-  debt_details = []
-  total_amount = 0
-  total_balance = 0
-
-  for debt in debts:
-    debt_type_name = debt.debt_type.name if debt.debt_type else "Desconocido"
-
-    debt_detail = {
-      "id": debt.id,
-      "neighbor_id": debt.neighbor_id,
-      "debt_type_id": debt.debt_type_id,
-      "debt_type_name": debt_type_name,
-      "meter_reading_id": debt.meter_reading_id,
-      "assistance_id": debt.assistance_id,
-      "amount": debt.amount,
-      "amount_paid": debt.amount_paid,
-      "balance": debt.balance,
-      "reason": debt.reason,
-      "period": debt.period,
-      "issue_date": str(debt.issue_date),
-      "due_date": str(debt.due_date) if debt.due_date else None,
-      "paid_date": str(debt.paid_date) if debt.paid_date else None,
-      "status": debt.status,
-      "is_overdue": debt.is_overdue,
-      "late_fee": debt.late_fee,
-      "discount": debt.discount,
-      "notes": debt.notes
-    }
-    debt_details.append(debt_detail)
-    total_amount += debt.amount
-    total_balance += debt.balance
-
-  neighbor_name = f"{neighbor.first_name} {neighbor.second_name} {neighbor.last_name}".strip()
-
-  return {
-    "neighbor_id": neighbor_id,
-    "neighbor_name": neighbor_name,
-    "total_debts": len(debts),
-    "total_amount": total_amount,
-    "total_balance": total_balance,
-    "debt_details": debt_details
-  }
+  debts = debts_service.get_neighbor_debts(db, neighbor_id=neighbor_id, only_pending=False)
+  return _neighbor_debts_response(neighbor, debts)

@@ -9,7 +9,7 @@ entity module directly, e.g. `from app.schemas.neighbor import NeighborCreate`.
 from .assistance import Assistance, AssistanceBase, AssistanceCreate, AssistanceUpdate
 from .auth import LoginRequest, LoginSchema
 from .collect_debt import CollectDebt, CollectDebtBase, CollectDebtCreate, CollectDebtUpdate
-from .debt_item import DebtItemBase, DebtItemDetail, NeighborDebtsResponse
+from .debt_item import DebtItemDetail, NeighborDebtsResponse
 from .debt_type import DebtType, DebtTypeBase
 from .item import Item, ItemBase, ItemCreate
 from .measure import Measure, MeasureBase, MeasureCreate, MeasureUpdate
@@ -28,7 +28,6 @@ __all__ = [
   "CollectDebtBase",
   "CollectDebtCreate",
   "CollectDebtUpdate",
-  "DebtItemBase",
   "DebtItemDetail",
   "DebtType",
   "DebtTypeBase",

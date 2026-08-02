@@ -27,8 +27,6 @@ class MeterReadingDetail(BaseModel):
   status: MeterReadingStatus
   notes: str | None = None
 
-  # Hardcoded for now: it should come from the same meter's reading in the
-  # previous measure, or from NeighborMeter.initial_reading for the first one
   previous_reading: int = 0
 
   # Meter information

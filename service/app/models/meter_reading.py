@@ -13,8 +13,10 @@ class MeterReading(Base):
   measure_id = Column(Integer, ForeignKey("measures.id"), nullable=False)
   meter_id = Column(Integer, ForeignKey("neighbor_meters.id"), nullable=False)
 
-  current_reading = Column(Integer, nullable=False, default=0) 
-  # previous_reading = Column(Integer, default=0)  # Lectura anterior
+  current_reading = Column(Integer, nullable=False, default=0)
+  # Frozen when the reading is created: the same meter's value in the previous
+  # measure, or the meter's initial_reading when there is no previous one
+  previous_reading = Column(Integer, nullable=False, default=0)
   # consumption = Column(Integer)  # Consumo calculado (current_reading - previous_reading)
 
   # reading_date = Column(DateTime, default=datetime.utcnow)  # Fecha y hora exacta de la lectura

@@ -55,9 +55,7 @@ class Neighbor(Base):
   meters = relationship("NeighborMeter", back_populates="neighbor", cascade="all, delete-orphan")
   
   
-  # Reached through the meter: DebtItem -> meter_reading -> meter -> neighbor.
-  # Only works again if DebtItem.neighbor_id comes back
-  # debts = relationship("DebtItem", back_populates="neighbor", cascade="all, delete-orphan")
+  debts = relationship("DebtItem", back_populates="neighbor", cascade="all, delete-orphan")
 
   # assistances = relationship("Assistance", back_populates="neighbor", cascade="all, delete-orphan")
   
