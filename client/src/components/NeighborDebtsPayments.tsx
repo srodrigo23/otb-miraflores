@@ -15,7 +15,7 @@ export const NeighborDebtsPayments = () => {
   const meter = meters.find((item) => item.id === selectedMeterId) ?? meters[0];
 
   return (
-    <section className='flex min-h-0 flex-1 flex-col gap-3'>
+    <section className='flex min-h-0 flex-1 flex-col gap-1'>
       <div className='flex items-center gap-2 overflow-x-auto pb-1'>
         {meters.map((item) => (
           <MeterPlate

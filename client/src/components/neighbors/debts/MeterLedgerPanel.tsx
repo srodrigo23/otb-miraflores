@@ -17,18 +17,21 @@ import { PaymentCard } from './PaymentCard';
 export const MeterLedgerPanel: React.FC<{ meter: MeterLedger }> = ({
   meter,
 }) => {
+  // Only what is still owed: a settled debt lives on in the payments tab
+  const pendingDebts = meter.debts.filter((debt) => debt.status === 'PENDING');
+
   const tabs = [
     {
       label: 'Deudas',
       value: 'debts',
       icon: <BanknotesIcon className='h-4 w-4' />,
-      count: meter.debts.length,
+      count: pendingDebts.length,
       content:
-        meter.debts.length === 0 ? (
-          <EmptyState message='Este medidor no tiene deudas registradas.' />
+        pendingDebts.length === 0 ? (
+          <EmptyState message='Este medidor no tiene deudas pendientes.' />
         ) : (
           <div className='flex flex-col gap-2'>
-            {meter.debts.map((debt) => (
+            {pendingDebts.map((debt) => (
               <DebtCard key={debt.id} debt={debt} meterCode={meter.code} />
             ))}
           </div>

@@ -12,8 +12,8 @@ import {
 } from '@material-tailwind/react';
 import {
   BanknotesIcon,
-  BuildingLibraryIcon,
-  QrCodeIcon,
+  // BuildingLibraryIcon,
+  // QrCodeIcon,
 } from '@heroicons/react/24/outline';
 
 import { LedgerDebt } from '../../../interfaces/neighborDebtsInterfaces';
@@ -36,8 +36,8 @@ const METHODS: {
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
   { value: 'CASH', label: 'Efectivo', icon: BanknotesIcon },
-  { value: 'QR', label: 'QR', icon: QrCodeIcon },
-  { value: 'TRANSFER', label: 'Transferencia', icon: BuildingLibraryIcon },
+  // { value: 'QR', label: 'QR', icon: QrCodeIcon },
+  // { value: 'TRANSFER', label: 'Transferencia', icon: BuildingLibraryIcon },
 ];
 
 export const PayDebtModal: React.FC<{
@@ -108,9 +108,9 @@ export const PayDebtModal: React.FC<{
               {currency(debt.amount)}
             </span>
           </div>
-          <p className='mt-1 text-xs text-blue-gray-500'>
+          {/* <p className='mt-1 text-xs text-blue-gray-500'>
             La deuda se salda completa. No se aceptan pagos parciales.
-          </p>
+          </p> */}
         </div>
 
         <form

@@ -229,13 +229,13 @@ export const NeighborDetails: React.FC<{
   }
 
   return (
-    <div className='mx-auto container w-full flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 py-3 px-3 lg:px-3'>
+    <div className='mx-auto container w-full flex flex-col gap-4 lg:gap-2 flex-1 min-h-0 py-3 px-3 lg:px-3'>
       <div>
         <Card className='w-full shadow-sm p-0'>
           <CardBody className='p-0'>
             <Accordion open={openInfo} className='py-0'>
               <AccordionHeader
-                className={`flex items-center justify-between px-4 lg:px-6 ${
+                className={`flex items-center justify-between py-1 lg:px-6 ${
                   edit ? 'cursor-default' : 'cursor-pointer'
                 }`}
                 onClick={handleHeaderClick}
