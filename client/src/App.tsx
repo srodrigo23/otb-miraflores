@@ -1,5 +1,4 @@
 // import NavBarComponent from './components/navigation/NavBarComponent'
-import { useLocation } from 'react-router-dom'
 import { Outlet } from 'react-router-dom'
 // import { useState } from 'react'
 // import { ListBullets, XCircle } from '@phosphor-icons/react'

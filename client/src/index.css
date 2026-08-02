@@ -51,6 +51,12 @@ html, body {
   height: 100%;
   margin: 0;
 }
+
+/* Without this the h-full chain breaks here: layouts asking for 100% would
+   resolve against an auto-height root and collapse to their content */
+#root {
+  height: 100%;
+}
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -1,61 +1,36 @@
-import DebtsTable from "./tables/DebtsTable";
-import { BanknotesIcon, CreditCardIcon, ChartBarIcon } from "@heroicons/react/24/outline";
-import { Tabs, TabsHeader, Tab, TabsBody, TabPanel } from "@material-tailwind/react";
+import { useState } from 'react';
 
+import { MOCK_METER_LEDGERS } from '../mocks/neighborDebtsMock';
+import { MeterPlate } from './neighbors/debts/MeterPlate';
+import { MeterConsumptionPanel } from './neighbors/debts/MeterConsumptionPanel';
+import { MeterLedgerPanel } from './neighbors/debts/MeterLedgerPanel';
 
-const PaymentsComponentNeighborPage = () => {
-  return <>Table B</>;
-};
-
-const ConsumptionComponentNeighborPage = () => {
-  return <>Table C</>;
-};
-
-export const NeighborDebtsPayments = ()=>{
-  const dataTabs = [
-    {
-      label: 'Deudas',
-      value: 'debts',
-      component: <DebtsTable />,
-      icon: <BanknotesIcon className='w-4 h-4' />,
-    },
-    {
-      label: 'Pagos',
-      value: 'payments',
-      component: <PaymentsComponentNeighborPage />,
-      icon: <CreditCardIcon className='w-4 h-4' />,
-    },
-    {
-      label: 'Consumo',
-      value: 'comsumption history',
-      component: <ConsumptionComponentNeighborPage />,
-      icon: <ChartBarIcon className='w-4 h-4' />,
-    },
-  ];
+/**
+ * Meters of a neighbor: pick one and see its consumption, debts and payments.
+ * Fed by mocks until the endpoints are wired up.
+ */
+export const NeighborDebtsPayments = () => {
+  const meters = MOCK_METER_LEDGERS;
+  const [selectedMeterId, setSelectedMeterId] = useState(meters[0].id);
+  const meter = meters.find((item) => item.id === selectedMeterId) ?? meters[0];
 
   return (
-    <>
-      <Tabs value='debts' className='h-full flex flex-col'>
-        <TabsHeader>
-          {dataTabs.map(({ label, value, icon }) => {
-            return (
-              <Tab key={value} value={value}>
-                <div className='flex items-center gap-2'>
-                  {icon}
-                  <span className='font-semibold text-sm'>{label}</span>
-                </div>
-              </Tab>
-            );
-          })}
-        </TabsHeader>
-        <TabsBody className='flex-1 overflow-y-auto'>
-          {dataTabs.map(({ value, component }) => (
-            <TabPanel key={value} value={value} className='h-full px-1 py-2'>
-              {component}
-            </TabPanel>
-          ))}
-        </TabsBody>
-      </Tabs>
-    </>
+    <section className='flex min-h-0 flex-1 flex-col gap-3'>
+      <div className='flex items-center gap-2 overflow-x-auto pb-1'>
+        {meters.map((item) => (
+          <MeterPlate
+            key={item.id}
+            meter={item}
+            isSelected={item.id === meter.id}
+            onSelect={() => setSelectedMeterId(item.id)}
+          />
+        ))}
+      </div>
+
+      <div className='grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]'>
+        <MeterConsumptionPanel meter={meter} />
+        <MeterLedgerPanel meter={meter} />
+      </div>
+    </section>
   );
-}
+};
