@@ -25,7 +25,9 @@ const useFetchData = <T> () => {
     }
   };
 
-  return { data, isLoading, error, execute };
+  // setData is exposed so a mutation can patch the cached data in place,
+  // instead of refetching the whole collection
+  return { data, setData, isLoading, error, execute };
 };
 
 export default useFetchData;

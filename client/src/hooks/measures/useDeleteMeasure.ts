@@ -18,7 +18,7 @@ const useDeleteMeasure = () => {
     }).then(
       (data)=>{
         if(data?.ok) {
-          toast.success(`Se ha elminado exitosamente la medición : ${measure?.period} (${measure?.measure_date.split('-')[0]})`)
+          toast.success(`Se ha eliminado exitosamente la medición : ${measure?.period} (${measure?.measure_date.split('-')[0]})`)
           return true;
         }
       }

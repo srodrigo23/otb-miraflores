@@ -87,7 +87,7 @@ const Measures = () => {
       {loadingMeasuresData ? (
         <LoaderAnimation />
       ) : (
-        <div className='w-full flex flex-col gap-6 h-full py-4 px-3 lg:px-3'>
+        <div className='w-full flex flex-col gap-3 h-full px-3 lg:px-3'>
           {measureId !== null ? (
             <MeterMeasures measureId={measureId}/>
           ) : (

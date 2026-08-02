@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 
 export default function MeasuresLayout() {
   return (
-    <div className='mx-auto container w-full flex flex-col h-full py-7 px-3 lg:px-3'>
+    <div className='mx-auto container w-full flex flex-col h-full py-5 px-3 lg:px-3'>
       {/* <Typography className='text-center mb-2' variant='h3' color='black'>
         Todas las Mediciones
       </Typography> */}

@@ -2,13 +2,14 @@
 import { Card, CardBody, Chip, Typography } from '@material-tailwind/react';
 
 import {
+  CheckCircleIcon,
   ClipboardDocumentListIcon,
-  ExclamationTriangleIcon,
   EyeSlashIcon,
   WrenchIcon,
 } from '@heroicons/react/24/outline';
 import { MeasureType, MeterReadingType } from '../../interfaces/measuresIterfaces';
 import { color } from '../../types/commonTypes';
+import { formatDate } from '../../utils/dates';
 
 const STATUS_COLORS: Record<string, string> = {
   CREATED: 'green',
@@ -29,6 +30,14 @@ export const DetailCardsReadings: React.FC<{
     <div className='flex flex-col gap-3 w-full'>
       {measure && (
         <div className='flex flex-wrap items-center gap-4 px-1'>
+          <div className='flex items-center gap-2'>
+            <Typography variant='small' color='blue-gray' className='font-medium'>
+              Fecha:
+            </Typography>
+            <Typography variant='small' color='blue-gray' className='font-bold'>
+              {formatDate(measure.measure_date)}
+            </Typography>
+          </div>
           <div className='flex items-center gap-2'>
             <Typography variant='small' color='blue-gray' className='font-medium'>
               Periodo:
@@ -83,8 +92,8 @@ export const DetailCardsReadings: React.FC<{
         <Card className='shadow-sm'>
           <CardBody className='p-3 lg:p-4'>
             <div className='flex items-center gap-3'>
-              <div className='p-2 rounded-lg bg-amber-50'>
-                <ExclamationTriangleIcon className='w-5 h-5 lg:w-6 lg:h-6 text-amber-700' />
+              <div className='p-2 rounded-lg bg-green-50'>
+                <CheckCircleIcon className='w-5 h-5 lg:w-6 lg:h-6 text-green-700' />
               </div>
               <div>
                 <Typography
@@ -92,10 +101,10 @@ export const DetailCardsReadings: React.FC<{
                   color='blue-gray'
                   className='font-medium leading-tight'
                 >
-                  Anomalías
+                  Leídas
                 </Typography>
-                <Typography variant='h4' color='amber'>
-                  {meterReadings.filter((el) => el.has_anomaly).length}
+                <Typography variant='h4' color='green'>
+                  {meterReadings.filter((el) => el.status === 'READED').length}
                 </Typography>
               </div>
             </div>
@@ -116,7 +125,7 @@ export const DetailCardsReadings: React.FC<{
                   Sin Leer
                 </Typography>
                 <Typography variant='h4' color='orange'>
-                  {meterReadings.filter((el) => el.status === 'not_read').length}
+                  {meterReadings.filter((el) => el.status === 'UNREAD').length}
                 </Typography>
               </div>
             </div>
@@ -138,7 +147,7 @@ export const DetailCardsReadings: React.FC<{
                 </Typography>
                 <Typography variant='h4' color='red'>
                   {
-                    meterReadings.filter((el) => el.status === 'meter_error')
+                    meterReadings.filter((el) => el.status === 'METER_ERROR')
                       .length
                   }
                 </Typography>

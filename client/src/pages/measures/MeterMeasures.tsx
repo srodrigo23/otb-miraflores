@@ -21,7 +21,8 @@ export const MeterMeasures: React.FC<{measureId:string}> = ({measureId}) => {
   const {
     data: meterLectures = [],
     isLoading: loadingMeterLectures,
-    createEmptyMeterReadingsByMeasure
+    createEmptyMeterReadingsByMeasure,
+    updateMeterReading
   } = useMeasureReadings(parseInt(measureId));
 
   const handleToggleCloseMeasureModal = () =>
@@ -56,7 +57,11 @@ export const MeterMeasures: React.FC<{measureId:string}> = ({measureId}) => {
           <LoaderAnimation fullScreen={false} />
         </div>
       ) : (
-        <MeasureReadingsTable readings={meterLectures} />
+        <MeasureReadingsTable
+          readings={meterLectures}
+          onSaveReading={updateMeterReading}
+          isReadOnly={dataMeasure?.status === 'CLOSED'}
+        />
       )}
 
       <CloseMeasureConfirmationModal

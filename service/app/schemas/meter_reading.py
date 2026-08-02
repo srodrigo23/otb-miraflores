@@ -4,6 +4,14 @@ from datetime import datetime
 from ..enums import MeterReadingStatus
 
 
+class MeterReadingUpdate(BaseModel):
+  """
+  Editable fields of a reading. Everything else about it is derived
+  """
+  current_reading: int = Field(ge=0)
+  notes: str | None = Field(default=None, max_length=200)
+
+
 class MeterReadingDetail(BaseModel):
   """
   Output schema for a meter reading, flattened with its meter and neighbor data.
@@ -19,8 +27,16 @@ class MeterReadingDetail(BaseModel):
   status: MeterReadingStatus
   notes: str | None = None
 
+  # Hardcoded for now: it should come from the same meter's reading in the
+  # previous measure, or from NeighborMeter.initial_reading for the first one
+  previous_reading: int = 0
+
+  # Meter information
   meter_number: str | None = Field(
     default=None, validation_alias=AliasPath("meter", "meter_code")
+  )
+  section: str | None = Field(
+    default=None, validation_alias=AliasPath("meter", "section")
   )
 
   # Neighbor information, reached through the meter

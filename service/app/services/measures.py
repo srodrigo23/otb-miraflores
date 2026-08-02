@@ -3,8 +3,8 @@ from app.models.measure import Measure
 from app.models.meter_reading import MeterReading
 from app.models.neighbor_meter import NeighborMeter
 from app.models.neighbor import Neighbor
-from app.enums import MeasureType
-from app.schemas.schema import MeasureCreate, MeasureUpdate
+from app.enums import MeasureType, MeterReadingStatus
+from app.schemas.schema import MeasureCreate, MeasureUpdate, MeterReadingUpdate
 
 def get_measures(db: Session):
   return db.query(Measure).order_by(Measure.created_at.desc()).all()
@@ -95,6 +95,33 @@ def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterRea
   ).order_by(Neighbor.last_name, Neighbor.first_name).all()
 
 
+def get_meter_reading(db: Session, measure_id: int, reading_id: int):
+  """
+  Gets a single reading of a measure, with its meter and neighbor loaded
+  """
+  return db.query(MeterReading).filter(
+    MeterReading.id == reading_id,
+    MeterReading.measure_id == measure_id
+  ).join(
+    MeterReading.meter
+  ).join(
+    NeighborMeter.neighbor
+  ).options(
+    contains_eager(MeterReading.meter).contains_eager(NeighborMeter.neighbor)
+  ).first()
+
+
+def update_meter_reading(db: Session, reading: MeterReading, data: MeterReadingUpdate) -> MeterReading:
+  """
+  Saves the editable fields and marks the reading as read: recording a value is
+  what moves it out of UNREAD
+  """
+  reading.current_reading = data.current_reading
+  reading.notes = data.notes
+  reading.status = MeterReadingStatus.READED
+  db.commit()
+  db.refresh(reading)
+  return reading
 
 
 def delete_measure(db: Session, measure_id: int):

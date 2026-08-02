@@ -222,6 +222,41 @@ def get_measure_meter_readings(measure_id: int, db: Session = Depends(get_db)):
 
 
 
+@router.put(
+  "/{measure_id}/meter-readings/{reading_id}",
+  response_model=schemas.MeterReadingDetail
+)
+def update_measure_meter_reading(
+  measure_id: int,
+  reading_id: int,
+  reading_update: schemas.MeterReadingUpdate,
+  db: Session = Depends(get_db)
+):
+  """
+  Updates the editable fields of a reading (current value and notes)
+  """
+  measure = measures_service.get_measure(db, measure_id=measure_id)
+  if not measure:
+    raise HTTPException(status_code=404, detail="Measure not found")
+
+  # A closed measure takes no more readings: that is what closing it means
+  if measure.status == MeasureType.CLOSED:
+    raise HTTPException(
+      status_code=400,
+      detail="A closed measure does not accept readings"
+    )
+
+  reading = measures_service.get_meter_reading(
+    db, measure_id=measure_id, reading_id=reading_id
+  )
+  if not reading:
+    raise HTTPException(status_code=404, detail="Meter reading not found")
+
+  return measures_service.update_meter_reading(
+    db=db, reading=reading, data=reading_update
+  )
+
+
 @router.delete("/{measure_id}/debts")
 def delete_measure_debts(measure_id: int, db: Session = Depends(get_db)):
   """
