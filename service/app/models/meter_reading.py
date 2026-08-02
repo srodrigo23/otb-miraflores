@@ -32,4 +32,5 @@ class MeterReading(Base):
   # Relaciones
   measure = relationship("Measure", back_populates="meter_readings")
   meter = relationship("NeighborMeter", back_populates="readings")
-  # debt_item = relationship("DebtItem", back_populates="meter_reading", uselist=False)
+  # One debt per reading, so uselist=False turns it into a single object
+  debt_item = relationship("DebtItem", back_populates="meter_reading", uselist=False, cascade="all, delete-orphan")
