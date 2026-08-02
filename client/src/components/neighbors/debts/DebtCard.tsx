@@ -49,8 +49,8 @@ export const DebtCard: React.FC<{ debt: LedgerDebt; meterCode: string }> = ({
       </header>
 
       <ReadingInterval
-        previousReading={debt.previousReading}
-        currentReading={debt.currentReading}
+        previousReading={debt.previous_reading}
+        currentReading={debt.current_reading}
         consumption={debt.consumption}
       />
 

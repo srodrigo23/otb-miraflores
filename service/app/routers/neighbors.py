@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from ..schemas import schema as schemas
 from ..services import crud
 import app.services.debts as debts_service
+import app.services.neighbor_meters as neighbor_meters
 from ..db.database import get_db
 
 router = APIRouter(
@@ -94,34 +95,16 @@ def delete_neighbor(neighbor_id: int, db: Session = Depends(get_db)):
   return {"message": "Neighbor deleted successfully", "id": neighbor_id}
 
 
-@router.get("/{neighbor_id}/meters")
+@router.get("/{neighbor_id}/meters", response_model=list[schemas.MeterLedgerDetail])
 def get_neighbor_meters(neighbor_id: int, db: Session = Depends(get_db)):
   """
-  Obtiene todos los medidores de un vecino
+  Obtiene los medidores de un vecino con su historial de consumo y sus deudas
   """
-  # Verificar que el vecino existe
   neighbor = crud.get_neighbor(db, neighbor_id=neighbor_id)
   if neighbor is None:
     raise HTTPException(status_code=404, detail="Neighbor not found")
 
-  # Obtener medidores
-  meters = crud.get_neighbor_meters(db, neighbor_id=neighbor_id)
-
-  # Formatear respuesta
-  meters_data = []
-  for meter in meters:
-    meters_data.append({
-      "id": meter.id,
-      "meter_code": meter.meter_code,
-      "label": meter.label,
-      "is_active": meter.is_active,
-      "installation_date": str(meter.installation_date) if meter.installation_date else None,
-      "last_maintenance_date": str(meter.last_maintenance_date) if meter.last_maintenance_date else None,
-      "notes": meter.notes,
-      "created_at": str(meter.created_at)
-    })
-
-  return meters_data
+  return neighbor_meters.get_neighbor_meter_ledgers(db, neighbor_id=neighbor_id)
 
 
 @router.get("/{neighbor_id}/payments")

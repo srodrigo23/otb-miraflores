@@ -32,7 +32,7 @@ export const MeterLedgerPanel: React.FC<{ meter: MeterLedger }> = ({
         ) : (
           <div className='flex flex-col gap-2'>
             {pendingDebts.map((debt) => (
-              <DebtCard key={debt.id} debt={debt} meterCode={meter.code} />
+              <DebtCard key={debt.id} debt={debt} meterCode={meter.meter_code} />
             ))}
           </div>
         ),

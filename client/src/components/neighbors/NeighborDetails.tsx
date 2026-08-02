@@ -343,7 +343,7 @@ export const NeighborDetails: React.FC<{
         </Card>
       </div>
 
-      <NeighborDebtsPayments />
+      <NeighborDebtsPayments neighborId={data?.id} />
     </div>
   );
 };

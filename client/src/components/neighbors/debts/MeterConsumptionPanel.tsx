@@ -22,7 +22,7 @@ export const MeterConsumptionPanel: React.FC<{ meter: MeterLedger }> = ({
           Consumo por periodo, en m³
         </h3>
         <span className={`text-xs text-blue-gray-500 ${NUMERIC}`}>
-          {meter.code}
+          {meter.meter_code}
         </span>
       </div>
 

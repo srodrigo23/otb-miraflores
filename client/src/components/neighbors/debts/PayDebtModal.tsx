@@ -96,8 +96,8 @@ export const PayDebtModal: React.FC<{
         {/* What is being charged, so the amount is never taken on faith */}
         <div className='rounded-lg border border-blue-gray-100 bg-blue-gray-50/40 p-3'>
           <ReadingInterval
-            previousReading={debt.previousReading}
-            currentReading={debt.currentReading}
+            previousReading={debt.previous_reading}
+            currentReading={debt.current_reading}
             consumption={debt.consumption}
           />
           <div className='mt-3 flex items-baseline justify-between'>

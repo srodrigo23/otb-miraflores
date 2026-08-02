@@ -16,7 +16,13 @@ from .measure import Measure, MeasureBase, MeasureCreate, MeasureUpdate
 from .meet import Meet, MeetBase, MeetCreate, MeetUpdate
 from .meter_reading import MeterReadingDetail, MeterReadingUpdate
 from .neighbor import Neighbor, NeighborBase, NeighborCreate, NeighborDetail, NeighborUpdate
-from .neighbor_meter import NeighborMeter
+from .neighbor_meter import (
+  ConsumptionPoint,
+  MeterDebtSummary,
+  MeterLedgerDetail,
+  MeterLedgerPayment,
+  NeighborMeter,
+)
 from .user import User, UserUpdate
 
 __all__ = [
@@ -51,6 +57,10 @@ __all__ = [
   "NeighborCreate",
   "NeighborDebtsResponse",
   "NeighborDetail",
+  "ConsumptionPoint",
+  "MeterDebtSummary",
+  "MeterLedgerDetail",
+  "MeterLedgerPayment",
   "NeighborMeter",
   "NeighborUpdate",
   "User",

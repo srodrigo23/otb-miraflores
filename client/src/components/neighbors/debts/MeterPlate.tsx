@@ -35,7 +35,7 @@ export const MeterPlate: React.FC<{
         <span
           className={`block text-sm font-bold leading-tight text-blue-gray-800 ${NUMERIC}`}
         >
-          {meter.code}
+          {meter.meter_code}
         </span>
         <span className='block text-xs leading-tight text-blue-gray-500'>
           Sección {meter.section}
