@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import {
   Button,
@@ -45,8 +45,10 @@ export const PayDebtModal: React.FC<{
   debt: LedgerDebt;
   meterCode: string;
   onClose: () => void;
-  onConfirm: (values: PayDebtFormValues) => void;
+  onConfirm: (values: PayDebtFormValues) => void | Promise<unknown>;
 }> = ({ open, debt, meterCode, onClose, onConfirm }) => {
+  // The receipt takes a moment to render: hold the dialog open until it is out
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
@@ -70,9 +72,15 @@ export const PayDebtModal: React.FC<{
 
   const selectedMethod = watch('method');
 
-  const onSubmit: SubmitHandler<PayDebtFormValues> = (values) => {
-    onConfirm(values);
-    onClose();
+  const onSubmit: SubmitHandler<PayDebtFormValues> = async (values) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onConfirm(values);
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -189,6 +197,7 @@ export const PayDebtModal: React.FC<{
           color='blue-gray'
           onClick={onClose}
           className='w-full sm:w-auto'
+          disabled={isSubmitting}
         >
           Cancelar
         </Button>
@@ -197,8 +206,9 @@ export const PayDebtModal: React.FC<{
           form='pay-debt-form'
           color='green'
           className='w-full sm:w-auto'
+          disabled={isSubmitting}
         >
-          Registrar pago
+          {isSubmitting ? 'Generando recibo...' : 'Registrar pago'}
         </Button>
       </DialogFooter>
     </Dialog>

@@ -8,9 +8,16 @@ export const getTodayDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-/** Formats an ISO date coming from the API as DD/MM/YYYY */
+/**
+ * Formats an ISO date coming from the API as DD/MM/YYYY.
+ *
+ * A date-only string ("2026-08-06") is parsed as UTC midnight by the engine,
+ * which in Bolivia (UTC-4) renders as the day before. Pinning the time makes it
+ * local and keeps the printed date equal to the one that was picked.
+ */
 export const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateString);
+  const date = new Date(isDateOnly ? `${dateString}T00:00:00` : dateString);
   return date.toLocaleDateString('es-BO', {
     year: 'numeric',
     month: '2-digit',

@@ -9,14 +9,16 @@ import { BanknotesIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 
 import { MeterLedger } from '../../../interfaces/neighborDebtsInterfaces';
 import { NUMERIC } from '../../../utils/format';
+import type { ReceiptNeighbor } from '../../../reports/PaymentReceipt';
 import { EmptyState } from '../../shared/EmptyState';
 import { DebtCard } from './DebtCard';
 import { PaymentCard } from './PaymentCard';
 
 /** Debts and payments of one meter, one tab each */
-export const MeterLedgerPanel: React.FC<{ meter: MeterLedger }> = ({
-  meter,
-}) => {
+export const MeterLedgerPanel: React.FC<{
+  meter: MeterLedger;
+  neighbor: ReceiptNeighbor;
+}> = ({ meter, neighbor }) => {
   // Only what is still owed: a settled debt lives on in the payments tab
   const pendingDebts = meter.debts.filter((debt) => debt.status === 'PENDING');
 
@@ -32,7 +34,12 @@ export const MeterLedgerPanel: React.FC<{ meter: MeterLedger }> = ({
         ) : (
           <div className='flex flex-col gap-2'>
             {pendingDebts.map((debt) => (
-              <DebtCard key={debt.id} debt={debt} meterCode={meter.meter_code} />
+              <DebtCard
+                key={debt.id}
+                debt={debt}
+                meterCode={meter.meter_code}
+                neighbor={neighbor}
+              />
             ))}
           </div>
         ),

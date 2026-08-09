@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 import { useNeighborMeterLedgers } from '../hooks/neighbors/useNeighborMeterLedgers';
+import type { ReceiptNeighbor } from '../reports/PaymentReceipt';
 import { LoaderAnimation } from './shared/LoaderAnimation';
 import { EmptyState } from './shared/EmptyState';
 import { MeterPlate } from './neighbors/debts/MeterPlate';
@@ -11,7 +12,9 @@ import { MeterLedgerPanel } from './neighbors/debts/MeterLedgerPanel';
 /** Meters of a neighbor: pick one and see its consumption, debts and payments */
 export const NeighborDebtsPayments: React.FC<{
   neighborId: number | undefined;
-}> = ({ neighborId }) => {
+  /** Only what the printed receipt needs to identify the payer */
+  neighbor: ReceiptNeighbor;
+}> = ({ neighborId, neighbor }) => {
   const { data: meters = [], isLoading, error } = useNeighborMeterLedgers(neighborId);
   const [selectedMeterId, setSelectedMeterId] = useState<number | null>(null);
 
@@ -62,7 +65,7 @@ export const NeighborDebtsPayments: React.FC<{
 
       <div className='grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]'>
         <MeterConsumptionPanel meter={meter} />
-        <MeterLedgerPanel meter={meter} />
+        <MeterLedgerPanel meter={meter} neighbor={neighbor} />
       </div>
     </section>
   );

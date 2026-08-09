@@ -1,4 +1,11 @@
-import { StyleSheet } from '@react-pdf/renderer';
+import { Font, StyleSheet } from '@react-pdf/renderer';
+
+/**
+ * Words break at spaces only. Left to itself the renderer hyphenates, which on
+ * a receipt turns a surname into "QUIS-PECALLATA" — wrong for names, meter
+ * codes and amounts alike.
+ */
+Font.registerHyphenationCallback((word) => [word]);
 
 /**
  * Shared look for every PDF report.

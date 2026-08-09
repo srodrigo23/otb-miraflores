@@ -7,8 +7,24 @@ import {
   LedgerDebt,
 } from '../../../interfaces/neighborDebtsInterfaces';
 import { currency, NUMERIC } from '../../../utils/format';
+import {
+  PaymentReceipt,
+  type ReceiptNeighbor,
+} from '../../../reports/PaymentReceipt';
+import { openReport, reportFileName } from '../../../reports/openReport';
+import {
+  createReceiptReference,
+  receiptPublicUrl,
+  toQrDataUrl,
+} from '../../../reports/qrDataUrl';
 import { ReadingInterval } from './ReadingInterval';
-import { PayDebtModal } from './PayDebtModal';
+import { PayDebtModal, type PayDebtFormValues } from './PayDebtModal';
+
+const METHOD_LABELS: Record<string, string> = {
+  CASH: 'Efectivo',
+  QR: 'QR',
+  TRANSFER: 'Transferencia',
+};
 
 /**
  * Badge classes are written in full: Tailwind scans the source for literal
@@ -19,13 +35,42 @@ const DEBT_STATUS: Record<DebtStatus, { label: string; badge: string }> = {
   PAID: { label: 'Pagada', badge: 'bg-green-50 text-green-800' },
 };
 
-export const DebtCard: React.FC<{ debt: LedgerDebt; meterCode: string }> = ({
-  debt,
-  meterCode,
-}) => {
+export const DebtCard: React.FC<{
+  debt: LedgerDebt;
+  meterCode: string;
+  neighbor: ReceiptNeighbor;
+}> = ({ debt, meterCode, neighbor }) => {
   const status = DEBT_STATUS[debt.status];
   const isPending = debt.status === 'PENDING';
   const [isPayOpen, setIsPayOpen] = useState(false);
+
+  /**
+   * Registering the payment is still pending a backend endpoint. What this does
+   * today is issue the receipt, which is the part the collector hands over.
+   */
+  const handleConfirmPayment = async (values: PayDebtFormValues) => {
+    const reference = createReceiptReference();
+    const qrDataUrl = await toQrDataUrl(receiptPublicUrl(reference));
+
+    await openReport(
+      <PaymentReceipt
+        debt={debt}
+        meterCode={meterCode}
+        neighbor={neighbor}
+        payment={{
+          receipt: values.receipt,
+          date: values.date,
+          method: METHOD_LABELS[values.method] ?? values.method,
+          notes: values.notes,
+          reference,
+          qrDataUrl,
+        }}
+      />,
+      reportFileName(['recibo', values.receipt || reference]),
+    );
+
+    toast.info('Recibo generado. El pago todavía no queda registrado.');
+  };
 
   return (
     <article className='rounded-lg border border-blue-gray-100 bg-white p-3 transition-shadow hover:shadow-md'>
@@ -80,12 +125,7 @@ export const DebtCard: React.FC<{ debt: LedgerDebt; meterCode: string }> = ({
           debt={debt}
           meterCode={meterCode}
           onClose={() => setIsPayOpen(false)}
-          onConfirm={() =>
-            // Visual only: nothing is persisted until the payments endpoint exists
-            toast.info(
-              `Pago de ${currency(debt.amount)} capturado en pantalla. Falta conectarlo al backend.`,
-            )
-          }
+          onConfirm={handleConfirmPayment}
         />
       )}
     </article>

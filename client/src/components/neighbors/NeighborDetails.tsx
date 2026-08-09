@@ -343,7 +343,15 @@ export const NeighborDetails: React.FC<{
         </Card>
       </div>
 
-      <NeighborDebtsPayments neighborId={data?.id} />
+      <NeighborDebtsPayments
+        neighborId={data?.id}
+        neighbor={{
+          fullName: `${data?.last_name ?? ''} ${data?.first_name ?? ''} ${data?.second_name ?? ''}`
+            .replace(/\s+/g, ' ')
+            .trim(),
+          ci: data?.ci ? String(data.ci) : '',
+        }}
+      />
     </div>
   );
 };
