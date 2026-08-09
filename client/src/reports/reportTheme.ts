@@ -24,6 +24,8 @@ export const REPORT_COLORS = {
   headerFill: '#eceff1',
   /** Cells the reader fills in by hand */
   blankFill: '#ffffff',
+  /** Light enough that printed data stays readable over it */
+  watermark: '#e6ebee',
 };
 
 export const REPORT_FONT = {

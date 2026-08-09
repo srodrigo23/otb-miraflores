@@ -145,7 +145,73 @@ const styles = StyleSheet.create({
     borderBottomStyle: 'dashed',
     borderColor: REPORT_COLORS.line,
   },
+
+  /**
+   * Watermarks sit in an absolute layer rendered before the content, so the
+   * data paints on top of them. overflow keeps a rotated mark from bleeding
+   * into the receipt beside it.
+   */
+  watermarkLayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: RECEIPT_WIDTH,
+    height: A4_HALF_HEIGHT,
+  },
+  tiledGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignContent: 'center',
+    width: '100%',
+    height: '100%',
+    paddingHorizontal: 6,
+  },
+  // Each tile rotates on its own: rotating the whole grid would push it past
+  // the receipt, and @react-pdf does not clip overflow
+  tile: {
+    width: '50%',
+    fontSize: 9,
+    fontFamily: REPORT_FONT.bold,
+    color: REPORT_COLORS.watermark,
+    textAlign: 'center',
+    paddingVertical: 14,
+    transform: 'rotate(-20deg)',
+  },
+  diagonal: {
+    position: 'absolute',
+    top: A4_HALF_HEIGHT / 2 - 40,
+    left: 0,
+    width: RECEIPT_WIDTH,
+    fontSize: 54,
+    fontFamily: REPORT_FONT.bold,
+    color: REPORT_COLORS.watermark,
+    textAlign: 'center',
+    letterSpacing: 4,
+    transform: 'rotate(-38deg)',
+  },
 });
+
+export type ReceiptWatermark =
+  | { kind: 'tiled'; text: string }
+  | { kind: 'diagonal'; text: string };
+
+const TILE_COUNT = 20;
+
+const Watermark: React.FC<{ watermark: ReceiptWatermark }> = ({ watermark }) => (
+  <View style={styles.watermarkLayer}>
+    {watermark.kind === 'tiled' ? (
+      <View style={styles.tiledGrid}>
+        {Array.from({ length: TILE_COUNT }, (_, index) => (
+          <Text key={index} style={styles.tile}>
+            {watermark.text}
+          </Text>
+        ))}
+      </View>
+    ) : (
+      <Text style={styles.diagonal}>{watermark.text}</Text>
+    )}
+  </View>
+);
 
 const money = (amountInCents: number) => `Bs ${(amountInCents / 100).toFixed(2)}`;
 
@@ -160,12 +226,24 @@ const ReceiptBody: React.FC<{
   copyTag: string;
   /** The right-hand copy carries the dashed rule that marks the cut */
   withCutLine?: boolean;
+  watermark: ReceiptWatermark;
   debt: LedgerDebt;
   meterCode: string;
   neighbor: ReceiptNeighbor;
   payment: ReceiptPayment;
-}> = ({ copyTag, withCutLine = false, debt, meterCode, neighbor, payment }) => (
+}> = ({
+  copyTag,
+  withCutLine = false,
+  watermark,
+  debt,
+  meterCode,
+  neighbor,
+  payment,
+}) => (
   <View style={withCutLine ? [styles.receipt, styles.cutLine] : styles.receipt}>
+    {/* First child, so every line of data paints over it */}
+    <Watermark watermark={watermark} />
+
     <Text style={styles.title}>RECIBO DE COBRO — AGUA</Text>
     <Text style={styles.org}>OTB Miraflores</Text>
     <Text style={styles.copyTag}>{copyTag}</Text>
@@ -232,6 +310,7 @@ export const PaymentReceipt: React.FC<{
       <View style={styles.sheet}>
         <ReceiptBody
           copyTag='ORIGINAL · VECINO'
+          watermark={{ kind: 'tiled', text: 'OTB MIRAFLORES' }}
           debt={debt}
           meterCode={meterCode}
           neighbor={neighbor}
@@ -240,6 +319,7 @@ export const PaymentReceipt: React.FC<{
         <ReceiptBody
           copyTag='COPIA · ARCHIVO'
           withCutLine
+          watermark={{ kind: 'diagonal', text: 'COPIA' }}
           debt={debt}
           meterCode={meterCode}
           neighbor={neighbor}
