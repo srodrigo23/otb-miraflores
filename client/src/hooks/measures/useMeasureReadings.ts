@@ -20,11 +20,21 @@ export const useMeasureReadings = (idMeasure:number)=>{
   const { isLoading: isSavingReading, execute: executeUpdate } =
     useFetchData<MeterReadingType>();
 
-  useEffect(()=>{
-    execute(apiMeasureReadings, {
+  /**
+   * Reads the list and hands it back to the caller, so anything that needs the
+   * readings on demand (the printable sheet, for one) gets fresh data without
+   * waiting for a re-render.
+   */
+  const fetchMeterReadings = async (): Promise<MeterReadingType[]> => {
+    const response = await execute(apiMeasureReadings, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     })
+    return response?.ok ? (response.data as MeterReadingType[]) : []
+  }
+
+  useEffect(()=>{
+    fetchMeterReadings()
   }, [idMeasure])
 // ''
   const createEmptyMeterReadingsByMeasure = async ()=>{
@@ -68,6 +78,7 @@ export const useMeasureReadings = (idMeasure:number)=>{
     data,
     isLoading,
     error,
+    fetchMeterReadings,
     createEmptyMeterReadingsByMeasure,
     updateMeterReading,
     isSavingReading,

@@ -14,6 +14,8 @@ export const MeasureReadingsHeader: React.FC<{
   isLoadingMeterReadings?: boolean;
   handlerCreateEmptyMeterReadings: () => void;
   handlerCloseMeasure: () => void;
+  handlerPrintReadingsSheet: () => void;
+  isPreparingSheet?: boolean;
 }> = ({
   measure,
   meterReadings,
@@ -21,6 +23,8 @@ export const MeasureReadingsHeader: React.FC<{
   isLoadingMeterReadings,
   handlerCreateEmptyMeterReadings,
   handlerCloseMeasure,
+  handlerPrintReadingsSheet,
+  isPreparingSheet = false,
 }) => {
   const statusMeasure = measure?.status;
   const isCreated = statusMeasure === 'CREATED';
@@ -64,9 +68,12 @@ export const MeasureReadingsHeader: React.FC<{
               variant='outlined'
               color='blue-gray'
               className='flex items-center justify-center gap-2 h-fit'
+              onClick={handlerPrintReadingsSheet}
+              // Nothing to hand the reader before the readings exist
+              disabled={isCreated || isPreparingSheet}
             >
               <PrinterIcon className='w-4 h-4' />
-              Imprimir Tabla
+              {isPreparingSheet ? 'Generando...' : 'Imprimir Tabla'}
             </Button>
           </div>
         ) : (
