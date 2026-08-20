@@ -4,12 +4,9 @@ import './index.css';
 
 import { ThemeProvider } from '@material-tailwind/react';
 
-// import CheckNeighborDebts from './pages/checkDebts/CheckNeighborsDebts.tsx';
 import Neighbors from './pages/neighbors/Neighbors.tsx';
-// import Meetings from './pages/meetings/Meetings.tsx';
-// import Collections from './pages/collections/Collections.tsx';
-// import Receipts from './pages/receipts/Receipts.tsx';
 import Measures from './pages/measures/Measures.tsx';
+import Payments from './pages/payments/Payments.tsx';
 
 import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/shared/ProtectedRoute.tsx';
@@ -19,6 +16,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // import NeighborDetails from './pages/neighbors/NeighborDetails.tsx';
 import NeighborsLayout from './layouts/NeighborsLayout.tsx';
 import MeasuresLayout from './layouts/MeasuresLayout.tsx';
+import PaymentsLayout from './layouts/PaymentsLayout.tsx';
 
 // import App from './App.tsx';
 
@@ -43,6 +41,10 @@ createRoot(document.getElementById('root')!).render(
 
               <Route path='mediciones' element={<MeasuresLayout />}>
                 <Route index element={<Measures />} />
+              </Route>
+
+              <Route path='pagos' element={<PaymentsLayout />}>
+                <Route index element={<Payments />} />
               </Route>
             </Route>
 

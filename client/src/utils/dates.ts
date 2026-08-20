@@ -24,3 +24,14 @@ export const formatDate = (dateString: string) => {
     day: '2-digit',
   });
 };
+
+/** Formats an ISO datetime as HH:MM */
+export const formatTime = (dateString: string) =>
+  new Date(dateString).toLocaleTimeString('es-BO', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+/** The date part of an ISO datetime, as YYYY-MM-DD, for comparing against filters */
+export const toIsoDate = (dateString: string) => dateString.slice(0, 10);

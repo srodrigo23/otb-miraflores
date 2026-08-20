@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 const navigationItems = [
   { label: 'Vecinos', path: '/vecinos' },
   { label: 'Mediciones', path: '/mediciones' },
+  { label: 'Pagos', path: '/pagos' },
   // { label: 'Reuniones', path: '/reuniones' },
   // { label: 'Recaudaciones', path: '/recaudaciones' },
 ];

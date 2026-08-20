@@ -25,7 +25,8 @@ export type StatIcon = React.ComponentType<{ className?: string }>;
 /** A labelled counter with an icon badge, as used by the summary rows */
 export const StatCard: React.FC<{
   label: string;
-  value: number;
+  /** A count, or a preformatted figure such as an amount with its currency */
+  value: number | string;
   icon: StatIcon;
   tone: StatTone;
 }> = ({ label, value, icon: Icon, tone }) => (
