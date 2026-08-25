@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  # gate: every PR that targets production must pass
+  pull_request:
+    branches: [production]
+  # record: also check the commit production actually deploys
+  push:
+    branches: [production]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: service
+    env:
+      # app/core/settings.py builds Settings() at import time, so these must
+      # exist or pytest fails during collection, before any test runs.
+      #
+      # NOT from secrets on purpose: this is the switch in app/db/database.py
+      # that chooses DB_URL_SUPABASE over DB_URL_SQLITE. CI must never point
+      # at the production database.
+      ENVIRONMENT: DEVELOPMENT
+      SECRET_KEY: ${{ vars.SECRET_KEY }}
+      ALGORITHM: ${{ vars.ALGORITHM }}
+      DB_URL_SQLITE: ${{ vars.DB_URL_SQLITE }}
+      # DB_URL_SUPABASE: ${{ vars.DB_URL_SUPABASE }}
+      PORT: ${{ vars.PORT }}
+      CLIENT_URL_DEV: ${{ vars.CLIENT_URL_DEV }}
+      CLIENT_URL_PROD: ${{ vars.CLIENT_URL_PROD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run pytest
