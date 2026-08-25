@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useState } from 'react';
 import { Typography } from '@material-tailwind/react';
 import CollectDebtTable from '../../components/tables/CollectDebtTable';
-import CollectDebtPaymentsModal from '../../components/modals/CollectDebtPaymentsModal';
+import CollectDebtPaymentsModal from '../components/modals/CollectDebtPaymentsModal';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 

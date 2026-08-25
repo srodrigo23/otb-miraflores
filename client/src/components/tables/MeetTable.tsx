@@ -107,8 +107,8 @@ const MeetTable: React.FC<MeetTableProps> = ({
   // Ordenar datos
   const sortedData = useMemo(() => {
     const sorted = [...tableData].sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
+      const aValue = a[sortField];
+      const bValue = b[sortField];
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortOrder === 'asc'
