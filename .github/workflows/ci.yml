@@ -14,6 +14,7 @@ jobs:
     defaults:
       run:
         working-directory: service
+    environment: production
     env:
       # app/core/settings.py builds Settings() at import time, so these must
       # exist or pytest fails during collection, before any test runs.
