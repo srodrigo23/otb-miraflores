@@ -14,7 +14,7 @@ def get_user_by_id(db:Session, user_id:int | UUID) -> User | None:
 # ---------------- password methods -------------------
 
 def hash_password(plain_text_password:str) -> str:
-  password_bytes = plain_text_password.endode("utf-8")
+  password_bytes = plain_text_password.encode("utf-8")
   hashed_bytes = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
   return hashed_bytes.decode('utf-8') 
   

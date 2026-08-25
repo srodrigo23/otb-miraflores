@@ -63,3 +63,15 @@ dependencies = [
     "watchfiles==1.1.0",
     "websockets==15.0.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+# make `app` importable from the service root
+pythonpath = ["."]
+# only collect test/ (scripts/test_update.py is a one-off script, not a test)
+testpaths = ["test"]
+addopts = "-v"

@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "concurrently -n BACKEND,FRONTEND -c blue,green \"npm run api\" \"npm run web\"",
     "web": "cd client && pnpm run dev",
-    "api": "cd service && bash scripts/api.sh"
+    "api": "cd service && bash scripts/api.sh",
+    "test": "cd service && uv run pytest"
   },
   "dependencies": {
     "concurrently": "^9.2.1"
