@@ -25,7 +25,7 @@ jobs:
       SECRET_KEY: ${{ vars.SECRET_KEY }}
       ALGORITHM: ${{ vars.ALGORITHM }}
       DB_URL_SQLITE: ${{ vars.DB_URL_SQLITE }}
-      # DB_URL_SUPABASE: ${{ vars.DB_URL_SUPABASE }}
+      DB_URL_SUPABASE: ${{ vars.DB_URL_SUPABASE }}
       PORT: ${{ vars.PORT }}
       CLIENT_URL_DEV: ${{ vars.CLIENT_URL_DEV }}
       CLIENT_URL_PROD: ${{ vars.CLIENT_URL_PROD }}
