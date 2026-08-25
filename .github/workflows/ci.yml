@@ -22,13 +22,13 @@ jobs:
       # that chooses DB_URL_SUPABASE over DB_URL_SQLITE. CI must never point
       # at the production database.
       ENVIRONMENT: DEVELOPMENT
-      SECRET_KEY: ${{ vars.SECRET_KEY }}
-      ALGORITHM: ${{ vars.ALGORITHM }}
-      DB_URL_SQLITE: ${{ vars.DB_URL_SQLITE }}
-      DB_URL_SUPABASE: ${{ vars.DB_URL_SUPABASE }}
-      PORT: ${{ vars.PORT }}
-      CLIENT_URL_DEV: ${{ vars.CLIENT_URL_DEV }}
-      CLIENT_URL_PROD: ${{ vars.CLIENT_URL_PROD }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      DB_URL_SQLITE: ${{ secrets.DB_URL_SQLITE }}
+      DB_URL_SUPABASE: ${{ secrets.DB_URL_SUPABASE }}
+      PORT: ${{ secrets.PORT }}
+      CLIENT_URL_DEV: ${{ secrets.CLIENT_URL_DEV }}
+      CLIENT_URL_PROD: ${{ secrets.CLIENT_URL_PROD }}
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
