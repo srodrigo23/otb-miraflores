@@ -1,9 +1,9 @@
 import {
   Button,
   Input,
-  Option,
-  Select,
-  Typography,
+  // Option,
+  // Select,
+  // Typography,
 } from '@material-tailwind/react';
 import {
   ArrowPathIcon,
@@ -29,16 +29,16 @@ export const PaymentsFiltersBar: React.FC<{
   onExport: () => void;
 }> = ({
   filters,
-  collectors,
+  // collectors,
   hasActiveFilters,
   resultCount,
-  totalCount,
+  // totalCount,
   isPreparingReport,
   onChange,
   onReset,
   onExport,
 }) => (
-  <div className='flex flex-col gap-3 border rounded-lg p-4'>
+  <div className='flex flex-col gap-3 rounded-lg py-4'>
     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3'>
       <Input
         type='date'
@@ -56,7 +56,7 @@ export const PaymentsFiltersBar: React.FC<{
         // A range that ends before it starts would silently return nothing
         error={!!filters.from && !!filters.to && filters.to < filters.from}
       />
-      <Select
+      {/* <Select
         label='Responsable'
         value={filters.collector}
         onChange={(value) => onChange({ collector: value ?? '' })}
@@ -67,34 +67,24 @@ export const PaymentsFiltersBar: React.FC<{
             {collector}
           </Option>
         ))}
-      </Select>
+      </Select> */}
       <Input
-        label='Buscar medidor, vecino o recibo'
+        label='Buscar'
         crossOrigin={undefined}
         icon={<MagnifyingGlassIcon className='h-4 w-4' />}
         value={filters.search}
         onChange={(e) => onChange({ search: e.target.value })}
       />
-      <div className='flex gap-2'>
-        <Button
-          variant='outlined'
-          color='blue-gray'
-          className='flex items-center justify-center gap-2 h-fit py-2.5 grow'
-          onClick={onReset}
-          disabled={!hasActiveFilters}
-        >
-          <ArrowPathIcon className='w-4 h-4' />
-          Limpiar
-        </Button>
-      </div>
-    </div>
-
-    <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-2'>
-      <Typography variant='small' color='blue-gray' className='font-normal'>
-        {hasActiveFilters
-          ? `Mostrando ${resultCount} de ${totalCount} pagos`
-          : `${totalCount} pagos registrados`}
-      </Typography>
+      <Button
+        variant='outlined'
+        color='blue-gray'
+        className='flex items-center justify-center gap-2 h-fit py-2.5 grow'
+        onClick={onReset}
+        disabled={!hasActiveFilters}
+      >
+        <ArrowPathIcon className='w-4 h-4' />
+        Limpiar
+      </Button>
       <Button
         variant='gradient'
         color='blue'
@@ -105,6 +95,15 @@ export const PaymentsFiltersBar: React.FC<{
         <DocumentArrowDownIcon className='w-4 h-4' />
         {isPreparingReport ? 'Generando...' : 'Reporte PDF'}
       </Button>
+      <div className='flex gap-2'>
+      </div>
     </div>
+    {/* <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-2'> */}
+      {/* <Typography variant='small' color='blue-gray' className='font-normal'>
+        {hasActiveFilters
+          ? `Mostrando ${resultCount} de ${totalCount} pagos`
+          : `${totalCount} pagos registrados`}
+      </Typography> */}
+    {/* </div> */}
   </div>
 );
