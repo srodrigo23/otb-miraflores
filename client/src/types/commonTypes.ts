@@ -1,3 +1,6 @@
+/** How a collection is rendered: as a grid of cards, or as a data table. */
+export type ViewMode = 'cards' | 'table';
+
 export type color =
   | 'blue-gray'
   | 'gray'

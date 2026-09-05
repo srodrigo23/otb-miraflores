@@ -12,49 +12,27 @@ import {
 } from '@heroicons/react/24/outline';
 import { NeighborType } from '../../interfaces/neighborsInterfaces';
 import { useNavigate } from 'react-router-dom';
-
-interface NeighborListProps {
-  neighborsData: NeighborType[];
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-  neighborSelected: NeighborType | null;
-  onSelectNeighbor: (neighbor: NeighborType) => void;
-  /** Optional — wire this from the parent to enable the "add neighbor" action. */
-  onAddNeighbor?: () => void;
-}
+import { NeighborsViewProps } from '../../types/NeighborsTypes';
+import { filterNeighbors } from '../../utils/neighbors';
 
 const getInitials = (n: NeighborType) =>
   `${n.first_name?.[0] ?? ''}${n.last_name?.[0] ?? ''}`.toUpperCase();
 
-export const NeighborList: React.FC<NeighborListProps> = ({
+export const NeighborList: React.FC<NeighborsViewProps> = ({
   neighborsData,
   searchTerm,
   onSearchChange,
   neighborSelected,
   onSelectNeighbor,
   onAddNeighbor,
+  headerActions,
 }) => {
   const navigate = useNavigate();
 
-  const query = searchTerm.trim().toLowerCase();
-
-  const filteredData = useMemo(() => {
-    if (!query) return neighborsData;
-    return neighborsData.filter((neighbor) => {
-      const haystack = [
-        neighbor.first_name,
-        neighbor.second_name,
-        neighbor.last_name,
-        neighbor.ci,
-        neighbor.phone_number,
-        neighbor.email,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [query, neighborsData]);
+  const filteredData = useMemo(
+    () => filterNeighbors(neighborsData, searchTerm),
+    [neighborsData, searchTerm],
+  );
 
   const handleSelect = (neighbor: NeighborType) => {
     navigate(`/vecinos?id=${neighbor.id}`);
@@ -94,6 +72,8 @@ export const NeighborList: React.FC<NeighborListProps> = ({
               </button>
             )}
           </div>
+
+          {headerActions}
 
           <IconButton
             variant='gradient'

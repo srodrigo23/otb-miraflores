@@ -92,8 +92,9 @@ const Measures = () => {
             <MeterMeasures measureId={measureId}/>
           ) : (
             <>
-              <div className='flex flex-col sm:flex-row justify-between gap-3 py-3 items-center border rounded-lg p-5'>
+              <div className='flex flex-col justify-between gap-3 py-3 p-5'>
                 <DetailCardsMeasures measures={measuresData} />
+              </div>
                 <Button
                   className='w-60 h-fit'
                   onClick={handleOpenModal}
@@ -101,7 +102,6 @@ const Measures = () => {
                 >
                   NUEVA MEDICIÓN
                 </Button>
-              </div>
               <MeasureTable
                 tableData={measuresData}
                 onDelete={handleDeleteWithModal}

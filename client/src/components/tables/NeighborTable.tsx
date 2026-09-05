@@ -1,75 +1,75 @@
-import { useState, useMemo } from 'react';
-import { Typography, Input, 
-  // IconButton, Button
-} from '@material-tailwind/react';
-import { MagnifyingGlassIcon, ChevronUpDownIcon, 
-  // PencilIcon, TrashIcon, EyeIcon 
+import { useMemo, useState } from 'react';
+import { IconButton, Input, Typography } from '@material-tailwind/react';
+import {
+  ChevronUpDownIcon,
+  EyeIcon,
+  MagnifyingGlassIcon,
+  UserPlusIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
-import NewNeighborModalForm from '../forms/NewNeighborModalForm';
-import { NeighborTableProps } from '../../types/NeighborsTypes';
+import { useNavigate } from 'react-router-dom';
 
-type SortField = 'id' | 'last_name' | 'first_name' | 'ci' | 'phone_number' | 'email';
+import { NeighborsViewProps } from '../../types/NeighborsTypes';
+import { NeighborType } from '../../interfaces/neighborsInterfaces';
+import { filterNeighbors, fullName } from '../../utils/neighbors';
+import { NUMERIC } from '../../utils/format';
+import { EmptyState } from '../shared/EmptyState';
+
+type SortField = 'id' | 'last_name' | 'ci' | 'phone_number' | 'email';
 type SortOrder = 'asc' | 'desc';
 
 const TABLE_HEAD = [
   { label: 'Num.', field: 'id' as SortField, sortable: true },
-  { label: 'Nombre Completo', field: 'Name' as SortField, sortable: true },
-  { label: 'Ultimo Consumo', field: 'lastConsumption' as SortField, sortable: true },
-  // { label: 'Nombres', field: 'first_name' as SortField, sortable: true },
-  // { label: 'CI', field: 'ci' as SortField, sortable: true },
-  // { label: 'Celular', field: 'phone_number' as SortField, sortable: true },
-  // { label: 'Correo', field: 'email' as SortField, sortable: true },
-  // { label: 'Acciones', field: null, sortable: false },
+  { label: 'Nombre Completo', field: 'last_name' as SortField, sortable: true },
+  { label: 'CI', field: 'ci' as SortField, sortable: true },
+  { label: 'Celular', field: 'phone_number' as SortField, sortable: true },
+  { label: 'Correo', field: 'email' as SortField, sortable: true },
+  { label: 'Acciones', field: null, sortable: false },
 ];
 
-const NeighborTable: React.FC<NeighborTableProps> = ({ 
-  tableData, 
-  // onEdit, 
-  // onDelete, 
-  onCreate, 
-  // onView
- }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+/** The name column sorts by surname, matching how the register is ordered. */
+const sortValue = (neighbor: NeighborType, field: SortField) =>
+  field === 'last_name' ? fullName(neighbor) : neighbor[field];
+
+const NeighborTable: React.FC<NeighborsViewProps> = ({
+  neighborsData,
+  searchTerm,
+  onSearchChange,
+  neighborSelected,
+  onSelectNeighbor,
+  onAddNeighbor,
+  headerActions,
+}) => {
+  const navigate = useNavigate();
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-  // Modal para nuevo vecino
-  const [openModal, setOpenModal] = useState(false);
-  const handleOpenModal = () => setOpenModal(!openModal);
+  const filteredData = useMemo(
+    () => filterNeighbors(neighborsData, searchTerm),
+    [neighborsData, searchTerm],
+  );
 
-  // Filtrar datos por búsqueda
-  const filteredData = useMemo(() => {
-    return tableData.filter((neighbor) => {
-      const fullName =
-        `${neighbor.first_name} ${neighbor.second_name} ${neighbor.last_name}`.toLowerCase();
-      return fullName.includes(searchTerm.toLowerCase());
-    });
-  }, [tableData, searchTerm]);
-
-  // Ordenar datos
   const sortedData = useMemo(() => {
-    const sorted = [...filteredData].sort((a, b) => {
-      let aValue = a[sortField];
-      let bValue = b[sortField];
+    const direction = sortOrder === 'asc' ? 1 : -1;
 
-      if (sortField === 'first_name') {
-        aValue = `${a.first_name} ${a.second_name}`;
-        bValue = `${b.first_name} ${b.second_name}`;
-      }
+    return [...filteredData].sort((a, b) => {
+      const aValue = sortValue(a, sortField);
+      const bValue = sortValue(b, sortField);
+
+      // Blanks sink to the bottom in both directions: a neighbor with no CI on
+      // record should never outrank one that has it.
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortOrder === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
+        return aValue.localeCompare(bValue) * direction;
       }
-
       if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+        return (aValue - bValue) * direction;
       }
-
       return 0;
     });
-    return sorted;
   }, [filteredData, sortField, sortOrder]);
 
   const handleSort = (field: SortField) => {
@@ -81,222 +81,190 @@ const NeighborTable: React.FC<NeighborTableProps> = ({
     }
   };
 
-  return (
-    <div className='flex flex-col h-screen w-1/2'>
-      {/* Campo de búsqueda */}
-      <div className='flex justify-between py-3 px-5 flex-shrink-0'>
-        {/* <Typography className='text-center mb-2' variant='h3' color='black'>
-          Vecinos
-        </Typography> */}
+  // Same navigation the card list uses, so both views land on the same screen.
+  const handleSelect = (neighbor: NeighborType) => {
+    navigate(`/vecinos?id=${neighbor.id}`);
+    onSelectNeighbor(neighbor);
+  };
 
-        <div className='flex mb-4 justify-center gap-3'>
-          <div className='flex w-full md:w-96'>
+  return (
+    <div className='flex h-full min-h-0 flex-col gap-4'>
+      {/* Header: title + live count + actions. Mirrors NeighborList so the
+          switch doesn't shift the layout when the view changes. */}
+      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex items-baseline gap-2'>
+          <Typography variant='h5' className='text-blue-gray-900'>
+            Vecinos
+          </Typography>
+          <span className='rounded-full bg-blue-gray-100 px-2 py-0.5 text-xs font-semibold text-blue-gray-700'>
+            {sortedData.length}
+          </span>
+        </div>
+
+        <div className='flex items-center gap-2'>
+          <div className='relative flex-1 sm:w-64'>
             <Input
-              label='Buscar vecino'
+              label='Buscar por nombre, CI o teléfono'
               icon={<MagnifyingGlassIcon className='h-5 w-5' />}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => onSearchChange(e.target.value)}
               crossOrigin={undefined}
             />
-            {/* <div className='flex gap-5 px-10 justify-end'>  </div>*/}
+            {searchTerm && (
+              <button
+                type='button'
+                onClick={() => onSearchChange('')}
+                aria-label='Limpiar búsqueda'
+                className='absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-blue-gray-500 transition-colors hover:bg-blue-gray-100 hover:text-blue-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+              >
+                <XMarkIcon className='h-4 w-4' />
+              </button>
+            )}
           </div>
-          {/* <Button className='' onClick={handleOpenModal}>
-            NUEVO VECINO
-          </Button> */}
+
+          {headerActions}
+
+          <IconButton
+            variant='gradient'
+            color='blue'
+            size='md'
+            onClick={onAddNeighbor}
+            disabled={!onAddNeighbor}
+            aria-label='Agregar vecino'
+            className='shrink-0'
+          >
+            <UserPlusIcon className='h-5 w-5' />
+          </IconButton>
         </div>
       </div>
 
-      {/* Tabla con scroll interno */}
-      <div className='flex-1 overflow-auto border border-blue-gray-100 rounded-lg mx-5'>
-        <table className='w-full min-w-max table-auto text-left'>
-          <thead className='sticky top-0 bg-blue-gray-50 z-10'>
-            <tr>
-              {TABLE_HEAD.map((head) => (
-                <th
-                  key={head.label}
-                  className={`border-b border-blue-gray-100 bg-blue-gray-50 py-1 ${
-                    head.sortable
-                      ? 'cursor-pointer hover:bg-blue-gray-100 transition-colors'
-                      : ''
-                  }`}
-                  onClick={() =>
-                    head.sortable && head.field && handleSort(head.field)
-                  }
-                >
-                  <div className='flex justify-center items-center gap-2'>
-                    <Typography
-                      variant='small'
-                      color='blue-gray'
-                      className='font-normal leading-none opacity-70'
-                    >
-                      {head.label}
-                    </Typography>
-                    {head.sortable && (
-                      <ChevronUpDownIcon
-                        className={`h-4 w-4 ${
-                          sortField === head.field ? 'text-blue-500' : ''
-                        }`}
-                      />
-                    )}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedData.map(
-              (
-                {
-                  id,
-                  first_name,
-                  second_name,
-                  last_name,
-                  // ci,
-                  // phone_number,
-                  // email,
-                },
-                index,
-              ) => {
-                const isLast = index === sortedData.length - 1;
-                const classes = isLast ? '' : 'border-b border-blue-gray-50 py-3';
-                
-                // const neighbor = {
-                //   id,
-                //   first_name,
-                //   second_name,
-                //   last_name,
-                //   // ci,
-                //   // phone_number,
-                //   // email,
-                // };
+      {/* Table with its own scroll, so the header above stays put */}
+      <div className='min-h-0 flex-1 overflow-auto rounded-lg border border-blue-gray-100'>
+        {sortedData.length > 0 ? (
+          <table className='w-full min-w-max table-auto text-left'>
+            <thead className='sticky top-0 z-10 bg-blue-gray-50'>
+              <tr>
+                {TABLE_HEAD.map((head) => (
+                  <th
+                    key={head.label}
+                    className={`border-b border-blue-gray-100 bg-blue-gray-50 py-2 ${
+                      head.sortable
+                        ? 'cursor-pointer transition-colors hover:bg-blue-gray-100'
+                        : ''
+                    }`}
+                    onClick={() =>
+                      head.sortable && head.field && handleSort(head.field)
+                    }
+                  >
+                    <div className='flex items-center justify-center gap-2'>
+                      <Typography
+                        variant='small'
+                        color='blue-gray'
+                        className='font-normal leading-none opacity-70'
+                      >
+                        {head.label}
+                      </Typography>
+                      {head.sortable && (
+                        <ChevronUpDownIcon
+                          className={`h-4 w-4 ${
+                            sortField === head.field ? 'text-blue-500' : ''
+                          }`}
+                        />
+                      )}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedData.map((neighbor) => {
+                const isSelected = neighborSelected?.id === neighbor.id;
+                const classes = 'border border-blue-gray-50 p-3 py-1';
 
                 return (
-                  <tr key={id} className='hover:bg-blue-gray-50/50'>
+                  <tr
+                    key={neighbor.id}
+                    onClick={() => handleSelect(neighbor)}
+                    className={`cursor-pointer transition-colors ${
+                      isSelected ? 'bg-blue-50' : 'hover:bg-blue-gray-50/50'
+                    }`}
+                  >
                     <td className={classes}>
                       <Typography
                         variant='small'
                         color='blue-gray'
-                        className='font-normal text-center'
+                        className={`text-center font-normal ${NUMERIC}`}
                       >
-                        {id}
-                      </Typography>
-                    </td>
-                    {/* <td className={classes}>
-                      <Typography
-                        variant='small'
-                        color='blue-gray'
-                        className='font-normal'
-                      >
-                        {last_name}
-                      </Typography>
-                    </td> */}
-                    <td className={classes}>
-                      <Typography
-                        variant='small'
-                        color='blue-gray'
-                        className='font-normal'
-                      >
-                        <a className='cursor-pointer'>
-                          {' '}
-                          {`${last_name} ${first_name} ${second_name}`}
-                        </a>
+                        {neighbor.id}
                       </Typography>
                     </td>
                     <td className={classes}>
                       <Typography
                         variant='small'
                         color='blue-gray'
-                        className='font-normal text-center'
+                        className='font-normal'
                       >
-                        0
+                        {fullName(neighbor)}
                       </Typography>
                     </td>
-                    {/* <td className={classes}>
+                    <td className={classes}>
                       <Typography
                         variant='small'
                         color='blue-gray'
-                        className='font-medium text-center'
+                        className={`text-center font-medium ${NUMERIC}`}
                       >
-                        {ci}
+                        {neighbor.ci ?? '-'}
                       </Typography>
-                    </td> */}
-                    {/* <td className={classes}>
+                    </td>
+                    <td className={classes}>
                       <Typography
                         variant='small'
                         color='blue-gray'
-                        className='font-normal text-center'
+                        className={`text-center font-normal ${NUMERIC}`}
                       >
-                        {phone_number}
+                        {neighbor.phone_number ?? '-'}
                       </Typography>
-                    </td> */}
-                    {/* <td className={classes}>
+                    </td>
+                    <td className={classes}>
                       <Typography
                         variant='small'
                         color='blue-gray'
                         className='font-normal'
                       >
-                        {email}
+                        {neighbor.email || '-'}
                       </Typography>
-                    </td> */}
-                    {/* <td className={classes}>
-                      <div className='flex gap-2 justify-center'>
-                        {onView && (
-                          <IconButton
-                            size='sm'
-                            variant='text'
-                            color='blue'
-                            onClick={() => onView(neighbor)}
-                            title='Ver detalles'
-                          >
-                            <EyeIcon className='h-4 w-4' />
-                          </IconButton>
-                        )}
-                        {onEdit && (
-                          <IconButton
-                            size='sm'
-                            variant='text'
-                            color='blue'
-                            onClick={() => onEdit(neighbor)}
-                            title='Editar'
-                          >
-                            <PencilIcon className='h-4 w-4 text-black' />
-                          </IconButton>
-                        )}
-                        {onDelete && (
-                          <IconButton
-                            size='sm'
-                            variant='text'
-                            color='red'
-                            onClick={() => onDelete(neighbor)}
-                            title='Eliminar'
-                          >
-                            <TrashIcon className='h-4 w-4' />
-                          </IconButton>
-                        )}
+                    </td>
+                    <td className={classes}>
+                      <div className='flex justify-center gap-2'>
+                        <IconButton
+                          size='sm'
+                          variant='text'
+                          color='blue'
+                          onClick={(e) => {
+                            // The whole row is clickable; don't fire twice.
+                            e.stopPropagation();
+                            handleSelect(neighbor);
+                          }}
+                          title='Ver detalles'
+                        >
+                          <EyeIcon className='h-4 w-4' />
+                        </IconButton>
                       </div>
-                    </td> */}
+                    </td>
                   </tr>
                 );
-              },
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <NewNeighborModalForm
-        openModalState={openModal}
-        handleCloseModal={handleOpenModal}
-        onSubmit={(data) => {
-          if (onCreate) {
-            onCreate(data);
-          }
-        }}
-      />
-
-      <div className='flex items-center justify-between border-t border-blue-gray-100 p-4 flex-shrink-0'>
-        <Typography variant='small' color='blue-gray' className='font-normal'>
-          Total: {filteredData.length} vecinos
-        </Typography>
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <EmptyState
+            message={
+              neighborsData.length === 0
+                ? 'Aún no hay vecinos registrados.'
+                : `No se encontraron vecinos para “${searchTerm}”.`
+            }
+          />
+        )}
       </div>
     </div>
   );
