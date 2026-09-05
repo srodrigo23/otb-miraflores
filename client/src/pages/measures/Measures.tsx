@@ -11,7 +11,8 @@ import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
 import useDeleteMeasure from '../../hooks/measures/useDeleteMeasure';
 import DeleteMeasureConfirmationModal from '../../components/modals/DeleteMeasureConfirmationModal';
 import { DetailCardsMeasures } from '../../components/measures/DetailCardsMeasures';
-import { Button } from '@material-tailwind/react';
+import { Button, Typography } from '@material-tailwind/react';
+import { DocumentPlusIcon } from '@heroicons/react/24/outline';
 import { useSearchParams } from 'react-router-dom';
 import { MeterMeasures } from './MeterMeasures';
 
@@ -89,19 +90,31 @@ const Measures = () => {
       ) : (
         <div className='w-full flex flex-col gap-3 h-full px-3 lg:px-3'>
           {measureId !== null ? (
-            <MeterMeasures measureId={measureId}/>
+            <MeterMeasures measureId={measureId} />
           ) : (
             <>
-              <div className='flex flex-col justify-between gap-3 py-3 p-5'>
-                <DetailCardsMeasures measures={measuresData} />
+              <div className='flex justify-between gap-3'>
+                  <Typography variant='h5' className='text-blue-gray-900 items-center'>
+                    Mediciones
+                  </Typography>
+                  {/* <span className='rounded-full bg-blue-gray-100 px-2 py-0.5 text-xs font-semibold text-blue-gray-700'>
+                          {filteredData.length}
+                        </span> */}
+                  <Button
+                    variant='gradient'
+                    color='blue'
+                    className='flex h-fit shrink-0 items-center justify-center gap-2'
+                    onClick={handleOpenModal}
+                    disabled={loadingMeasureCreated}
+                  >
+                    <DocumentPlusIcon className='h-4 w-4' />
+                    NUEVA MEDICIÓN
+                  </Button>
+                
               </div>
-                <Button
-                  className='w-60 h-fit'
-                  onClick={handleOpenModal}
-                  disabled={loadingMeasuresData && loadingMeasureCreated}
-                >
-                  NUEVA MEDICIÓN
-                </Button>
+
+              <DetailCardsMeasures measures={measuresData} />
+
               <MeasureTable
                 tableData={measuresData}
                 onDelete={handleDeleteWithModal}

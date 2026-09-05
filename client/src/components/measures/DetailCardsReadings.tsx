@@ -1,5 +1,4 @@
-
-import { Card, CardBody, Chip, Typography } from '@material-tailwind/react';
+import { Chip, Typography } from '@material-tailwind/react';
 
 import {
   CheckCircleIcon,
@@ -7,9 +6,13 @@ import {
   EyeSlashIcon,
   WrenchIcon,
 } from '@heroicons/react/24/outline';
-import { MeasureType, MeterReadingType } from '../../interfaces/measuresIterfaces';
+import {
+  MeasureType,
+  MeterReadingType,
+} from '../../interfaces/measuresIterfaces';
 import { color } from '../../types/commonTypes';
 import { formatDate } from '../../utils/dates';
+import { StatCardGrid, StatDescriptor } from '../shared/StatCardGrid';
 
 const STATUS_COLORS: Record<string, string> = {
   CREATED: 'green',
@@ -23,139 +26,83 @@ const STATUS_LABELS: Record<string, string> = {
   CLOSED: 'Cerrada',
 };
 
+const countByStatus = (status: string) => (readings: MeterReadingType[]) =>
+  readings.filter((reading) => reading.status === status).length;
+
+const STATS: StatDescriptor<MeterReadingType[]>[] = [
+  {
+    label: 'Total Lecturas',
+    icon: ClipboardDocumentListIcon,
+    tone: 'blue-gray',
+    value: (readings) => readings.length,
+  },
+  {
+    label: 'Leídas',
+    icon: CheckCircleIcon,
+    tone: 'green',
+    value: countByStatus('READED'),
+  },
+  {
+    label: 'Sin Leer',
+    icon: EyeSlashIcon,
+    tone: 'orange',
+    value: countByStatus('UNREAD'),
+  },
+  {
+    label: 'Errores Medidor',
+    icon: WrenchIcon,
+    tone: 'red',
+    value: countByStatus('METER_ERROR'),
+  },
+];
+
+/** One labelled fact from the measure header, e.g. "Periodo: 2025-01" */
+const MetaField: React.FC<{ label: string; children: React.ReactNode }> = ({
+  label,
+  children,
+}) => (
+  <div className='flex items-center gap-2'>
+    <Typography variant='small' color='blue-gray' className='font-medium'>
+      {label}:
+    </Typography>
+    {children}
+  </div>
+);
+
 export const DetailCardsReadings: React.FC<{
-  meterReadings: MeterReadingType[] | [],
-  measure: MeasureType | undefined }> = ({ meterReadings, measure}) => {
+  meterReadings: MeterReadingType[] | [];
+  measure: MeasureType | undefined;
+}> = ({ meterReadings, measure }) => {
   return (
     <div className='flex flex-col gap-3 w-full'>
       {measure && (
         <div className='flex flex-wrap items-center gap-4 px-1'>
-          <div className='flex items-center gap-2'>
-            <Typography variant='small' color='blue-gray' className='font-medium'>
-              Fecha:
-            </Typography>
+          <MetaField label='Fecha'>
             <Typography variant='small' color='blue-gray' className='font-bold'>
               {formatDate(measure.measure_date)}
             </Typography>
-          </div>
-          <div className='flex items-center gap-2'>
-            <Typography variant='small' color='blue-gray' className='font-medium'>
-              Periodo:
-            </Typography>
+          </MetaField>
+          <MetaField label='Periodo'>
             <span className='px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-800 text-sm font-semibold'>
               {measure.period}
             </span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <Typography variant='small' color='blue-gray' className='font-medium'>
-              Estado:
-            </Typography>
+          </MetaField>
+          <MetaField label='Estado'>
             <Chip
               size='sm'
               value={STATUS_LABELS[measure.status] || measure.status}
               color={(STATUS_COLORS[measure.status] || 'gray') as color}
             />
-          </div>
-          <div className='flex items-center gap-2'>
-            <Typography variant='small' color='blue-gray' className='font-medium'>
-              Responsable:
-            </Typography>
+          </MetaField>
+          <MetaField label='Responsable'>
             <Typography variant='small' color='blue-gray' className='font-bold'>
               {measure.reader_name}
             </Typography>
-          </div>
+          </MetaField>
         </div>
       )}
 
-      <div className='grid grid-cols-2 lg:grid-cols-4 gap-3'>
-        <Card className='shadow-sm'>
-          <CardBody className='p-3 lg:p-4'>
-            <div className='flex items-center gap-3'>
-              <div className='p-2 rounded-lg bg-blue-gray-50'>
-                <ClipboardDocumentListIcon className='w-5 h-5 lg:w-6 lg:h-6 text-blue-gray-700' />
-              </div>
-              <div>
-                <Typography
-                  variant='small'
-                  color='blue-gray'
-                  className='font-medium leading-tight'
-                >
-                  Total Lecturas
-                </Typography>
-                <Typography variant='h4' color='blue-gray'>
-                  {meterReadings.length}
-                </Typography>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className='shadow-sm'>
-          <CardBody className='p-3 lg:p-4'>
-            <div className='flex items-center gap-3'>
-              <div className='p-2 rounded-lg bg-green-50'>
-                <CheckCircleIcon className='w-5 h-5 lg:w-6 lg:h-6 text-green-700' />
-              </div>
-              <div>
-                <Typography
-                  variant='small'
-                  color='blue-gray'
-                  className='font-medium leading-tight'
-                >
-                  Leídas
-                </Typography>
-                <Typography variant='h4' color='green'>
-                  {meterReadings.filter((el) => el.status === 'READED').length}
-                </Typography>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className='shadow-sm'>
-          <CardBody className='p-3 lg:p-4'>
-            <div className='flex items-center gap-3'>
-              <div className='p-2 rounded-lg bg-orange-50'>
-                <EyeSlashIcon className='w-5 h-5 lg:w-6 lg:h-6 text-orange-700' />
-              </div>
-              <div>
-                <Typography
-                  variant='small'
-                  color='blue-gray'
-                  className='font-medium leading-tight'
-                >
-                  Sin Leer
-                </Typography>
-                <Typography variant='h4' color='orange'>
-                  {meterReadings.filter((el) => el.status === 'UNREAD').length}
-                </Typography>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className='shadow-sm'>
-          <CardBody className='p-3 lg:p-4'>
-            <div className='flex items-center gap-3'>
-              <div className='p-2 rounded-lg bg-red-50'>
-                <WrenchIcon className='w-5 h-5 lg:w-6 lg:h-6 text-red-700' />
-              </div>
-              <div>
-                <Typography
-                  variant='small'
-                  color='blue-gray'
-                  className='font-medium leading-tight'
-                >
-                  Errores Medidor
-                </Typography>
-                <Typography variant='h4' color='red'>
-                  {
-                    meterReadings.filter((el) => el.status === 'METER_ERROR')
-                      .length
-                  }
-                </Typography>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+      <StatCardGrid stats={STATS} data={meterReadings} />
     </div>
   );
 };
