@@ -249,7 +249,7 @@ export const NeighborDetails: React.FC<{
                   />
                 )}
               </AccordionHeader>
-              <AccordionBody>
+              <AccordionBody className='py-2'>
                 <EditNeighborDataControls
                   edit={edit}
                   setEdit={setEdit}
@@ -259,7 +259,7 @@ export const NeighborDetails: React.FC<{
                   canSave={isDirty}
                 />
 
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 lg:gap-x-8 gap-y-5 lg:gap-y-4 px-4 lg:px-6 pb-6 text-center'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 lg:gap-x-8 gap-y-5 lg:gap-y-4 px-4 lg:px-6 text-center'>
                   <InfoField
                     label='Primer Nombre'
                     value={toUpdateDataNeighbor?.first_name}

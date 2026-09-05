@@ -54,7 +54,7 @@ const Measures = () => {
     null,
   );
 
-  const { createNewMeasure, isLoading: loadingMeasureCreated } =
+  const { createNewMeasure} =
     useNewMeasure();
 
   const { deleteMeasure } = useDeleteMeasure();
@@ -105,7 +105,7 @@ const Measures = () => {
                     color='blue'
                     className='flex h-fit shrink-0 items-center justify-center gap-2'
                     onClick={handleOpenModal}
-                    disabled={loadingMeasureCreated}
+                    // disabled={loadingMeasureCreated}
                   >
                     <DocumentPlusIcon className='h-4 w-4' />
                     NUEVA MEDICIÓN
