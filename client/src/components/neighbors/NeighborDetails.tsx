@@ -317,7 +317,7 @@ export const NeighborDetails: React.FC<{
                   />
                 </div>
 
-                {edit && (
+                {/* {edit && (
                   <div className='flex justify-end gap-2 px-4 lg:px-6 pb-5'>
                     <Button
                       variant='text'
@@ -336,7 +336,7 @@ export const NeighborDetails: React.FC<{
                       Guardar cambios
                     </Button>
                   </div>
-                )}
+                )} */}
               </AccordionBody>
             </Accordion>
           </CardBody>

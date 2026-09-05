@@ -4,10 +4,10 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
   UserPlusIcon,
-  IdentificationIcon,
-  PhoneIcon,
-  CheckCircleIcon,
-  ChevronRightIcon,
+  // IdentificationIcon,
+  // PhoneIcon,
+  // CheckCircleIcon,
+  // ChevronRightIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
 import { NeighborType } from '../../interfaces/neighborsInterfaces';
@@ -55,7 +55,7 @@ export const NeighborList: React.FC<NeighborsViewProps> = ({
         <div className='flex items-center gap-2'>
           <div className='relative flex-1 sm:w-64'>
             <Input
-              label='Buscar por nombre, CI o teléfono'
+              label='Buscar vecino'
               icon={<MagnifyingGlassIcon className='h-5 w-5' />}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
@@ -92,14 +92,14 @@ export const NeighborList: React.FC<NeighborsViewProps> = ({
       {/* List */}
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {filteredData.length > 0 ? (
-          <ul className='grid grid-cols-1 gap-3 py-1 md:grid-cols-2 xl:grid-cols-3'>
+          <ul className='grid grid-cols-1 sm:grid-cols-2 gap-3 py-1 md:grid-cols-3 xl:grid-cols-4'>
             {filteredData.map((neighbor) => {
               const isSelected = neighborSelected?.id === neighbor.id;
-              const contact = neighbor.ci
-                ? { Icon: IdentificationIcon, text: `CI ${neighbor.ci}` }
-                : neighbor.phone_number
-                  ? { Icon: PhoneIcon, text: String(neighbor.phone_number) }
-                  : null;
+              // const contact = neighbor.ci
+              //   ? { Icon: IdentificationIcon, text: `CI ${neighbor.ci}` }
+              //   : neighbor.phone_number
+              //     ? { Icon: PhoneIcon, text: String(neighbor.phone_number) }
+              //     : null;
 
               return (
                 <li key={neighbor.id}>
@@ -129,19 +129,19 @@ export const NeighborList: React.FC<NeighborsViewProps> = ({
                       <p className='truncate font-semibold text-blue-gray-900'>
                         {neighbor.last_name}
                       </p>
-                      {contact && (
+                      {/* {contact && (
                         <span className='mt-0.5 flex items-center gap-1 truncate text-xs text-blue-gray-500'>
                           <contact.Icon className='h-3.5 w-3.5 shrink-0' />
                           <span className='truncate'>{contact.text}</span>
                         </span>
-                      )}
+                      )} */}
                     </div>
 
-                    {isSelected ? (
+                    {/* {isSelected ? (
                       <CheckCircleIcon className='h-5 w-5 shrink-0 text-blue-500' />
                     ) : (
                       <ChevronRightIcon className='h-5 w-5 shrink-0 text-blue-gray-300' />
-                    )}
+                    )} */}
                   </button>
                 </li>
               );

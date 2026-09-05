@@ -23,8 +23,8 @@ const TABLE_HEAD = [
   { label: 'Nombre Completo', field: 'last_name' as SortField, sortable: true },
   { label: 'CI', field: 'ci' as SortField, sortable: true },
   { label: 'Celular', field: 'phone_number' as SortField, sortable: true },
-  { label: 'Correo', field: 'email' as SortField, sortable: true },
-  { label: 'Acciones', field: null, sortable: false },
+  // { label: 'Correo', field: 'email' as SortField, sortable: true },
+  { label: '', field: null, sortable: false },
 ];
 
 /** The name column sorts by surname, matching how the register is ordered. */
@@ -225,7 +225,7 @@ const NeighborTable: React.FC<NeighborsViewProps> = ({
                         {neighbor.phone_number ?? '-'}
                       </Typography>
                     </td>
-                    <td className={classes}>
+                    {/* <td className={classes}>
                       <Typography
                         variant='small'
                         color='blue-gray'
@@ -233,7 +233,7 @@ const NeighborTable: React.FC<NeighborsViewProps> = ({
                       >
                         {neighbor.email || '-'}
                       </Typography>
-                    </td>
+                    </td> */}
                     <td className={classes}>
                       <div className='flex justify-center gap-2'>
                         <IconButton
