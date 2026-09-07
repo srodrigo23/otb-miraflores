@@ -1,4 +1,12 @@
-import { NeighborType } from '../interfaces/neighborsInterfaces';
+import {
+  NeighborType,
+  UpdateNeighborPayloadType,
+} from '../interfaces/neighborsInterfaces';
+
+/** Per-field validation messages, keyed by the field they belong to. */
+export type NeighborFieldErrors = Partial<
+  Record<keyof UpdateNeighborPayloadType, string>
+>;
 
 /**
  * Both neighbor views — the card list and the table — take exactly these props,

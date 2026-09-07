@@ -2,21 +2,18 @@ import { useState, useEffect, useMemo, ChangeEvent } from 'react';
 import { useNeighborDetailsData } from '../../hooks/neighbors/useNeighborsData';
 import { LoaderAnimation } from '../shared/LoaderAnimation';
 import { toast } from 'react-toastify';
-import { InfoField } from './InfoField';
 
 import {
   Card,
   CardBody,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-  // Button,
+  IconButton,
+  Tooltip,
 } from '@material-tailwind/react';
 import {
-  ChevronDownIcon,
   UserCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
+import { PencilIcon } from 'lucide-react';
 
 import { NeighborDebtsPayments } from '../NeighborDebtsPayments';
 import { useUpdateNeighbor } from '../../hooks/neighbors/useUpdateNeighbor';
@@ -24,10 +21,11 @@ import {
   NeighborWithDetailsType,
   UpdateNeighborPayloadType,
 } from '../../interfaces/neighborsInterfaces';
+import { NeighborFieldErrors } from '../../types/NeighborsTypes';
 import NeighborDataCard from './NeighborDataCard';
-import EditNeighborDataControls from './EditNeighborDataControls';
+import EditNeighborModal from '../modals/EditNeighborModal';
 
-type FieldErrors = Partial<Record<keyof UpdateNeighborPayloadType, string>>;
+type FieldErrors = NeighborFieldErrors;
 
 const EDITABLE_FIELDS = [
   'first_name',
@@ -68,7 +66,7 @@ export const NeighborDetails: React.FC<{
   neighborId: number | undefined;
   refetchNeighbors: () => void;
 }> = ({ neighborId, refetchNeighbors }) => {
-  const [openInfo, setOpenInfo] = useState(false);
+  // Doubles as the edit-modal visibility: the modal is only ever open to edit.
   const [edit, setEdit] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -202,12 +200,6 @@ export const NeighborDetails: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [edit, toUpdateDataNeighbor, isSaving]);
 
-  const handleHeaderClick = () => {
-    // Don't collapse while editing — it would silently discard unsaved changes.
-    if (edit) return;
-    setOpenInfo((o) => !o);
-  };
-
   if (neighborId === undefined) {
     return (
       <CenteredState
@@ -230,118 +222,35 @@ export const NeighborDetails: React.FC<{
 
   return (
     <div className='mx-auto container w-full flex flex-col gap-4 lg:gap-2 flex-1 min-h-0 py-3 px-3 lg:px-3'>
-      <div>
-        <Card className='w-full shadow-sm p-0'>
-          <CardBody className='p-0'>
-            <Accordion open={openInfo} className='py-0'>
-              <AccordionHeader
-                className={`flex items-center justify-between py-1 lg:px-6 ${
-                  edit ? 'cursor-default' : 'cursor-pointer'
-                }`}
-                onClick={handleHeaderClick}
-              >
-                <NeighborDataCard neighborData={data} />
-                {!edit && (
-                  <ChevronDownIcon
-                    className={`h-5 w-5 shrink-0 text-blue-gray-500 transition-transform duration-200 ${
-                      openInfo ? 'rotate-180' : ''
-                    }`}
-                  />
-                )}
-              </AccordionHeader>
-              <AccordionBody className='py-2'>
-                <EditNeighborDataControls
-                  edit={edit}
-                  setEdit={setEdit}
-                  updateNeighborDetail={updateNeighborDetail}
-                  onCancel={handleCancelEdit}
-                  isSaving={isSaving}
-                  canSave={isDirty}
-                />
+      <Card className='w-full shrink-0 shadow-sm'>
+        <CardBody className='flex items-center justify-between gap-3 p-3 lg:px-6'>
+          <NeighborDataCard neighborData={data} />
+          <Tooltip content='Editar datos'>
+            <IconButton
+              size='sm'
+              variant='outlined'
+              color='blue-gray'
+              onClick={() => setEdit(true)}
+              aria-label='Editar datos del vecino'
+              className='shrink-0'
+            >
+              <PencilIcon className='h-5 w-5' />
+            </IconButton>
+          </Tooltip>
+        </CardBody>
+      </Card>
 
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 lg:gap-x-8 gap-y-5 lg:gap-y-4 px-4 lg:px-6 text-center'>
-                  <InfoField
-                    label='Primer Nombre'
-                    value={toUpdateDataNeighbor?.first_name}
-                    isInput={edit}
-                    onChange={handleFieldChange('first_name')}
-                    error={errors.first_name}
-                  />
-                  <InfoField
-                    label='Segundo Nombre'
-                    value={toUpdateDataNeighbor?.second_name || ''}
-                    isInput={edit}
-                    onChange={handleFieldChange('second_name')}
-                    error={errors.second_name}
-                  />
-                  <InfoField
-                    label='Apellido'
-                    value={toUpdateDataNeighbor?.last_name}
-                    isInput={edit}
-                    onChange={handleFieldChange('last_name')}
-                    error={errors.last_name}
-                  />
-                  <InfoField
-                    label='Cédula de Identidad'
-                    value={toUpdateDataNeighbor?.ci || ''}
-                    isInput={edit}
-                    onChange={handleFieldChange('ci')}
-                    error={errors.ci}
-                    inputMode='numeric'
-                  />
-                  <InfoField
-                    label='Teléfono'
-                    value={toUpdateDataNeighbor?.phone_number || ''}
-                    isInput={edit}
-                    onChange={handleFieldChange('phone_number')}
-                    error={errors.phone_number}
-                    inputMode='tel'
-                  />
-                  <InfoField
-                    label='Email'
-                    value={toUpdateDataNeighbor?.email || ''}
-                    isInput={edit}
-                    onChange={handleFieldChange('email')}
-                    error={errors.email}
-                    type='email'
-                    inputMode='email'
-                  />
-                  <InfoField
-                    label='Fecha de Nacimiento'
-                    value={
-                      data?.birth_day
-                        ? new Date(data.birth_day).toLocaleDateString('es-ES')
-                        : '-'
-                    }
-                    isInput={false}
-                  />
-                </div>
-
-                {/* {edit && (
-                  <div className='flex justify-end gap-2 px-4 lg:px-6 pb-5'>
-                    <Button
-                      variant='text'
-                      color='blue-gray'
-                      onClick={handleCancelEdit}
-                      disabled={isSaving}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      color='green'
-                      onClick={updateNeighborDetail}
-                      disabled={isSaving || !isDirty}
-                      loading={isSaving}
-                    >
-                      Guardar cambios
-                    </Button>
-                  </div>
-                )} */}
-              </AccordionBody>
-            </Accordion>
-          </CardBody>
-        </Card>
-      </div>
+      <EditNeighborModal
+        openModalState={edit}
+        handleCloseModal={handleCancelEdit}
+        neighbor={data}
+        values={toUpdateDataNeighbor}
+        errors={errors}
+        onFieldChange={handleFieldChange}
+        onSubmit={updateNeighborDetail}
+        isSaving={isSaving}
+        canSave={isDirty}
+      />
 
       <NeighborDebtsPayments
         neighborId={data?.id}

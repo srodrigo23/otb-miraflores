@@ -2,6 +2,10 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { IconButton, Tooltip, Typography } from "@material-tailwind/react";
 import { CheckIcon, Loader2, PencilIcon } from "lucide-react";
 
+/**
+ * NOT WORKING!
+ * 
+ */
 
 const EditNeighborDataControls: React.FC<{
   edit: boolean;

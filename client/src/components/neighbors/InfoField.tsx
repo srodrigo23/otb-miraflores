@@ -1,5 +1,10 @@
 import { ChangeEvent, HTMLInputTypeAttribute } from "react";
 
+/**
+ * NOT WORKING!
+ * 
+ */
+
 export function InfoField({ label, value, isInput, onChange, error, type = 'text', inputMode }: {
   label: string;
   value?: number | string | null;
