@@ -1,18 +1,18 @@
-import { ReactNode } from 'react';
 import { NeighborType } from '../interfaces/neighborsInterfaces';
 
 /**
  * Both neighbor views — the card list and the table — take exactly these props,
- * so the page can swap one for the other without rewiring anything.
+ * so the page can swap one for the other without rewiring anything. The header
+ * (title, search box, actions), the filtering and the navigation on select all
+ * live in the Neighbors page, which is why neither appears here.
  */
 export type NeighborsViewProps = {
-  neighborsData: NeighborType[];
+  /** Already filtered by the page's search box. */
+  neighbors: NeighborType[];
+  /** Size of the unfiltered register, to tell "nothing yet" from "no matches". */
+  totalCount: number;
+  /** Only for the empty-state message; the filtering already happened. */
   searchTerm: string;
-  onSearchChange: (value: string) => void;
   neighborSelected: NeighborType | null;
   onSelectNeighbor: (neighbor: NeighborType) => void;
-  /** Optional — wire this from the parent to enable the "add neighbor" action. */
-  onAddNeighbor?: () => void;
-  /** Rendered in the header, between the search box and the add button. */
-  headerActions?: ReactNode;
 };

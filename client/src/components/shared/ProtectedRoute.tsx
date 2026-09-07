@@ -1,7 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-import App from '../../App';
+// Swap this import back to '../../App' to return to the top navbar shell.
+// import App from '../../App';
+import App from '../../AppDrawer';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuth();
