@@ -264,9 +264,11 @@ const MeasureReadingsTable: React.FC<{
 
   return (
     <>
-      <div className='h-[600px] overflow-y-auto'>
-        <div className='flex flex-col h-full'>
-          <div className='flex-1 overflow-auto border border-blue-gray-100 rounded-lg'>
+      {/* Fills whatever the header leaves, instead of a fixed height that
+          overflowed small screens and wasted room on large ones. The floor
+          keeps it usable if an ancestor ever loses its height. */}
+      <div className='flex min-h-[320px] flex-1 flex-col'>
+        <div className='min-h-0 flex-1 overflow-auto border border-blue-gray-100 rounded-lg'>
             {readings?.length === 0 ? (
               <div className='flex items-center justify-center h-full'>
                 <Typography variant='small' color='gray'>
@@ -280,7 +282,7 @@ const MeasureReadingsTable: React.FC<{
                     {COLUMNS.map(({ key, header }) => (
                       <th
                         key={key}
-                        className='border-b border-blue-gray-100 bg-blue-gray-50 p-3'
+                        className='border-b border-blue-gray-100 bg-blue-gray-50 p-2 sm:p-3'
                       >
                         <Typography
                           variant='small'
@@ -296,9 +298,10 @@ const MeasureReadingsTable: React.FC<{
                 <tbody>
                   {readings.map((reading, index) => {
                     const isLast = index === readings.length - 1;
+                    // Tighter rows on phones fit a few more meters per screen
                     const classes = isLast
-                      ? 'p-3'
-                      : 'p-3 border-b border-blue-gray-50';
+                      ? 'p-2 sm:p-3'
+                      : 'p-2 sm:p-3 border-b border-blue-gray-50';
 
                     const isEditing = editingId === reading.id;
                     const editing: RowEditing = {
@@ -340,7 +343,6 @@ const MeasureReadingsTable: React.FC<{
                 </tbody>
               </table>
             )}
-          </div>
         </div>
       </div>
     </>

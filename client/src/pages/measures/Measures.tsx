@@ -88,12 +88,12 @@ const Measures = () => {
       {loadingMeasuresData ? (
         <LoaderAnimation />
       ) : (
-        <div className='w-full flex flex-col gap-3 h-full px-3 lg:px-3'>
+        <div className='w-full flex flex-col gap-2 h-full px-3 lg:px-3'>
           {measureId !== null ? (
             <MeterMeasures measureId={measureId} />
           ) : (
             <>
-              <div className='flex justify-between gap-3'>
+              <div className='flex shrink-0 flex-wrap items-center justify-between gap-3'>
                   <Typography variant='h5' className='text-blue-gray-900 items-center'>
                     Mediciones
                   </Typography>

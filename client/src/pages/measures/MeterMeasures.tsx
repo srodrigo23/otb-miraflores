@@ -65,7 +65,7 @@ export const MeterMeasures: React.FC<{measureId:string}> = ({measureId}) => {
 
   return (
     <>
-      <BackButton path={'/mediciones'} />
+      <BackButton path={'/mediciones'} className='shrink-0' />
       {!loadingMeasure ? (
         <MeasureReadingsHeader
           meterReadings={meterLectures}

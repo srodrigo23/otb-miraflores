@@ -92,9 +92,11 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
   };
 
   return (
-    <div className='flex flex-col h-full'>
+    // flex-1 rather than h-full: as one flex child among the title row and the
+    // stat cards, h-full asked for the whole column and pushed the page over.
+    <div className='flex min-h-0 flex-1 flex-col'>
       {/* Tabla con scroll interno */}
-      <div className='flex-1 overflow-auto border border-blue-gray-100 rounded-lg'>
+      <div className='min-h-0 flex-1 overflow-auto border border-blue-gray-100 rounded-lg'>
         <table className='w-full min-w-max table-auto text-left'>
           <thead className='sticky top-0 bg-blue-gray-50 z-10'>
             <tr>
