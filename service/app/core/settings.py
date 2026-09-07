@@ -14,8 +14,12 @@ class Settings(BaseSettings):
   CLIENT_URL_DEV:str
   
   @property
-  def cookie_secure(self) -> bool:
+  def prod(self) -> bool:
     return self.ENVIRONMENT == "PRODUCTION"
+
+  @property
+  def cookie_secure(self) -> bool:
+    return self.prod
 
   @property
   def cookie_samesite(self) -> str:

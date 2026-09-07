@@ -16,6 +16,7 @@ app = FastAPI()
 origins = [
   settings.CLIENT_URL_DEV,
   settings.CLIENT_URL_PROD,
+  "http://192.168.100.6:5173"
 ]
 
 app.add_middleware(
