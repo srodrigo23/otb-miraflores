@@ -1,5 +1,6 @@
 import { MeterLedger } from '../../../interfaces/neighborDebtsInterfaces';
-import { currency, NUMERIC } from '../../../utils/format';
+// `currency` is only referenced by the commented-out owed-amount badge below.
+import { NUMERIC } from '../../../utils/format';
 
 /**
  * Meter selector entry. Each meter is its own plate showing what it owes right
@@ -11,9 +12,9 @@ export const MeterPlate: React.FC<{
   onSelect: () => void;
 }> = ({ meter, isSelected, onSelect }) => {
   // A pending debt is owed in full, so the balance is just their sum
-  const owed = meter.debts
-    .filter((debt) => debt.status === 'PENDING')
-    .reduce((total, debt) => total + debt.amount, 0);
+  // const owed = meter.debts
+  //   .filter((debt) => debt.status === 'PENDING')
+  //   .reduce((total, debt) => total + debt.amount, 0);
 
   return (
     <button
@@ -41,13 +42,13 @@ export const MeterPlate: React.FC<{
           Sección {meter.section}
         </span>
       </span>
-      <span
+      {/* <span
         className={`ml-2 text-sm font-bold ${NUMERIC} ${
           owed > 0 ? 'text-amber-800' : 'text-green-700'
         }`}
       >
         {owed > 0 ? currency(owed) : 'Al día'}
-      </span>
+      </span> */}
     </button>
   );
 };

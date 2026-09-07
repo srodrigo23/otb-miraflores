@@ -3,6 +3,22 @@ import {
   UpdateNeighborPayloadType,
 } from '../interfaces/neighborsInterfaces';
 
+/** Fields of the "new meter" form. Names match the NeighborMeter model. */
+export type InputsNewMeterForm = {
+  meter_code: string;
+  section: string;
+  /** YYYY-MM-DD, as the date input hands it over */
+  created_at: string;
+  is_active: boolean;
+  initial_reading: number;
+};
+
+export type NewMeterModalFormType = {
+  openModalState: boolean;
+  handleCloseModal: () => void;
+  onSubmit: (data: InputsNewMeterForm) => void | Promise<void>;
+};
+
 /** Per-field validation messages, keyed by the field they belong to. */
 export type NeighborFieldErrors = Partial<
   Record<keyof UpdateNeighborPayloadType, string>
