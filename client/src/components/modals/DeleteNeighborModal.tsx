@@ -5,6 +5,7 @@ import {
     Dialog,
     Typography
 } from "@material-tailwind/react"
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline"
 
 interface NeighborType {
   id: number;
@@ -39,20 +40,10 @@ const DeleteNeighborModal: React.FC<DeleteNeighborModalType> = ({
         <Dialog open={openModalState} handler={handleCloseModal} size="sm">
             <DialogBody className="text-center">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
+                    <ExclamationTriangleIcon
                         className="h-8 w-8 text-red-500"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                        />
-                    </svg>
+                        strokeWidth={2}
+                    />
                 </div>
                 <Typography variant="h4" color="blue-gray" className="mb-2">
                     ¿Eliminar Vecino?
