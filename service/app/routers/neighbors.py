@@ -52,8 +52,6 @@ def read_neighbor_detail(neighbor_id:int, db:Session= Depends(get_db)):
     "email":neighbor.email,
     "ci":neighbor.ci,
     "phone_number": neighbor.phone_number,
-    "birth_day":neighbor.birth_day,
-    "is_active":neighbor.is_active,
     "meters":meters
   } 
   

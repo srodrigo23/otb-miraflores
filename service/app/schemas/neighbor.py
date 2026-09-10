@@ -40,9 +40,8 @@ class Neighbor(BaseModel):
 
 
 class NeighborDetail(Neighbor):
-  birth_day:datetime | None= None
   meters:list[NeighborMeter]
-  is_active:bool
+  # birth_day and is_active are commented out in the Neighbor model
   # created_at:datetime # date
   # updated_at:datetime # date
 

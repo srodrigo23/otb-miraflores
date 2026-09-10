@@ -114,19 +114,6 @@ const EditNeighborModal: React.FC<EditNeighborModalProps> = ({
                 )}
               </div>
             ))}
-
-            <Input
-              label='Fecha de Nacimiento'
-              crossOrigin={undefined}
-              value={
-                neighbor?.birth_day
-                  ? new Date(neighbor.birth_day).toLocaleDateString('es-ES')
-                  : '-'
-              }
-              // Read-only here: it is not part of the update payload.
-              readOnly
-              disabled
-            />
           </div>
 
           <DialogFooter className='flex flex-col-reverse gap-2 px-0 pt-2 sm:flex-row'>

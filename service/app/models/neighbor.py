@@ -45,17 +45,15 @@ class Neighbor(Base):
   ci = Column(Integer, nullable=True)
   phone_number = Column(Integer, nullable=True)
   email = Column(String(50), nullable=True)
-  birth_day = Column(Date, nullable=True)
+  # birth_day = Column(Date, nullable=True)
 
-  is_active = Column(Boolean, default=True)  # Si el vecino está activo
+  # is_active = Column(Boolean, default=True)
   created_at = Column(DateTime, default=datetime.utcnow)
   updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
   
   # Relaciones
   meters = relationship("NeighborMeter", back_populates="neighbor", cascade="all, delete-orphan")
   
-  
   debts = relationship("DebtItem", back_populates="neighbor", cascade="all, delete-orphan")
-
   # assistances = relationship("Assistance", back_populates="neighbor", cascade="all, delete-orphan")
   

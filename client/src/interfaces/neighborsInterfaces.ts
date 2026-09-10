@@ -17,7 +17,6 @@ interface MetersI {
 }
 export interface NeighborWithDetailsType extends NeighborType{
   meters:MetersI[]
-  birth_day:string|null;
   created_at:string
   updated_at:string
 }
