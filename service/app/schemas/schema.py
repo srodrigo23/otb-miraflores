@@ -18,6 +18,8 @@ from .meter_reading import MeterReadingDetail, MeterReadingUpdate
 from .neighbor import Neighbor, NeighborBase, NeighborCreate, NeighborDetail, NeighborUpdate
 from .neighbor_meter import (
   ConsumptionPoint,
+  NeighborMeterCreate,
+  NextMeterCodes,
   MeterDebtSummary,
   MeterLedgerDetail,
   MeterLedgerPayment,
@@ -28,6 +30,8 @@ from .user import User, UserUpdate
 __all__ = [
   "Assistance",
   "AssistanceBase",
+  "NeighborMeterCreate",
+  "NextMeterCodes",
   "AssistanceCreate",
   "AssistanceUpdate",
   "CollectDebt",

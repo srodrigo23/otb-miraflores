@@ -6,6 +6,8 @@ import {
   Button,
   Dialog,
   DialogHeader,
+  Option,
+  Select,
   Switch,
   Typography,
 } from '@material-tailwind/react';
@@ -13,6 +15,8 @@ import { ClipLoader } from 'react-spinners';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import { getTodayDate } from '../../utils/dates';
+import { METER_SECTIONS } from '../../constants';
+import { useNextMeterCodes } from '../../hooks/neighbors/useNextMeterCodes';
 import {
   InputsNewMeterForm,
   NewMeterModalFormType,
@@ -23,11 +27,17 @@ const NewMeterModalForm: React.FC<NewMeterModalFormType> = ({
   handleCloseModal,
   onSubmit,
 }) => {
+  // One request per opening: the map holds the next free code of every
+  // section, so switching section does not hit the API again.
+  const { codes, isLoading: loadingCodes } = useNextMeterCodes(openModalState);
+
   const {
     register,
     handleSubmit,
     reset,
     control,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<InputsNewMeterForm>({
     defaultValues: {
@@ -39,13 +49,24 @@ const NewMeterModalForm: React.FC<NewMeterModalFormType> = ({
     },
   });
 
+  const section = watch('section');
+
   // Start clean every time it closes, so a cancelled draft never reappears.
   useEffect(() => {
     if (!openModalState) reset();
   }, [openModalState, reset]);
 
+  // Keeps the code in step with the section, and fills it in when the codes
+  // land after a section was already picked.
+  useEffect(() => {
+    setValue('meter_code', section ? (codes[section] ?? '') : '');
+  }, [section, codes, setValue]);
+
   const onSubmitMethod: SubmitHandler<InputsNewMeterForm> = async (data) => {
-    await onSubmit(data);
+    const created = await onSubmit(data);
+    // Keep the modal open on failure (a code taken meanwhile, for instance)
+    // so the user can react instead of retyping everything.
+    if (!created) return;
     reset();
     handleCloseModal();
   };
@@ -77,14 +98,29 @@ const NewMeterModalForm: React.FC<NewMeterModalFormType> = ({
           onSubmit={handleSubmit(onSubmitMethod)}
         >
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+            {/* Section comes first: the code is derived from it */}
             <div>
-              <Input
-                label='Código de Medidor'
-                crossOrigin={undefined}
-                {...register('meter_code', { required: true })}
-                error={!!errors.meter_code}
+              <Controller
+                name='section'
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <Select
+                    label='Sección'
+                    value={value}
+                    onChange={(val) => onChange(val ?? '')}
+                    error={!!errors.section}
+                    disabled={loadingCodes}
+                  >
+                    {METER_SECTIONS.map((option) => (
+                      <Option key={option} value={option}>
+                        {option}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
               />
-              {errors.meter_code && (
+              {errors.section && (
                 <Typography
                   variant='small'
                   color='red'
@@ -97,20 +133,26 @@ const NewMeterModalForm: React.FC<NewMeterModalFormType> = ({
 
             <div>
               <Input
-                label='Sección'
+                label='Código de Medidor'
                 crossOrigin={undefined}
-                {...register('section', { required: true })}
-                error={!!errors.section}
+                {...register('meter_code', { required: true })}
+                error={!!errors.meter_code}
+                // Assigned by the correlative, not typed: letting it be edited
+                // is what would produce a duplicate of a code already in use.
+                readOnly
+                className='!bg-blue-gray-50/60'
               />
-              {errors.section && (
-                <Typography
-                  variant='small'
-                  color='red'
-                  className='mt-1 font-normal'
-                >
-                  Campo requerido
-                </Typography>
-              )}
+              <Typography
+                variant='small'
+                color='gray'
+                className='mt-1 font-normal'
+              >
+                {loadingCodes
+                  ? 'Buscando el siguiente código...'
+                  : section
+                    ? 'Siguiente código libre de la sección'
+                    : 'Elige una sección para asignarlo'}
+              </Typography>
             </div>
 
             <div>

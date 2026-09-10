@@ -95,6 +95,53 @@ def get_neighbor_meters(neighbor_id: int, db: Session = Depends(get_db)):
   return neighbor_meters.get_neighbor_meter_ledgers(db, neighbor_id=neighbor_id)
 
 
+@router.post(
+  "/{neighbor_id}/meters",
+  response_model=schemas.NeighborMeter,
+  status_code=status.HTTP_201_CREATED,
+)
+def create_neighbor_meter(
+  neighbor_id: int,
+  meter: schemas.NeighborMeterCreate,
+  db: Session = Depends(get_db),
+):
+  """
+  Registers a meter for an existing neighbor.
+
+  The code is validated instead of trusted: the form filled it in from
+  /meters/next-codes, and between that read and this write another collector
+  may have taken it.
+  """
+  if crud.get_neighbor(db, neighbor_id=neighbor_id) is None:
+    raise HTTPException(status_code=404, detail="Neighbor not found")
+
+  code = meter.meter_code.strip().upper()
+  match = neighbor_meters.METER_CODE_PATTERN.match(code)
+  if not match:
+    raise HTTPException(
+      status_code=400,
+      detail="El código debe tener el formato S-NNN, por ejemplo A-007",
+    )
+
+  if match.group(1) != meter.section.value:
+    raise HTTPException(
+      status_code=400,
+      detail=f"El código {code} no corresponde a la sección {meter.section.value}",
+    )
+
+  if neighbor_meters.get_meter_by_code(db, meter_code=code):
+    # Hand back the code that is free now, so the form can recover
+    suggested = neighbor_meters.get_next_meter_codes(db)[meter.section.value]
+    raise HTTPException(
+      status_code=409,
+      detail=f"El código {code} ya está registrado. El siguiente libre es {suggested}",
+    )
+
+  return neighbor_meters.create_neighbor_meter(
+    db, neighbor_id=neighbor_id, meter=meter
+  )
+
+
 @router.get("/{neighbor_id}/payments")
 def get_neighbor_payments(neighbor_id: int, db: Session = Depends(get_db)):
   """

@@ -10,6 +10,15 @@ class MeasureType(Enum):
   IN_PROGRESS = "IN_PROGRESS"
   CLOSED = "CLOSED" 
   
+class MeterSection(Enum):
+  """The sections the OTB is divided into. Every meter belongs to one."""
+  A = "A"
+  B = "B"
+  C = "C"
+  D = "D"
+  E = "E"
+  F = "F"
+
 class MeterReadingStatus(Enum):
   UNREAD = "UNREAD"
   READED = "READED"

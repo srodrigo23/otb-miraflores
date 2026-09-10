@@ -36,7 +36,8 @@ export type InputsNewMeterForm = {
 export type NewMeterModalFormType = {
   openModalState: boolean;
   handleCloseModal: () => void;
-  onSubmit: (data: InputsNewMeterForm) => void | Promise<void>;
+  /** Resolves to whether it was created: on failure the form stays open */
+  onSubmit: (data: InputsNewMeterForm) => Promise<boolean>;
 };
 
 /** Per-field validation messages, keyed by the field they belong to. */

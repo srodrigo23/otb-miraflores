@@ -11,6 +11,7 @@ import { ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
 
 import { useNeighborMeterLedgers } from '../hooks/neighbors/useNeighborMeterLedgers';
+import { useNewMeter } from '../hooks/neighbors/useNewMeter';
 import type { ReceiptNeighbor } from '../reports/PaymentReceipt';
 import { InputsNewMeterForm } from '../types/NeighborsTypes';
 import { NUMERIC } from '../utils/format';
@@ -27,7 +28,13 @@ export const NeighborDebtsPayments: React.FC<{
   /** Only what the printed receipt needs to identify the payer */
   neighbor: ReceiptNeighbor;
 }> = ({ neighborId, neighbor }) => {
-  const { data: meters = [], isLoading, error } = useNeighborMeterLedgers(neighborId);
+  const {
+    data: meters = [],
+    isLoading,
+    error,
+    refetchMeterLedgers,
+  } = useNeighborMeterLedgers(neighborId);
+  const { createNewMeter } = useNewMeter(neighborId);
   const [selectedMeterId, setSelectedMeterId] = useState<number | null>(null);
   const [openNewMeterModal, setOpenNewMeterModal] = useState(false);
   // Id of the meter waiting for the user to confirm its deactivation
@@ -92,10 +99,10 @@ export const NeighborDebtsPayments: React.FC<{
     setMeterToDeactivate(null);
   };
 
-  // Visual only for now: the endpoint that registers a meter is still to be
-  // designed, so nothing is persisted and the list is not refetched.
   const handlerNewMeter = async (data: InputsNewMeterForm) => {
-    void data;
+    const created = await createNewMeter(data);
+    if (created) await refetchMeterLedgers();
+    return created;
   };
 
   const addMeterButton = (

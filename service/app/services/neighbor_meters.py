@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session, contains_eager, joinedload
 from app.models import NeighborMeter, Neighbor, Measure, MeterReading
-from app.enums import MeterReadingStatus
+import re
+from datetime import datetime, time
+
+from app.enums import MeterReadingStatus, MeterSection
 
 
 def get_neighbor_meters(db: Session):
@@ -133,3 +136,72 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
     })
 
   return ledgers
+
+
+# --- Meter codes -------------------------------------------------------------
+# A meter code is "S-NNN": the section letter, a dash, and a zero-padded
+# correlative that runs independently inside each section.
+METER_CODE_PATTERN = re.compile(r"^([A-Z])-(\d+)$")
+METER_CODE_DIGITS = 3
+
+
+def build_meter_code(section: str, number: int) -> str:
+  """"A", 7 -> "A-007" """
+  return f"{section.upper()}-{number:0{METER_CODE_DIGITS}d}"
+
+
+def get_next_meter_codes(db: Session) -> dict[str, str]:
+  """
+  The next free code of every section, as {"A": "A-019", "B": "B-011", ...}.
+
+  One query answers the whole form: the client picks the code for the section
+  the user selects instead of asking the API again on every change.
+
+  The correlative is the highest one in use plus one, not the number of meters
+  in the section: deleting a meter would otherwise suggest a code that is
+  already taken, and meter_code is unique in the database.
+  """
+  highest: dict[str, int] = {}
+
+  for (code,) in db.query(NeighborMeter.meter_code).all():
+    match = METER_CODE_PATTERN.match((code or "").strip().upper())
+    if not match:
+      # Codes that predate the format are ignored rather than blocking the count
+      continue
+    section, number = match.group(1), int(match.group(2))
+    highest[section] = max(highest.get(section, 0), number)
+
+  # Every known section is answered, including the ones with no meters yet
+  return {
+    section.value: build_meter_code(section.value, highest.get(section.value, 0) + 1)
+    for section in MeterSection
+  }
+
+
+def get_meter_by_code(db: Session, meter_code: str):
+  return db.query(NeighborMeter).filter(
+    NeighborMeter.meter_code == meter_code
+  ).first()
+
+
+def create_neighbor_meter(db: Session, neighbor_id: int, meter) -> NeighborMeter:
+  """
+  Registers a meter for an existing neighbor. The caller is expected to have
+  checked the neighbor exists and the code is free.
+  """
+  db_meter = NeighborMeter(
+    neighbor_id=neighbor_id,
+    meter_code=meter.meter_code.strip().upper(),
+    section=meter.section.value,
+    initial_reading=meter.initial_reading,
+    is_active=meter.is_active,
+  )
+  if meter.created_at is not None:
+    # The form lets the user date the registration, e.g. when loading a meter
+    # that was installed days ago
+    db_meter.created_at = datetime.combine(meter.created_at, time.min)
+
+  db.add(db_meter)
+  db.commit()
+  db.refresh(db_meter)
+  return db_meter
