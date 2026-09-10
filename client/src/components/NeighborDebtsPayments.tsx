@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { IconButton, Tabs, TabsHeader, Tab, Tooltip } from '@material-tailwind/react';
+import {
+  IconButton,
+  Switch,
+  Tabs,
+  TabsHeader,
+  Tab,
+  Tooltip,
+} from '@material-tailwind/react';
 import { ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 import { useNeighborMeterLedgers } from '../hooks/neighbors/useNeighborMeterLedgers';
@@ -21,13 +28,26 @@ export const NeighborDebtsPayments: React.FC<{
   const { data: meters = [], isLoading, error } = useNeighborMeterLedgers(neighborId);
   const [selectedMeterId, setSelectedMeterId] = useState<number | null>(null);
   const [openNewMeterModal, setOpenNewMeterModal] = useState(false);
+  // Enabled/disabled flipped in the UI but not yet persisted: there is no
+  // endpoint to update a meter, so the switch reads through this overlay.
+  const [activeOverrides, setActiveOverrides] = useState<
+    Record<number, boolean>
+  >({});
 
   // Select the first meter once they arrive, and again if the neighbor changes
   useEffect(() => {
     setSelectedMeterId(meters.length > 0 ? meters[0].id : null);
+    setActiveOverrides({});
   }, [meters]);
 
   const toggleNewMeterModal = () => setOpenNewMeterModal((isOpen) => !isOpen);
+
+  const isMeterActive = (item: { id: number; is_active: boolean }) =>
+    activeOverrides[item.id] ?? item.is_active;
+
+  // Visual only for now: same missing endpoint as the "new meter" form.
+  const handleToggleMeterActive = (meterId: number, isActive: boolean) =>
+    setActiveOverrides((current) => ({ ...current, [meterId]: isActive }));
 
   // Visual only for now: the endpoint that registers a meter is still to be
   // designed, so nothing is persisted and the list is not refetched.
@@ -114,7 +134,7 @@ export const NeighborDebtsPayments: React.FC<{
                 <div className='flex items-center gap-2'>
                   <span
                     className={`h-2 w-2 shrink-0 rounded-full ${
-                      item.is_active ? 'bg-green-500' : 'bg-red-400'
+                      isMeterActive(item) ? 'bg-green-500' : 'bg-red-400'
                     }`}
                     aria-hidden='true'
                   />
@@ -129,6 +149,32 @@ export const NeighborDebtsPayments: React.FC<{
             ))}
           </TabsHeader>
         </Tabs>
+
+        {/* Acts on the meter of the active tab, named in the tooltip so it is
+            never ambiguous which one is being switched. */}
+        <Tooltip
+          content={`${isMeterActive(meter) ? 'Deshabilitar' : 'Habilitar'} el medidor ${meter.meter_code}`}
+        >
+          <div className='flex shrink-0 items-center gap-2'>
+            <Switch
+              crossOrigin={undefined}
+              color='green'
+              checked={isMeterActive(meter)}
+              onChange={(e) =>
+                handleToggleMeterActive(meter.id, e.target.checked)
+              }
+              aria-label={`Habilitar medidor ${meter.meter_code}`}
+            />
+            <span
+              className={`text-xs font-semibold ${
+                isMeterActive(meter) ? 'text-green-700' : 'text-blue-gray-500'
+              }`}
+            >
+              {isMeterActive(meter) ? 'Habilitado' : 'Deshabilitado'}
+            </span>
+          </div>
+        </Tooltip>
+
         {addMeterButton}
       </div>
 
