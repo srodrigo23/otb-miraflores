@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import datetime
 
 from .neighbor_meter import NeighborMeter
@@ -9,12 +9,16 @@ class NeighborBase(BaseModel):
 
 
 class NeighborCreate(BaseModel):
-  first_name: str
+  """
+  Only the names are required, matching the model: a neighbor may be on the
+  register without a CI or a phone on record. Meters are registered apart.
+  """
+  first_name: str = Field(min_length=1)
   second_name: str | None = None
-  last_name: str
-  ci: str | int
-  phone_number: str | int
-  email: str | None = None
+  last_name: str = Field(min_length=1)
+  ci: int | None = None
+  phone_number: int | None = None
+  email: EmailStr | None = None
 
 
 class NeighborUpdate(BaseModel):
@@ -40,7 +44,8 @@ class Neighbor(BaseModel):
 
 
 class NeighborDetail(Neighbor):
-  meters:list[NeighborMeter]
+  # Defaults to empty: a neighbor may exist before any meter is registered
+  meters: list[NeighborMeter] = []
   # birth_day and is_active are commented out in the Neighbor model
   # created_at:datetime # date
   # updated_at:datetime # date

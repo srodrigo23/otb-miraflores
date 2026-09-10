@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..schemas import schema as schemas
 from ..services import crud
@@ -13,13 +13,15 @@ router = APIRouter(
   responses={404: {"description": "Not found"}}
 )
 
-@router.post("", response_model=schemas.Neighbor, )
+@router.post("", response_model=schemas.Neighbor, status_code=status.HTTP_201_CREATED)
 def create_neighbor(neighbor: schemas.NeighborCreate, db: Session = Depends(get_db)):
-  # Validar email solo si se proporciona
-  if neighbor.email:
-    db_neighbor = crud.get_neighbor_by_email(db, email=neighbor.email)
-    if db_neighbor:
-      raise HTTPException(status_code=400, detail="Email already registered")
+  # Both are optional, so each one is only checked when it was provided
+  if neighbor.email and crud.get_neighbor_by_email(db, email=neighbor.email):
+    raise HTTPException(status_code=400, detail="El correo ya está registrado")
+
+  if neighbor.ci and crud.get_neighbor_by_ci(db, ci=neighbor.ci):
+    raise HTTPException(status_code=400, detail="La cédula ya está registrada")
+
   return crud.create_neighbor(db=db, neighbor=neighbor)
 
 @router.get("", response_model=list[schemas.Neighbor])
@@ -37,23 +39,11 @@ def read_neighbors( db: Session = Depends(get_db)):
 
 @router.get("/{neighbor_id}", response_model=schemas.NeighborDetail)
 def read_neighbor_detail(neighbor_id:int, db:Session= Depends(get_db)):
-  neighbor_answer = crud.get_neighbor_by_id(db, neighbor_id=neighbor_id)
-  if not neighbor_answer:
+  neighbor = crud.get_neighbor_by_id(db, neighbor_id=neighbor_id)
+  if not neighbor:
     raise HTTPException(status_code=404, detail="Neighbor not found")
-  neighbor = neighbor_answer[0][0]
-  meters = []
-  for _, meter in neighbor_answer:
-    meters.append(meter)
-  return {
-    "id":neighbor.id,
-    "first_name":neighbor.first_name,
-    "second_name":neighbor.second_name,
-    "last_name":neighbor.last_name,
-    "email":neighbor.email,
-    "ci":neighbor.ci,
-    "phone_number": neighbor.phone_number,
-    "meters":meters
-  } 
+  # NeighborDetail reads straight off the ORM object, meters included
+  return neighbor
   
 
 @router.get("/users/{user_id}", response_model=schemas.User)

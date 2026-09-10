@@ -10,6 +10,9 @@ class NeighborMeter(BaseModel):
   initial_reading:int = 0
   is_active:bool
 
+  # Needed to build this from the ORM object nested in NeighborDetail.meters
+  model_config = ConfigDict(from_attributes=True)
+
 
 class ConsumptionPoint(BaseModel):
   """One period of the meter's consumption history"""

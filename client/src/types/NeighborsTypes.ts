@@ -3,6 +3,26 @@ import {
   UpdateNeighborPayloadType,
 } from '../interfaces/neighborsInterfaces';
 
+/**
+ * Fields of the "new neighbor" form. Names match the NeighborCreate schema, so
+ * the form data is the request body. Only the names are required; a neighbor
+ * can be registered without CI, phone or email, and without any meter.
+ */
+export type InputsNewNeighborForm = {
+  first_name: string;
+  second_name: string | null;
+  last_name: string;
+  ci: number | null;
+  phone_number: number | null;
+  email: string | null;
+};
+
+export type NewNeighborModalFormType = {
+  openModalState: boolean;
+  handleCloseModal: () => void;
+  onSubmit: (data: InputsNewNeighborForm) => Promise<boolean>;
+};
+
 /** Fields of the "new meter" form. Names match the NeighborMeter model. */
 export type InputsNewMeterForm = {
   meter_code: string;

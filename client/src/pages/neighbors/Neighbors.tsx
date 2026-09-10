@@ -17,7 +17,10 @@ import { NeighborDetails } from '../../components/neighbors/NeighborDetails';
 import { BackButton } from '../../components/shared/BackButton';
 import { ViewSwitch } from '../../components/shared/ViewSwitch';
 import { ViewMode } from '../../types/commonTypes';
+import { InputsNewNeighborForm } from '../../types/NeighborsTypes';
 import { filterNeighbors } from '../../utils/neighbors';
+import { useNewNeighbor } from '../../hooks/neighbors/useNewNeighbor';
+import NewNeighborModalForm from '../../components/forms/NewNeighborModalForm';
 
 const Neighbors = () => {
   const navigate = useNavigate();
@@ -33,6 +36,9 @@ const Neighbors = () => {
     null,
   );
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
+  const [openNewNeighborModal, setOpenNewNeighborModal] = useState(false);
+
+  const { createNewNeighbor } = useNewNeighbor();
 
   // Filtering lives here, not in the views: both answered the same search the
   // same way, and the header count has to match whatever is rendered below.
@@ -41,8 +47,15 @@ const Neighbors = () => {
     [neighborsData, searchTerm],
   );
 
-  // Not wired yet — the register is still populated by the seed scripts.
-  const onAddNeighbor: (() => void) | undefined = undefined;
+  const toggleNewNeighborModal = () =>
+    setOpenNewNeighborModal((isOpen) => !isOpen);
+
+  /** Reports back whether it worked, so the form knows if it can close */
+  const handlerNewNeighbor = async (data: InputsNewNeighborForm) => {
+    const created = await createNewNeighbor(data);
+    if (created) refetchNeighbors();
+    return created;
+  };
 
   const handleSelect = (neighbor: NeighborType) => {
     navigate(`/vecinos?id=${neighbor.id}`);
@@ -114,15 +127,21 @@ const Neighbors = () => {
             variant='gradient'
             color='blue'
             size='md'
-            onClick={onAddNeighbor}
-            disabled={!onAddNeighbor}
+            onClick={toggleNewNeighborModal}
             aria-label='Agregar vecino'
+            title='Agregar vecino'
             className='shrink-0'
           >
             <UserPlusIcon className='h-5 w-5' />
           </IconButton>
         </div>
       </div>
+
+      <NewNeighborModalForm
+        openModalState={openNewNeighborModal}
+        handleCloseModal={toggleNewNeighborModal}
+        onSubmit={handlerNewNeighbor}
+      />
 
       {viewMode === 'table' ? (
         <NeighborTable {...viewProps} />

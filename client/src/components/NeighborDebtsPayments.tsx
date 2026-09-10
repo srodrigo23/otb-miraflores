@@ -142,7 +142,7 @@ export const NeighborDebtsPayments: React.FC<{
   // to get one, and the tab bar that normally carries it is not rendered.
   if (meters.length === 0) {
     return (
-      <div className='flex flex-1 flex-col items-center justify-center gap-3 rounded-lg border border-blue-gray-100 bg-white'>
+      <div className='flex flex-1 items-center justify-center gap-3 rounded-lg border border-blue-gray-100 bg-white'>
         <EmptyState message='Este vecino no tiene medidores registrados.' />
         {addMeterButton}
         {newMeterModal}
