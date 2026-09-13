@@ -13,7 +13,7 @@ export type MeasureTableProps = {
 
 
 export type InputsNewMeasureForm = {
-  measure_date: string;
+  year: number;
   period: string;
   reader_name: string;
   notes: string|null;

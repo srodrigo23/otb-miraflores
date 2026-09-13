@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, contains_eager, joinedload
 from app.models import NeighborMeter, Neighbor, Measure, MeterReading
+from app.models.measure import measure_rank, measure_rank_expr
 import re
 from datetime import datetime, time
 
@@ -19,9 +20,12 @@ def get_previous_readings_by_meter(db: Session, measure: Measure) -> dict[int, i
   Meters missing from the map have no previous measure and fall back to their
   own initial_reading.
   """
+  # Ordered by year and period instead of by date: the newest measure that
+  # still comes before this one
+  rank = measure_rank_expr()
   previous_measure = db.query(Measure).filter(
-    Measure.measure_date < measure.measure_date
-  ).order_by(Measure.measure_date.desc(), Measure.id.desc()).first()
+    rank < measure_rank(measure)
+  ).order_by(rank.desc(), Measure.id.desc()).first()
 
   if previous_measure is None:
     return {}
@@ -83,7 +87,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
   ).options(
     contains_eager(MeterReading.measure),
     joinedload(MeterReading.debt_item),
-  ).order_by(Measure.measure_date, Measure.id).all()
+  ).order_by(measure_rank_expr(), Measure.id).all()
 
   readings_by_meter: dict[int, list[MeterReading]] = {meter.id: [] for meter in meters}
   for reading in readings:
@@ -97,7 +101,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
     for reading in readings_by_meter[meter.id]:
       measure = reading.measure
       period = measure.period or ""
-      year = measure.measure_date.year
+      year = measure.year
 
       # An unread meter has no consumption yet: charting it as 0 would draw a
       # dip that never happened

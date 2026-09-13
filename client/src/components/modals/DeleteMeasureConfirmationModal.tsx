@@ -36,7 +36,7 @@ const DeleteMeasureConfirmationModal: React.FC<DeleteNeighborModalType> = ({
         <Typography color='gray' className='mb-4 font-normal'>
           ¿Estás seguro que deseas eliminar la lecturacion{' '}
           <span className='font-semibold'>
-            {measure?.measure_date}
+            {measure?.period} ({measure?.year})
             {/* {neighbor?.names} {neighbor?.mat_lname} {neighbor?.pat_lname} */}
           </span>
           ?

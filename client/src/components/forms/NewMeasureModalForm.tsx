@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Input,
   DialogBody,
@@ -15,7 +15,6 @@ import {
 import { ClipLoader } from 'react-spinners';
 
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { getTodayDate } from '../../utils/dates';
 import { useAuth } from '../../context/AuthContext';
 import { NewMeasureModalFormType } from '../../types/MeasuresTypes';
 import { InputsNewMeasureForm } from '../../types/MeasuresTypes';
@@ -45,21 +44,20 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
 
   const { user } = useAuth();
 
-  const [selectedDate, setSelectedDate] = useState<string>(getTodayDate());
+  // Today's year and period are only the starting point: a measure can be
+  // registered for a period that already went by.
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentPeriod = periods[Math.floor(today.getMonth() / 2)];
 
   useEffect(() => {
-    if (!openModalState) {
-      const today = getTodayDate();
-      setSelectedDate(today);
-      reset();
-    }
+    if (!openModalState) reset();
   }, [openModalState, reset]);
 
   useEffect(() => {
-    const month = new Date(`${selectedDate} 00:00:00`).getMonth();
-    const periodIndex = Math.floor(month / 2);
-    setValue('period', periods[periodIndex]);
-  }, [selectedDate, setValue]);
+    setValue('year', currentYear);
+    setValue('period', currentPeriod);
+  }, [openModalState, setValue]);
 
   const onSubmitMethod: SubmitHandler<InputsNewMeasureForm> = async (data) => {
     await onSubmit(data);
@@ -95,21 +93,27 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
             <div>
               <Input
-                type='date'
-                label='Fecha de Medición'
-                defaultValue={selectedDate}
+                type='number'
+                inputMode='numeric'
+                label='Año'
                 crossOrigin={undefined}
-                {...register('measure_date', { required: true })}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                error={!!errors.measure_date}
+                defaultValue={currentYear}
+                className='appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+                {...register('year', {
+                  required: 'Campo requerido',
+                  valueAsNumber: true,
+                  min: { value: 2000, message: 'Año fuera de rango' },
+                  max: { value: 2100, message: 'Año fuera de rango' },
+                })}
+                error={!!errors.year}
               />
-              {errors.measure_date && (
+              {errors.year && (
                 <Typography
                   variant='small'
                   color='red'
                   className='mt-1 font-normal'
                 >
-                  Campo requerido
+                  {errors.year.message}
                 </Typography>
               )}
             </div>
@@ -117,7 +121,7 @@ const NewMeasureModalForm: React.FC<NewMeasureModalFormType> = ({
             <Controller
               name='period'
               control={control}
-              defaultValue={periods[0]}
+              defaultValue={currentPeriod}
               render={({ field: { onChange, value } }) => (
                 <Select
                   label='Periodo'

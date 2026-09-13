@@ -7,7 +7,6 @@ import {
 } from '../../interfaces/measuresIterfaces';
 import { LoaderAnimation } from '../shared/LoaderAnimation';
 import { MetaField } from '../shared/MetaField';
-import { formatDate } from '../../utils/dates';
 import { STATUS_COLORS, STATUS_LABELS } from '../../constants';
 import { color } from '../../types/commonTypes';
 
@@ -55,9 +54,9 @@ export const MeasureReadingsHeader: React.FC<{
             {
               measure && (
                 <div className='grid flex-1 grid-cols-2 gap-x-4 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6'>
-                  <MetaField label='Fecha'>
+                  <MetaField label='Año'>
                     <Typography variant='small' color='blue-gray' className='font-bold'>
-                      {formatDate(measure.measure_date)}
+                      {measure.year}
                     </Typography>
                   </MetaField>
                   <MetaField label='Periodo'>

@@ -1,7 +1,6 @@
 import { Document, Page, Text, View } from '@react-pdf/renderer';
 
 import { MeasureType, MeterReadingType } from '../interfaces/measuresIterfaces';
-import { formatDate } from '../utils/dates';
 import { REPORT_COLORS, reportStyles } from './reportTheme';
 
 /**
@@ -76,7 +75,7 @@ export const MeterReadingsSheet: React.FC<{
               Fecha de medición
             </Text>
             <Text style={reportStyles.metaValue}>
-              {measure?.measure_date ? formatDate(measure.measure_date) : '-'}
+              {measure?.year ?? '-'}
             </Text>
           </View>
         </View>

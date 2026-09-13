@@ -3,7 +3,7 @@ export type MeasureStatus = "CREATED" | "IN_PROGRESS" | "CLOSED";
 
 export interface MeasureType {
   id: number;
-  measure_date: string;
+  year: number;
   period: string;
   reader_name: string;
   status: MeasureStatus;

@@ -18,6 +18,24 @@ class MeterSection(Enum):
   D = "D"
   E = "E"
   F = "F"
+  
+class MeasurePeriod(Enum):
+  """
+  The six two-month periods a measure can belong to, declared in calendar
+  order: that order is what tells which measure came before another now that
+  measures no longer carry a date.
+  """
+  ENERO_FEBRERO = "ENERO-FEBRERO"
+  MARZO_ABRIL = "MARZO-ABRIL"
+  MAYO_JUNIO = "MAYO-JUNIO"
+  JULIO_AGOSTO = "JULIO-AGOSTO"
+  SEPTIEMBRE_OCTUBRE = "SEPTIEMBRE-OCTUBRE"
+  NOVIEMBRE_DICIEMBRE = "NOVIEMBRE-DICIEMBRE"
+
+  @classmethod
+  def for_month(cls, month: int) -> "MeasurePeriod":
+    """The period a calendar month (1-12) falls into"""
+    return list(cls)[(month - 1) // 2]
 
 class MeterReadingStatus(Enum):
   UNREAD = "UNREAD"

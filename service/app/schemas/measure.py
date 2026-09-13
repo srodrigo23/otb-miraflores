@@ -1,12 +1,13 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
-from ..enums import MeasureType
+from ..enums import MeasurePeriod, MeasureType
 
 
 class MeasureBase(BaseModel):
-  measure_date: str  # Date as string
-  period: str | None = None
+  # Year plus period place the measure in time; there is no date any more
+  year: int = Field(ge=2000, le=2100)
+  period: MeasurePeriod
   reader_name: str | None = None
   notes: str | None = None
 
@@ -16,8 +17,8 @@ class MeasureCreate(MeasureBase):
 
 
 class MeasureUpdate(BaseModel):
-  measure_date: datetime | None = None
-  period: str | None = None
+  year: int | None = Field(default=None, ge=2000, le=2100)
+  period: MeasurePeriod | None = None
   reader_name: str | None = None
   status: str | None = None
   notes: str | None = None
@@ -27,7 +28,7 @@ class MeasureUpdate(BaseModel):
 
 class Measure(BaseModel):
   id: int
-  measure_date: datetime
+  year: int | None = None
   period: str | None = None
   reader_name: str | None = None
   status: MeasureType

@@ -19,10 +19,9 @@ def create_measure(db: Session, measure: MeasureCreate):
   """
   Crea una nueva medición
   """
-  from datetime import datetime
   db_measure = Measure(
-    measure_date=datetime.strptime(measure.measure_date, "%Y-%m-%d").date(),
-    period=measure.period,
+    year=measure.year,
+    period=measure.period.value,
     reader_name=measure.reader_name,
     notes=measure.notes,
     status=MeasureType.CREATED,
@@ -41,10 +40,9 @@ def update_measure(db: Session, measure_id: int, measure: MeasureUpdate):
   if db_measure:
     update_data = measure.model_dump(exclude_unset=True)
 
-    # Si se actualiza la fecha, convertirla
-    # if "measure_date" in update_data and update_data["measure_date"]:
-    #   from datetime import datetime
-    #   update_data["measure_date"] = datetime.strptime(update_data["measure_date"], "%Y-%m-%d").date()
+    # The period travels as an enum; the column stores its value
+    if update_data.get("period") is not None:
+      update_data["period"] = update_data["period"].value
 
     for key, value in update_data.items():
       setattr(db_measure, key, value)

@@ -14,13 +14,13 @@ import { MeasureTableProps } from '../../types/MeasuresTypes';
 import { useNavigate } from 'react-router-dom';
 import { color } from '../../types/commonTypes';
 
-type SortField = 'id' | 'measure_date' | 'period' | 'reader_name' | 'status' | 'created_at';
+type SortField = 'id' | 'year' | 'period' | 'reader_name' | 'status' | 'created_at';
 type SortOrder = 'asc' | 'desc';
 
 const TABLE_HEAD = [
   { label: 'Num.', field: 'id' as SortField, sortable: true },
+  { label: 'Año', field: 'year' as SortField, sortable: true },
   { label: 'Periodo', field: 'period' as SortField, sortable: true },
-  { label: 'Fecha de Medición', field: 'measure_date' as SortField, sortable: true },
   { label: 'Responsable', field: 'reader_name' as SortField, sortable: false },
   { label: 'Estado', field: 'status' as SortField, sortable: false},
   { label: 'Acciones', field: null, sortable: false },
@@ -80,15 +80,6 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
       setSortField(field);
       setSortOrder('asc');
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-BO', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
   };
 
   return (
@@ -152,18 +143,18 @@ const MeasureTable: React.FC<MeasureTableProps> = ({
                     <Typography
                       variant='small'
                       color='blue-gray'
-                      className='font-normal text-center'
+                      className='font-medium text-center'
                     >
-                      {measure.period || '-'}
+                      {measure.year ?? '-'}
                     </Typography>
                   </td>
                   <td className={classes}>
                     <Typography
                       variant='small'
                       color='blue-gray'
-                      className='font-medium text-center'
+                      className='font-normal text-center'
                     >
-                      {formatDate(measure.measure_date)}
+                      {measure.period || '-'}
                     </Typography>
                   </td>
                   <td className={classes}>
