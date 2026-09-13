@@ -1,10 +1,18 @@
 import { useState } from 'react';
-import { Switch, Tab, Tabs, TabsHeader, Tooltip } from '@material-tailwind/react';
+import {
+  IconButton,
+  Tab,
+  Tabs,
+  TabsHeader,
+  Tooltip,
+} from '@material-tailwind/react';
+import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 import { MeterLedger } from '../../../interfaces/neighborDebtsInterfaces';
 import { InputsNewMeterForm } from '../../../types/NeighborsTypes';
 import { NUMERIC } from '../../../utils/format';
 import DeactivateMeterModal from '../../modals/DeactivateMeterModal';
+import MeterSettingsModal from '../../modals/MeterSettingsModal';
 import AddMeterButton from './AddMeterButton';
 
 type MeterSelectorTabsProps = {
@@ -35,6 +43,7 @@ export const MeterSelectorTabs: React.FC<MeterSelectorTabsProps> = ({
   isSavingActive = false,
   onCreateMeter,
 }) => {
+  const [openSettings, setOpenSettings] = useState(false);
   // Id of the meter waiting for the user to confirm its deactivation
   const [meterToDeactivate, setMeterToDeactivate] = useState<number | null>(
     null,
@@ -43,12 +52,14 @@ export const MeterSelectorTabs: React.FC<MeterSelectorTabsProps> = ({
   const isSelectedActive = isMeterActive(selectedMeter);
 
   // Only turning a meter off asks for confirmation: enabling one back is
-  // harmless and undoing it is one click away.
+  // harmless and undoing it is one click away. The settings modal steps aside
+  // while the confirmation is up, rather than stacking one dialog on another.
   const handleToggle = (isActive: boolean) => {
     if (isActive) {
       onSetMeterActive(selectedMeter.id, true);
       return;
     }
+    setOpenSettings(false);
     setMeterToDeactivate(selectedMeter.id);
   };
 
@@ -97,31 +108,31 @@ export const MeterSelectorTabs: React.FC<MeterSelectorTabsProps> = ({
         </TabsHeader>
       </Tabs>
 
-      {/* Acts on the meter of the active tab, named in the tooltip so it is
-          never ambiguous which one is being switched. */}
-      <Tooltip
-        content={`${isSelectedActive ? 'Deshabilitar' : 'Habilitar'} el medidor ${selectedMeter.meter_code}`}
-      >
-        <div className='flex shrink-0 items-center gap-2'>
-          <Switch
-            crossOrigin={undefined} 
-            color='green'
-            checked={isSelectedActive}
-            onChange={(e) => handleToggle(e.target.checked)}
-            disabled={isSavingActive}
-            aria-label={`Habilitar medidor ${selectedMeter.meter_code}`}
-          />
-          <span
-            className={`text-xs font-semibold ${
-              isSelectedActive ? 'text-green-700' : 'text-blue-gray-500'
-            }`}
-          >
-            {isSelectedActive ? 'Habilitado' : 'Deshabilitado'}
-          </span>
-        </div>
+      {/* Opens the settings of the meter of the active tab, named in the
+          tooltip so it is never ambiguous which one it acts on. */}
+      <Tooltip content={`Configurar el medidor ${selectedMeter.meter_code}`}>
+        <IconButton
+          variant='outlined'
+          color='blue-gray'
+          size='md'
+          onClick={() => setOpenSettings(true)}
+          aria-label={`Configurar medidor ${selectedMeter.meter_code}`}
+          className='shrink-0'
+        >
+          <Cog6ToothIcon className='h-5 w-5' />
+        </IconButton>
       </Tooltip>
 
       <AddMeterButton onCreateMeter={onCreateMeter} />
+
+      <MeterSettingsModal
+        openModalState={openSettings}
+        handleCloseModal={() => setOpenSettings(false)}
+        meter={selectedMeter}
+        isActive={isSelectedActive}
+        onToggleActive={handleToggle}
+        isSaving={isSavingActive}
+      />
 
       <DeactivateMeterModal
         openModalState={meterToDeactivate !== null}

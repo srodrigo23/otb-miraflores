@@ -19,6 +19,7 @@ from .neighbor import Neighbor, NeighborBase, NeighborCreate, NeighborDetail, Ne
 from .neighbor_meter import (
   ConsumptionPoint,
   NeighborMeterCreate,
+  NeighborMeterUpdate,
   NextMeterCodes,
   MeterDebtSummary,
   MeterLedgerDetail,
@@ -31,6 +32,7 @@ __all__ = [
   "Assistance",
   "AssistanceBase",
   "NeighborMeterCreate",
+  "NeighborMeterUpdate",
   "NextMeterCodes",
   "AssistanceCreate",
   "AssistanceUpdate",

@@ -1,41 +1,37 @@
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { MeterLedger } from '../../interfaces/neighborDebtsInterfaces';
+import { useUpdateMeter } from './useUpdateMeter';
 
 /**
  * Enabled/disabled state of the meters of a neighbor.
  *
- * TODO: there is no endpoint to update a meter yet, so a change only lives in
- * a local overlay on top of what the API returned. Once it exists, call it in
- * `setMeterActive` and refetch the ledgers; the toasts, the error branch and
- * the saving flag are already where they need to be.
+ * The change is persisted through PATCH /meters/{id} and mirrored in a local
+ * overlay, so the tabs and the settings modal follow immediately instead of
+ * waiting for the ledgers to be read again.
  */
-export const useMeterActiveState = (meters: MeterLedger[]) => {
+export const useMeterActiveState = (
+  meters: MeterLedger[],
+  /** Re-reads the ledgers once the change is stored */
+  refetchMeterLedgers?: () => Promise<unknown>,
+) => {
   const [overrides, setOverrides] = useState<Record<number, boolean>>({});
-  const [isSavingActive, setIsSavingActive] = useState(false);
+  const { setMeterActive: persist, isSaving: isSavingActive } =
+    useUpdateMeter();
 
-  // Whatever was flipped stops applying once the meters themselves change
+  // The overlay stops applying once the meters themselves are read again
   useEffect(() => setOverrides({}), [meters]);
 
   const isMeterActive = (meter: { id: number; is_active: boolean }) =>
     overrides[meter.id] ?? meter.is_active;
 
   const setMeterActive = async (meterId: number, isActive: boolean) => {
-    const code = meters.find((item) => item.id === meterId)?.meter_code ?? '';
-    setIsSavingActive(true);
-    try {
-      setOverrides((current) => ({ ...current, [meterId]: isActive }));
-      toast.success(
-        isActive
-          ? `Medidor ${code} habilitado correctamente`
-          : `Medidor ${code} deshabilitado correctamente`,
-      );
-    } catch {
-      toast.error('No se pudo actualizar el estado del medidor');
-    } finally {
-      setIsSavingActive(false);
-    }
+    const saved = await persist(meterId, isActive);
+    // Only mirror what the API accepted: a failed call must leave the switch
+    // showing the state the meter really has.
+    if (!saved) return;
+    setOverrides((current) => ({ ...current, [meterId]: isActive }));
+    await refetchMeterLedgers?.();
   };
 
   return { isMeterActive, setMeterActive, isSavingActive };

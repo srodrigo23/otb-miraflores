@@ -9,7 +9,13 @@ import { InputsNewNeighborForm } from '../../types/NeighborsTypes';
 type ApiError = { detail?: string };
 
 export const useNewNeighbor = () => {
-  const { data, isLoading, error, execute } = useFetchData<NeighborType>();
+  // Runs on demand only, so it must not start out loading
+  const {
+    data,
+    isLoading: isSaving,
+    error,
+    execute,
+  } = useFetchData<NeighborType>({ initialLoading: false });
   const apiLinkNewNeighbor = `${apiLink}/neighbors`;
 
   /** Resolves to whether the neighbor was created, so the form can stay open on failure */
@@ -38,7 +44,7 @@ export const useNewNeighbor = () => {
     return false;
   };
 
-  return { createNewNeighbor, isLoading, data, error };
+  return { createNewNeighbor, isSaving, data, error };
 };
 
 export default useNewNeighbor;

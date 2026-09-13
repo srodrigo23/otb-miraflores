@@ -1,8 +1,18 @@
 import { useState } from "react";
 
-const useFetchData = <T> () => {
+type FetchDataOptions = {
+  /**
+   * Whether it starts out loading. True suits a hook that fetches on mount:
+   * the first render already shows the loader instead of an empty state.
+   * Mutation hooks must pass false — nothing runs until they are called, so a
+   * true would never clear and would leave their buttons disabled forever.
+   */
+  initialLoading?: boolean;
+};
+
+const useFetchData = <T> (options?: FetchDataOptions) => {
   const [data, setData] = useState<T>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(options?.initialLoading ?? true);
   const [error, setError] = useState<unknown>(null);
 
   const execute = async (url: string, options?: RequestInit) => {

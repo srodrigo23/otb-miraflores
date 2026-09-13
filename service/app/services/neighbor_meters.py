@@ -205,3 +205,18 @@ def create_neighbor_meter(db: Session, neighbor_id: int, meter) -> NeighborMeter
   db.commit()
   db.refresh(db_meter)
   return db_meter
+
+
+def get_meter_by_id(db: Session, meter_id: int):
+  return db.query(NeighborMeter).filter(NeighborMeter.id == meter_id).first()
+
+
+def set_meter_active(db: Session, meter: NeighborMeter, is_active: bool) -> NeighborMeter:
+  """
+  Enables or disables a meter. A disabled meter stays on the register with all
+  its history: it is simply left out of the next measures.
+  """
+  meter.is_active = is_active
+  db.commit()
+  db.refresh(meter)
+  return meter

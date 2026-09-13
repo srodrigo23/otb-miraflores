@@ -32,8 +32,10 @@ export const NeighborDebtsPayments: React.FC<{
     refetchMeterLedgers,
   } = useNeighborMeterLedgers(neighborId);
   const { createNewMeter } = useNewMeter(neighborId);
-  const { isMeterActive, setMeterActive, isSavingActive } =
-    useMeterActiveState(meters);
+  const { isMeterActive, setMeterActive, isSavingActive } = useMeterActiveState(
+    meters,
+    refetchMeterLedgers,
+  );
 
   const [selectedMeterId, setSelectedMeterId] = useState<number | null>(null);
 

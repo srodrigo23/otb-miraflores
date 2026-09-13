@@ -21,6 +21,15 @@ class NextMeterCodes(BaseModel):
   codes: dict[str, str]
 
 
+class NeighborMeterUpdate(BaseModel):
+  """
+  What the meter settings modal can change. Only the enabled flag: the code,
+  the section and the initial reading are fixed once the meter is registered,
+  because readings and debts are already hanging off them.
+  """
+  is_active: bool
+
+
 class NeighborMeterCreate(BaseModel):
   """
   A new meter of an existing neighbor. `meter_code` is the one the form was

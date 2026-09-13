@@ -9,7 +9,13 @@ type CreatedMeter = { id: number; meter_code: string; section: string };
 type ApiError = { detail?: string };
 
 export const useNewMeter = (neighborId: number | undefined) => {
-  const { data, isLoading, error, execute } = useFetchData<CreatedMeter>();
+  // Runs on demand only, so it must not start out loading
+  const {
+    data,
+    isLoading: isSaving,
+    error,
+    execute,
+  } = useFetchData<CreatedMeter>({ initialLoading: false });
 
   /** Resolves to whether the meter was created, so the form can stay open on failure */
   const createNewMeter = async (payload: InputsNewMeterForm) => {
@@ -40,7 +46,7 @@ export const useNewMeter = (neighborId: number | undefined) => {
     return false;
   };
 
-  return { createNewMeter, isLoading, data, error };
+  return { createNewMeter, isSaving, data, error };
 };
 
 export default useNewMeter;
