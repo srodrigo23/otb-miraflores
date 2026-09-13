@@ -19,7 +19,6 @@ class DebtItemDetail(BaseModel):
 
   consumption: int | None = None
   amount: int  # Total amount in cents
-  amount_paid: int
 
   notes: str | None = None
 
@@ -58,5 +57,4 @@ class NeighborDebtsResponse(BaseModel):
   neighbor_name: str
   total_debts: int
   total_amount: int  # Total owed in cents
-  total_paid: int
   debt_details: list[DebtItemDetail]

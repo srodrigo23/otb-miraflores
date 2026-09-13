@@ -27,23 +27,10 @@ class DebtItem(Base):
   consumption = Column(Integer)
 
   amount = Column(Integer, nullable=False)  # Total amount in cents
-  amount_paid = Column(Integer, nullable=False, default=0)
-  # balance = Column(Integer, nullable=False)  # Outstanding balance
-
-  # reason = Column(String(200), nullable=False)
-  # period = Column(String(20))  # Period (e.g. "2025-01", "ENERO-FEBRERO")
-
-  # Dates
-  # issue_date = Column(Date, nullable=False, default=lambda: datetime.utcnow().date())
-  # due_date = Column(Date)
-  # paid_date = Column(Date)  # Date it was fully paid
+  # amount_paid = Column(Integer, nullable=False, default=0)
 
   status = Column(Enum(DebtStatus), nullable=False, default=DebtStatus.PENDING)
-  # is_overdue = Column(Boolean, default=False)
-
-  # late_fee = Column(Integer, default=0)
-  # discount = Column(Integer, default=0)
-
+  
   notes = Column(String(200))
 
   created_at = Column(DateTime, default=datetime.utcnow)

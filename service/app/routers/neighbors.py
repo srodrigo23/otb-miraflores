@@ -202,7 +202,6 @@ def _neighbor_debts_response(neighbor, debts) -> dict:
     "neighbor_name": neighbor_name,
     "total_debts": len(debts),
     "total_amount": sum(debt.amount for debt in debts),
-    "total_paid": sum(debt.amount_paid for debt in debts),
     "debt_details": debts,
   }
 

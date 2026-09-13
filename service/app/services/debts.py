@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, contains_eager
 
 from app.models import DebtItem, MeterReading, NeighborMeter, Neighbor
-from app.enums import DebtOrigin, DebtStatus
+from app.enums import DebtOrigin, DebtStatus, MeterReadingStatus
 import app.services.neighbor_meters as neighbor_meters
 
 # Water tariff. Amounts are held in cents, so Bs. 20 is 2000
@@ -32,8 +32,12 @@ def calculate_consumption(reading: MeterReading, previous_reading: int) -> int:
 
 def create_debts_for_readings(db: Session, readings: list[MeterReading]) -> list[DebtItem]:
   """
-  Creates one pending debt per reading, with default values. The amount is
-  settled later, when the reading is actually recorded
+  One debt per reading, created with the readings themselves so every meter of
+  every measure leaves a record, whether or not it ends up being read.
+
+  They are born PENDING with nothing billed: a meter that is never read keeps
+  its debt on the register to be annulled by hand, which is what leaves the
+  decision traceable in an audit.
   """
   if len(readings) == 0:
     return []
@@ -44,8 +48,9 @@ def create_debts_for_readings(db: Session, readings: list[MeterReading]) -> list
       meter_reading_id=reading.id,
       origin=DebtOrigin.WATER_CONSUMPTION,
       consumption=0,
+      # Not calculate_amount(0): that is the flat rate, Bs. 20. Nothing is
+      # billed until the meter is actually read
       amount=0,
-      amount_paid=0,
       status=DebtStatus.PENDING,
     )
     for reading in readings
@@ -57,10 +62,10 @@ def create_debts_for_readings(db: Session, readings: list[MeterReading]) -> list
 
 def sync_debt_for_reading(db: Session, reading: MeterReading) -> DebtItem | None:
   """
-  Recomputes consumption and amount from the reading. Called whenever the
-  reading changes, so editing a value re-bills it.
-  A debt already being paid is left alone: changing what someone owes after
-  they paid part of it needs a decision, not a silent overwrite.
+  Creates the debt the first time the reading is recorded, and re-bills it
+  whenever the reading is edited afterwards.
+  A debt already settled is left alone: changing what someone owes after they
+  paid it needs a decision, not a silent overwrite.
   """
   debt = reading.debt_item
   if debt is None:
@@ -68,16 +73,24 @@ def sync_debt_for_reading(db: Session, reading: MeterReading) -> DebtItem | None
       neighbor_id=reading.meter.neighbor_id,
       meter_reading_id=reading.id,
       origin=DebtOrigin.WATER_CONSUMPTION,
-      amount_paid=0,
     )
     db.add(debt)
 
-  if debt.amount_paid and debt.amount_paid > 0:
+  # A settled debt is not re-billed, and an annulled one stays annulled: both
+  # are decisions that a later edit must not undo silently
+  if debt.status in (DebtStatus.PAID, DebtStatus.CANCELLED):
     return debt
 
-  previous_reading = neighbor_meters.get_previous_reading(db, reading)
-  debt.consumption = calculate_consumption(reading, previous_reading)
-  debt.amount = calculate_amount(debt.consumption)
+  if reading.status != MeterReadingStatus.READED:
+    # Still on the record, still owing nothing: calculate_amount(0) would
+    # charge the flat rate for a meter nobody read
+    debt.consumption = 0
+    debt.amount = 0
+  else:
+    previous_reading = neighbor_meters.get_previous_reading(db, reading)
+    debt.consumption = calculate_consumption(reading, previous_reading)
+    debt.amount = calculate_amount(debt.consumption)
+
   debt.status = DebtStatus.PENDING
   db.commit()
   db.refresh(debt)

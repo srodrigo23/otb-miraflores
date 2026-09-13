@@ -117,8 +117,8 @@ def generate_debts_from_measure(measure_id: int, db: Session = Depends(get_db)):
     meters=meters_with_neighbor
   )
 
-  # One pending debt per reading, still with no amount: it is settled when the
-  # reading is recorded
+  # One debt per reading, with nothing billed yet: it is settled when the
+  # reading is recorded, and annulled by hand if the meter is never read
   debts_service.create_debts_for_readings(db=db, readings=created_readings)
 
   # Re-read: the newly created objects are expired after the commit, and their
