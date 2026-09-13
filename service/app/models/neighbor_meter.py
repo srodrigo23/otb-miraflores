@@ -15,7 +15,7 @@ class NeighborMeter(Base):
   meter_code = Column(String, unique=True, nullable=False)
   section = Column(String, nullable=False)
 
-  initial_reading = Column(Integer, default=0, nullable=False)  # Meter reading when it was installed/registered
+  initial_reading = Column(Integer, default=0, nullable=True)  # Meter reading when it was installed/registered
   is_active = Column(Boolean, default=True)  # Whether the meter is active
   notes = Column(String(200))  # Additional notes about the meter
 

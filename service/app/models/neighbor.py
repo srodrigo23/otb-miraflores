@@ -40,9 +40,9 @@ class Neighbor(Base):
 
   # Bolivian naming: given names in one field, then the two surnames apart.
   # The register is ordered and looked up by the paternal surname.
-  names = Column(String(60), unique=False, nullable=False)
   pat_lname = Column(String(30), unique=False, nullable=False)
   mat_lname = Column(String(30), unique=False, default="", nullable=True)
+  names = Column(String(60), unique=False, nullable=False)
 
   ci = Column(Integer, nullable=True)
   phone_number = Column(Integer, nullable=True)
