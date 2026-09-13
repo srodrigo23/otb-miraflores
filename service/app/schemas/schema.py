@@ -26,6 +26,7 @@ from .neighbor_meter import (
   MeterLedgerPayment,
   NeighborMeter,
 )
+from .payment import NextReceiptNumber, Payment, PaymentCreate
 from .user import User, UserUpdate
 
 __all__ = [
@@ -34,6 +35,9 @@ __all__ = [
   "NeighborMeterCreate",
   "NeighborMeterUpdate",
   "NextMeterCodes",
+  "Payment",
+  "PaymentCreate",
+  "NextReceiptNumber",
   "AssistanceCreate",
   "AssistanceUpdate",
   "CollectDebt",

@@ -1,7 +1,7 @@
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 import { LedgerDebt } from '../interfaces/neighborDebtsInterfaces';
-import { formatDate } from '../utils/dates';
+import { formatDate, formatTime } from '../utils/dates';
 import { REPORT_COLORS, REPORT_FONT } from './reportTheme';
 
 /**
@@ -19,9 +19,9 @@ const RECEIPT_WIDTH = (A4_WIDTH - PAGE_PADDING * 2) / 2;
 export type ReceiptPayment = {
   /** Number typed by the collector */
   receipt: string;
+  /** ISO datetime stamped by the server when the payment was stored */
   date: string;
   method: string;
-  notes?: string;
   /** Random stand-in for the UUID the backend will issue */
   reference: string;
   qrDataUrl: string;
@@ -251,7 +251,10 @@ const ReceiptBody: React.FC<{
     <View style={styles.rule} />
 
     <InfoLine label='N° de recibo' value={payment.receipt || '-'} />
-    <InfoLine label='Fecha de pago' value={formatDate(payment.date)} />
+    <InfoLine
+      label='Fecha de pago'
+      value={`${formatDate(payment.date)} ${formatTime(payment.date)}`}
+    />
     <InfoLine label='Periodo' value={`${debt.period} ${debt.year}`} />
 
     <View style={styles.rule} />
@@ -274,7 +277,6 @@ const ReceiptBody: React.FC<{
     </View>
     <View style={{ marginTop: 3 }}>
       <InfoLine label='Forma de pago' value={payment.method} />
-      {!!payment.notes && <InfoLine label='Observaciones' value={payment.notes} />}
     </View>
 
     <View style={styles.qrRow}>
@@ -329,7 +331,7 @@ export const PaymentReceipt: React.FC<{
 
       {/* Cut here: this rule sits exactly at half the sheet */}
       <View style={styles.horizontalCut} />
-      <Text style={styles.cutHint}>— — —  recortar por las líneas  — — —</Text>
+      {/* <Text style={styles.cutHint}>— — —  recortar por las líneas  — — —</Text> */}
     </Page>
   </Document>
 );

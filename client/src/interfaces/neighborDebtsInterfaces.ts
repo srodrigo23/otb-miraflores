@@ -5,7 +5,7 @@
  */
 
 /** A debt is settled or it is not: there are no partial payments */
-export type DebtStatus = 'PENDING' | 'PAID';
+export type DebtStatus = 'PENDING' | 'PAID' | 'CANCELLED';
 
 export interface ConsumptionPoint {
   /** Period label as the measure names it, e.g. "MARZO-ABRIL" */
@@ -34,7 +34,6 @@ export interface LedgerPayment {
   period: string;
   /** In cents */
   amount: number;
-  method: string;
 }
 
 export interface MeterLedger {

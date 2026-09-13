@@ -1,6 +1,9 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session, contains_eager
 
-from app.models import DebtItem, MeterReading, NeighborMeter, Neighbor
+from datetime import datetime
+
+from app.models import DebtItem, MeterReading, NeighborMeter, Neighbor, Payment
 from app.enums import DebtOrigin, DebtStatus, MeterReadingStatus
 import app.services.neighbor_meters as neighbor_meters
 
@@ -137,3 +140,63 @@ def get_neighbor_debts(db: Session, neighbor_id: int, only_pending: bool = True)
     db, [debt.meter_reading for debt in debts if debt.meter_reading]
   )
   return debts
+
+
+RECEIPT_DIGITS = 6
+
+
+def format_receipt_number(payment_id: int) -> str:
+  """42 -> "000042". The receipt number is the payment's own id"""
+  return f"{payment_id:0{RECEIPT_DIGITS}d}"
+
+
+def get_next_receipt_number(db: Session) -> str:
+  """
+  What the next payment's receipt will read, for the form to show before the
+  row exists. It is a preview: the number that ends up printed is the id the
+  database assigns, which is what the receipt is issued with.
+  """
+  last_id = db.query(func.max(Payment.id)).scalar() or 0
+  return format_receipt_number(last_id + 1)
+
+
+def get_debt(db: Session, debt_id: int) -> DebtItem | None:
+  return db.query(DebtItem).filter(DebtItem.id == debt_id).first()
+
+
+def pay_debt(db: Session, debt: DebtItem, data) -> Payment:
+  """
+  Settles a debt in full and marks it PAID.
+
+  The amount comes from the debt, not from the request: with no partial
+  payments there is nothing to choose, and taking it from the client would let
+  a receipt disagree with what was owed.
+  """
+  payment = Payment(
+    debt_item_id=debt.id,
+    # Taken from the debt so the two can never point at different neighbors
+    neighbor_id=debt.neighbor_id,
+    # The server clock decides when: the payment is happening right now, and
+    # letting the client say otherwise would date a receipt at will
+    paid_at=datetime.now(),
+    amount=debt.amount,
+    received_by=data.received_by,
+  )
+  db.add(payment)
+  debt.status = DebtStatus.PAID
+  db.commit()
+  db.refresh(payment)
+  return payment
+
+
+def cancel_debt(db: Session, debt: DebtItem, notes: str | None = None) -> DebtItem:
+  """
+  Annuls a debt, which is how a meter that was never read stops showing as
+  owed. A paid debt is not annulled: that would need the payment undone first.
+  """
+  debt.status = DebtStatus.CANCELLED
+  if notes:
+    debt.notes = notes
+  db.commit()
+  db.refresh(debt)
+  return debt

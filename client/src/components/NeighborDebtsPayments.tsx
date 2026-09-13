@@ -99,7 +99,11 @@ export const NeighborDebtsPayments: React.FC<{
         className='grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]'
       >
         <MeterConsumptionPanel meter={meter} />
-        <MeterLedgerPanel meter={meter} neighbor={neighbor} />
+        <MeterLedgerPanel
+          meter={meter}
+          neighbor={neighbor}
+          onPaid={refetchMeterLedgers}
+        />
       </div>
     </section>
   );

@@ -21,9 +21,6 @@ export const PaymentCard: React.FC<{ payment: LedgerPayment }> = ({
         {currency(payment.amount)}
       </div>
     </header>
-    <div className='flex items-center justify-between text-xs text-blue-gray-500'>
-      <span>{payment.period}</span>
-      <span>{payment.method}</span>
-    </div>
+    <div className='text-xs text-blue-gray-500'>{payment.period}</div>
   </article>
 );

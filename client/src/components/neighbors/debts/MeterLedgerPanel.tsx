@@ -18,7 +18,9 @@ import { PaymentCard } from './PaymentCard';
 export const MeterLedgerPanel: React.FC<{
   meter: MeterLedger;
   neighbor: ReceiptNeighbor;
-}> = ({ meter, neighbor }) => {
+  /** Re-reads the ledger once a debt is settled */
+  onPaid?: () => void | Promise<unknown>;
+}> = ({ meter, neighbor, onPaid }) => {
   // Only what is still owed: a settled debt lives on in the payments tab
   const pendingDebts = meter.debts.filter((debt) => debt.status === 'PENDING');
 
@@ -39,6 +41,7 @@ export const MeterLedgerPanel: React.FC<{
                 debt={debt}
                 meterCode={meter.meter_code}
                 neighbor={neighbor}
+                onPaid={onPaid}
               />
             ))}
           </div>

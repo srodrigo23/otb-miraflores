@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, contains_eager, joinedload
-from app.models import NeighborMeter, Neighbor, Measure, MeterReading
+from app.models import NeighborMeter, Neighbor, Measure, MeterReading, DebtItem
 from app.models.measure import measure_rank, measure_rank_expr
 import re
 from datetime import datetime, time
@@ -132,7 +132,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
     MeterReading.measure
   ).options(
     contains_eager(MeterReading.measure),
-    joinedload(MeterReading.debt_item),
+    joinedload(MeterReading.debt_item).joinedload(DebtItem.payment),
   ).order_by(measure_rank_expr(), Measure.id).all()
 
   readings_by_meter: dict[int, list[MeterReading]] = {meter.id: [] for meter in meters}
@@ -145,6 +145,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
   for meter in meters:
     history = []
     debts = []
+    payments = []
 
     for reading in readings_by_meter[meter.id]:
       measure = reading.measure
@@ -162,7 +163,9 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
         })
 
       debt = reading.debt_item
-      # A debt is only real once the reading was taken and billed
+      # A debt is only real once the reading was taken and billed. The ones
+      # with no amount belong to meters nobody read: they stay on the register
+      # to be annulled, but there is nothing to show the neighbor
       if debt is not None and debt.amount > 0:
         debts.append({
           "id": debt.id,
@@ -175,6 +178,17 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
           "status": debt.status,
         })
 
+        # One payment per debt, so a settled debt carries its own receipt
+        payment = debt.payment
+        if payment is not None:
+          payments.append({
+            "id": payment.id,
+            "receipt": f"{payment.id:06d}",
+            "date": payment.paid_at.isoformat() if payment.paid_at else None,
+            "period": period,
+            "amount": payment.amount,
+          })
+
     ledgers.append({
       "id": meter.id,
       "meter_code": meter.meter_code,
@@ -184,8 +198,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
       "history": history,
       # Newest first: what is owed now goes on top of the list
       "debts": list(reversed(debts)),
-      # No Payment model yet, so nothing can fill this
-      "payments": [],
+      "payments": list(reversed(payments)),
     })
 
   return ledgers

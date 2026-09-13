@@ -39,6 +39,12 @@ class DebtItem(Base):
   # Relationships
   neighbor = relationship("Neighbor", back_populates="debts")
   meter_reading = relationship("MeterReading", back_populates="debt_item")
+  # One payment settles the whole debt, so uselist=False turns it into a single
+  # object. Deleting the debt takes its payment with it
+  payment = relationship(
+    "Payment", back_populates="debt_item", uselist=False,
+    cascade="all, delete-orphan",
+  )
 
   # Pending models, kept out until they are activated (see models/unused_models/):
   # debt_type = relationship("DebtType", back_populates="debt_items")

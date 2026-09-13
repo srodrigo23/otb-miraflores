@@ -65,16 +65,13 @@ class MeterDebtSummary(BaseModel):
 
 
 class MeterLedgerPayment(BaseModel):
-  """
-  Placeholder shape for a payment. Nothing fills it yet: the Payment and
-  PaymentDetail models are still parked in models/unused_models/
-  """
+  """A settled debt, as the neighbor's meter view lists it"""
   id: int
   receipt: str
-  date: str
+  # Null for the seeded history, settled on paper before the system existed
+  date: str | None = None
   period: str
-  amount: int
-  method: str
+  amount: int  # In cents
 
 
 class MeterLedgerDetail(BaseModel):

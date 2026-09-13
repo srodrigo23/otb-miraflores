@@ -1,29 +1,41 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from app.db.database import Base
 
+
 class Payment(Base):
-  """Pagos realizados por los vecinos"""
+  """
+  A debt being settled. One payment per debt and one debt per payment: there
+  are no partial payments, so a debt is either owed in full or paid in full.
+  """
   __tablename__ = "payments"
 
   id = Column(Integer, primary_key=True, index=True)
+
+  # unique is what makes the relation 1:1 — a debt cannot be paid twice
+  debt_item_id = Column(
+    Integer, ForeignKey("debt_items.id"), unique=True, nullable=False
+  )
+  # Reachable through the debt, kept here so a neighbor's payments can be
+  # listed without walking every debt. Always set from the debt, never from
+  # the request, so the two cannot disagree
   neighbor_id = Column(Integer, ForeignKey("neighbors.id"), nullable=False)
-  collect_debt_id = Column(Integer, ForeignKey("collect_debts.id"))  # FK a la jornada de cobro
 
-  payment_date = Column(Date, nullable=False, default=datetime.utcnow)
-  total_amount = Column(Integer, nullable=False)  # Monto total del pago en centavos
-  payment_method = Column(String(20))  # cash, transfer, qr, card
+  # Date and time the payment was taken, in one column. Nullable because the
+  # seeded history carries neither: those debts were settled on paper before
+  # the system existed
+  paid_at = Column(DateTime, nullable=True)
+  # Mirrors debt.amount at the time it was settled, in cents
+  amount = Column(Integer, nullable=False)
 
-  reference_number = Column(String(50))  # Número de referencia/recibo/transacción
-  received_by = Column(String(100))  # Persona que recibió el pago
-
-  notes = Column(String(200))
+  # There is no receipt column: the receipt number IS this row's id, so it is
+  # correlative by construction and cannot be typed in wrong or repeated
+  received_by = Column(String(100))  # Persona que recibio el pago
 
   created_at = Column(DateTime, default=datetime.utcnow)
 
   # Relaciones
   neighbor = relationship("Neighbor")
-  collect_debt = relationship("CollectDebt", back_populates="payments")
-  payment_details = relationship("PaymentDetail", back_populates="payment", cascade="all, delete-orphan")
+  debt_item = relationship("DebtItem", back_populates="payment")
