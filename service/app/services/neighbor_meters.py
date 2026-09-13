@@ -14,26 +14,77 @@ def get_neighbor_meters(db: Session):
   return db.query(NeighborMeter, Neighbor).join(NeighborMeter.neighbor).all()
 
 
-def get_previous_readings_by_meter(db: Session, measure: Measure) -> dict[int, int]:
+def get_previous_reading_map(
+  db: Session, readings: list[MeterReading]
+) -> dict[int, int]:
   """
-  Maps meter_id -> value that meter was read at in the previous measure.
-  Meters missing from the map have no previous measure and fall back to their
-  own initial_reading.
-  """
-  # Ordered by year and period instead of by date: the newest measure that
-  # still comes before this one
-  rank = measure_rank_expr()
-  previous_measure = db.query(Measure).filter(
-    rank < measure_rank(measure)
-  ).order_by(rank.desc(), Measure.id.desc()).first()
+  Maps reading_id -> the value its meter was previously read at.
 
-  if previous_measure is None:
+  Derived instead of stored: the answer is the last READED reading of that same
+  meter before this one, falling back to the meter's initial_reading. Taking
+  "the previous measure" instead would bill a meter that was skipped or
+  disabled for a period against its initial_reading, which is its whole
+  lifetime of consumption.
+
+  Only READED readings count as a precedent: the rest of a measure is created
+  empty, and a 0 sitting there is the absence of a reading, not a value.
+  """
+  if not readings:
     return {}
 
-  rows = db.query(MeterReading.meter_id, MeterReading.current_reading).filter(
-    MeterReading.measure_id == previous_measure.id
-  ).all()
-  return {meter_id: current_reading for meter_id, current_reading in rows}
+  meter_ids = {reading.meter_id for reading in readings}
+
+  initial_by_meter = dict(
+    db.query(NeighborMeter.id, NeighborMeter.initial_reading).filter(
+      NeighborMeter.id.in_(meter_ids)
+    ).all()
+  )
+
+  # Every reading those meters ever had, oldest first
+  rank = measure_rank_expr()
+  history = db.query(
+    MeterReading.id, MeterReading.meter_id, MeterReading.current_reading, rank
+  ).join(MeterReading.measure).filter(
+    MeterReading.meter_id.in_(meter_ids),
+    MeterReading.status == MeterReadingStatus.READED,
+  ).order_by(MeterReading.meter_id, rank, MeterReading.id).all()
+
+  # meter_id -> [(rank, reading_id, value)] in chronological order
+  by_meter: dict[int, list[tuple[int, int, int]]] = {}
+  for reading_id, meter_id, value, reading_rank in history:
+    by_meter.setdefault(meter_id, []).append(
+      (reading_rank, reading_id, value or 0)
+    )
+
+  ranks_by_reading = {
+    reading_id: reading_rank for reading_id, _, _, reading_rank in history
+  }
+
+  previous: dict[int, int] = {}
+  for reading in readings:
+    fallback = initial_by_meter.get(reading.meter_id) or 0
+    own_rank = ranks_by_reading.get(reading.id)
+    if own_rank is None:
+      # Not read yet: its precedent is simply the meter's latest reading
+      own_rank = measure_rank(reading.measure)
+
+    value = fallback
+    for reading_rank, reading_id, reading_value in by_meter.get(
+      reading.meter_id, []
+    ):
+      # Strictly before, and never the reading itself
+      if reading_rank < own_rank and reading_id != reading.id:
+        value = reading_value
+      else:
+        break
+    previous[reading.id] = value
+
+  return previous
+
+
+def get_previous_reading(db: Session, reading: MeterReading) -> int:
+  """The previous value of a single reading. See get_previous_reading_map"""
+  return get_previous_reading_map(db, [reading]).get(reading.id, 0)
 
 
 def create_meter_readings_by_measure(
@@ -47,15 +98,10 @@ def create_meter_readings_by_measure(
   """
   if len(meters)== 0: return []
 
-  # Frozen now so the consumption of this measure does not shift if an older
-  # measure is edited afterwards
-  previous_readings = get_previous_readings_by_meter(db=db, measure=measure)
-
   meter_readings = [
     MeterReading(
       meter_id = meter.id,
       measure_id = measure.id,
-      previous_reading = previous_readings.get(meter.id, meter.initial_reading or 0),
       # current_measure = 0,
       # status =
     )
@@ -93,6 +139,8 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
   for reading in readings:
     readings_by_meter[reading.meter_id].append(reading)
 
+  previous_by_reading = get_previous_reading_map(db, readings)
+
   ledgers = []
   for meter in meters:
     history = []
@@ -102,6 +150,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
       measure = reading.measure
       period = measure.period or ""
       year = measure.year
+      previous_reading = previous_by_reading.get(reading.id, 0)
 
       # An unread meter has no consumption yet: charting it as 0 would draw a
       # dip that never happened
@@ -109,7 +158,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
         history.append({
           "period": period,
           "year": year,
-          "consumption": max(0, reading.current_reading - reading.previous_reading),
+          "consumption": max(0, reading.current_reading - previous_reading),
         })
 
       debt = reading.debt_item
@@ -119,7 +168,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
           "id": debt.id,
           "period": period,
           "year": year,
-          "previous_reading": reading.previous_reading,
+          "previous_reading": previous_reading,
           "current_reading": reading.current_reading,
           "consumption": debt.consumption or 0,
           "amount": debt.amount,
@@ -224,3 +273,15 @@ def set_meter_active(db: Session, meter: NeighborMeter, is_active: bool) -> Neig
   db.commit()
   db.refresh(meter)
   return meter
+
+
+def annotate_previous_readings(db: Session, readings: list[MeterReading]):
+  """
+  Sets `previous_reading` on each reading so the schemas can read it like any
+  other attribute. It is a plain Python attribute, not a column: nothing of it
+  is written back to the database.
+  """
+  previous = get_previous_reading_map(db, readings)
+  for reading in readings:
+    reading.previous_reading = previous.get(reading.id, 0)
+  return readings

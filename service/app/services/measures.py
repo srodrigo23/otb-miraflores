@@ -5,6 +5,7 @@ from app.models.neighbor_meter import NeighborMeter
 from app.models.neighbor import Neighbor
 from app.enums import MeasureType, MeterReadingStatus
 from app.schemas.schema import MeasureCreate, MeasureUpdate, MeterReadingUpdate
+import app.services.neighbor_meters as neighbor_meters
 
 def get_measures(db: Session):
   return db.query(Measure).order_by(Measure.created_at.desc()).all()
@@ -82,7 +83,7 @@ def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterRea
   # ).join(
   #   Neighbor, NeighborMeter.neighbor_id == Neighbor.id
   # ).order_by(Neighbor.pat_lname, Neighbor.names).all()
-  return db.query(MeterReading).filter(
+  readings = db.query(MeterReading).filter(
     MeterReading.measure_id == measure_id
   ).join(
     MeterReading.meter
@@ -92,12 +93,15 @@ def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterRea
     contains_eager(MeterReading.meter).contains_eager(NeighborMeter.neighbor)
   ).order_by(Neighbor.pat_lname, Neighbor.names).all()
 
+  # previous_reading is derived, so it is attached before the schema reads it
+  return neighbor_meters.annotate_previous_readings(db, readings)
+
 
 def get_meter_reading(db: Session, measure_id: int, reading_id: int):
   """
   Gets a single reading of a measure, with its meter and neighbor loaded
   """
-  return db.query(MeterReading).filter(
+  reading = db.query(MeterReading).filter(
     MeterReading.id == reading_id,
     MeterReading.measure_id == measure_id
   ).join(
@@ -107,6 +111,10 @@ def get_meter_reading(db: Session, measure_id: int, reading_id: int):
   ).options(
     contains_eager(MeterReading.meter).contains_eager(NeighborMeter.neighbor)
   ).first()
+
+  if reading is not None:
+    neighbor_meters.annotate_previous_readings(db, [reading])
+  return reading
 
 
 def update_meter_reading(db: Session, reading: MeterReading, data: MeterReadingUpdate) -> MeterReading:

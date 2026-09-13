@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session, contains_eager
 
 from app.models import DebtItem, MeterReading, NeighborMeter, Neighbor
 from app.enums import DebtOrigin, DebtStatus
+import app.services.neighbor_meters as neighbor_meters
 
 # Water tariff. Amounts are held in cents, so Bs. 20 is 2000
 FLAT_RATE_LIMIT_M3 = 20
@@ -18,12 +19,15 @@ def calculate_amount(consumption: int) -> int:
   return consumption * PRICE_PER_M3_CENTS
 
 
-def calculate_consumption(reading: MeterReading) -> int:
+def calculate_consumption(reading: MeterReading, previous_reading: int) -> int:
   """
-  Consumption of the period. Clamped at zero: a replaced or rolled over meter
-  can read lower than the previous one, and a negative consumption is not billable
+  Consumption of the period. The previous value is passed in because it is no
+  longer stored on the reading: see neighbor_meters.get_previous_reading_map.
+
+  Clamped at zero: a replaced or rolled over meter can read lower than the
+  previous one, and a negative consumption is not billable
   """
-  return max(0, (reading.current_reading or 0) - (reading.previous_reading or 0))
+  return max(0, (reading.current_reading or 0) - (previous_reading or 0))
 
 
 def create_debts_for_readings(db: Session, readings: list[MeterReading]) -> list[DebtItem]:
@@ -71,7 +75,8 @@ def sync_debt_for_reading(db: Session, reading: MeterReading) -> DebtItem | None
   if debt.amount_paid and debt.amount_paid > 0:
     return debt
 
-  debt.consumption = calculate_consumption(reading)
+  previous_reading = neighbor_meters.get_previous_reading(db, reading)
+  debt.consumption = calculate_consumption(reading, previous_reading)
   debt.amount = calculate_amount(debt.consumption)
   debt.status = DebtStatus.PENDING
   db.commit()
@@ -112,4 +117,10 @@ def get_neighbor_debts(db: Session, neighbor_id: int, only_pending: bool = True)
   query = _debts_query(db).filter(DebtItem.neighbor_id == neighbor_id)
   if only_pending:
     query = query.filter(DebtItem.status != DebtStatus.PAID)
-  return query.order_by(DebtItem.created_at.desc()).all()
+  debts = query.order_by(DebtItem.created_at.desc()).all()
+
+  # The schema reads previous_reading through the reading, and it is derived
+  neighbor_meters.annotate_previous_readings(
+    db, [debt.meter_reading for debt in debts if debt.meter_reading]
+  )
+  return debts
