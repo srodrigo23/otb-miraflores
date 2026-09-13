@@ -38,14 +38,14 @@ class MeterReadingDetail(BaseModel):
   )
 
   # Neighbor information, reached through the meter
-  neighbor_first_name: str | None = Field(
-    default=None, validation_alias=AliasPath("meter", "neighbor", "first_name")
+  neighbor_names: str | None = Field(
+    default=None, validation_alias=AliasPath("meter", "neighbor", "names")
   )
-  neighbor_second_name: str | None = Field(
-    default=None, validation_alias=AliasPath("meter", "neighbor", "second_name")
+  neighbor_mat_lname: str | None = Field(
+    default=None, validation_alias=AliasPath("meter", "neighbor", "mat_lname")
   )
-  neighbor_last_name: str | None = Field(
-    default=None, validation_alias=AliasPath("meter", "neighbor", "last_name")
+  neighbor_pat_lname: str | None = Field(
+    default=None, validation_alias=AliasPath("meter", "neighbor", "pat_lname")
   )
 
   created_at: datetime

@@ -30,17 +30,19 @@ results = (
     .all()
 )
 for neighbor, meter in results:
-    print(neighbor.first_name, meter.meter_code if meter else None)
+    print(neighbor.names, meter.meter_code if meter else None)
 You get full type safety and DB integrity from ForeignKey. relationship() only saves you from writing explicit join/filter boilerplate and enables ORM-level features like cascade deletes and lazy/eager loading strategies.
 """
 class Neighbor(Base):
   __tablename__ = "neighbors"
 
-  id = Column(Integer, primary_key=True, index=True)
+  id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
-  first_name = Column(String(30), unique=False, nullable=False)
-  second_name = Column(String(30), unique=False, default="", nullable=True)
-  last_name = Column(String(30), unique=False, nullable=False)
+  # Bolivian naming: given names in one field, then the two surnames apart.
+  # The register is ordered and looked up by the paternal surname.
+  names = Column(String(60), unique=False, nullable=False)
+  pat_lname = Column(String(30), unique=False, nullable=False)
+  mat_lname = Column(String(30), unique=False, default="", nullable=True)
 
   ci = Column(Integer, nullable=True)
   phone_number = Column(Integer, nullable=True)
@@ -51,6 +53,15 @@ class Neighbor(Base):
   created_at = Column(DateTime, default=datetime.utcnow)
   updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
   
+  @property
+  def full_name(self) -> str:
+    """"PEREZ GOMEZ JUAN CARLOS" — the order the OTB register lists people in"""
+    return " ".join(
+      part for part in
+      (self.pat_lname, self.mat_lname, self.names)
+      if part
+    )
+
   # Relaciones
   meters = relationship("NeighborMeter", back_populates="neighbor", cascade="all, delete-orphan")
   

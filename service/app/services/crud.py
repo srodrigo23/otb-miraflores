@@ -50,9 +50,9 @@ def create_neighbor(db: Session, neighbor: schemas.NeighborCreate):
   created here: meters are registered separately against an existing neighbor.
   """
   db_neighbor = Neighbor(
-    first_name=neighbor.first_name.strip().upper(),
-    second_name=(neighbor.second_name or "").strip().upper(),
-    last_name=neighbor.last_name.strip().upper(),
+    names=neighbor.names.strip().upper(),
+    pat_lname=neighbor.pat_lname.strip().upper(),
+    mat_lname=(neighbor.mat_lname or "").strip().upper(),
     # ci and phone_number are Integer columns: keep them numeric or null
     ci=neighbor.ci,
     phone_number=neighbor.phone_number,

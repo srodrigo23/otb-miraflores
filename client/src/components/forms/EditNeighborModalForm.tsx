@@ -12,9 +12,9 @@ import { useEffect } from 'react';
 
 interface NeighborType {
   id: number;
-  first_name: string;
-  second_name: string;
-  last_name: string;
+  names: string;
+  mat_lname: string;
+  pat_lname: string;
   ci: string;
   phone_number: string;
   email: string;
@@ -38,7 +38,7 @@ type EditNeighborModalFormType = {
 
 /**
  * NOT WORKING!
- * 
+ *
  */
 
 const EditNeighborModalForm: React.FC<EditNeighborModalFormType> = ({
@@ -58,9 +58,9 @@ const EditNeighborModalForm: React.FC<EditNeighborModalFormType> = ({
   useEffect(() => {
     if (neighbor) {
       reset({
-        firstName: neighbor.first_name,
-        secondName: neighbor.second_name,
-        lastName: neighbor.last_name,
+        firstName: neighbor.names,
+        secondName: neighbor.mat_lname,
+        lastName: neighbor.pat_lname,
         ci: neighbor.ci,
         phonenumber: neighbor.phone_number,
         email: neighbor.email,

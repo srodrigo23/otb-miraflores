@@ -47,7 +47,7 @@ export const EditNeighborInfoForm: React.FC<{
         </div>
         <div className='col-span-4'>
           <Input
-            value={dataNeighbor?.first_name}
+            value={dataNeighbor?.names}
             disabled={!edit}
             // crossOrigin={undefined}
           />

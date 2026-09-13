@@ -1,10 +1,5 @@
-import {
-  Typography,
-  Checkbox,
-} from '@material-tailwind/react';
-import {
-  ChevronUpDownIcon,
-} from '@heroicons/react/24/outline';
+import { Typography, Checkbox } from '@material-tailwind/react';
+import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 
 import { useState, useMemo } from 'react';
 
@@ -14,16 +9,18 @@ type SortField =
   | 'lastReading'
   | 'currentReading'
   | 'consumption'
-  | 'amount'
-  // | 'selection';
+  | 'amount';
+// | 'selection';
 
 type SortOrder = 'asc' | 'desc';
 
 const DebtsTable = () => {
-  const [sortField, 
+  const [
+    sortField,
     // setSortField
   ] = useState<SortField>('num');
-  const [sortOrder, 
+  const [
+    sortOrder,
     // setSortOrder
   ] = useState<SortOrder>('asc');
   const TABLE_HEAD = [
@@ -106,9 +103,9 @@ const DebtsTable = () => {
       const aValue = a[sortField];
       const bValue = b[sortField];
 
-      // if (sortField === 'first_name') {
-      //   aValue = `${a.first_name} ${a.second_name}`;
-      //   bValue = `${b.first_name} ${b.second_name}`;
+      // if (sortField === 'names') {
+      //   aValue = `${a.names} ${a.mat_lname}`;
+      //   bValue = `${b.names} ${b.mat_lname}`;
       // }
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -139,7 +136,8 @@ const DebtsTable = () => {
                     ? 'cursor-pointer hover:bg-blue-gray-100 transition-colors'
                     : ''
                 }`}
-                onClick={() =>{}
+                onClick={
+                  () => {}
                   // head.sortable && head.field && handleSort(head.field)
                 }
               >
@@ -234,7 +232,7 @@ const DebtsTable = () => {
                       color='blue-gray'
                       className='font-normal text-center'
                     > */}
-                      <Checkbox color='blue' defaultChecked />
+                    <Checkbox color='blue' defaultChecked />
                     {/* </Typography> */}
                   </td>
                 </tr>

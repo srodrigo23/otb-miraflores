@@ -1,9 +1,9 @@
 export interface NeighborType {
   id: number;
-  first_name: string;
-  second_name: string|null;
+  names: string;
+  mat_lname: string|null;
 
-  last_name: string;
+  pat_lname: string;
   ci: number|null;
   phone_number: number|null;
   email: string|null;

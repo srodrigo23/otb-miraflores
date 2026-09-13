@@ -26,9 +26,9 @@ import { toast } from 'react-toastify';
 
 interface NeighborType {
   id: number;
-  first_name: string;
-  second_name: string;
-  last_name: string;
+  names: string;
+  mat_lname: string;
+  pat_lname: string;
   ci: string;
   phone_number: string;
   email: string;
@@ -151,14 +151,18 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
     setLoading(true);
     try {
       // Cargar medidores
-      const metersResponse = await fetch(`${apiLink}/neighbors/${neighbor.id}/meters`);
+      const metersResponse = await fetch(
+        `${apiLink}/neighbors/${neighbor.id}/meters`,
+      );
       if (metersResponse.ok) {
         const metersData = await metersResponse.json();
         setMeters(metersData);
       }
 
       // Cargar deudas activas
-      const debtsResponse = await fetch(`${apiLink}/neighbors/${neighbor.id}/debts/active`);
+      const debtsResponse = await fetch(
+        `${apiLink}/neighbors/${neighbor.id}/debts/active`,
+      );
       if (debtsResponse.ok) {
         const debtsData = await debtsResponse.json();
         // El backend devuelve un objeto con debt_details, extraemos solo eso
@@ -166,7 +170,9 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
       }
 
       // Cargar pagos
-      const paymentsResponse = await fetch(`${apiLink}/neighbors/${neighbor.id}/payments`);
+      const paymentsResponse = await fetch(
+        `${apiLink}/neighbors/${neighbor.id}/payments`,
+      );
       if (paymentsResponse.ok) {
         const paymentsData = await paymentsResponse.json();
         setPayments(paymentsData);
@@ -195,7 +201,7 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
 
   const getFullName = () => {
     if (!neighbor) return '';
-    return `${neighbor.first_name} ${neighbor.second_name || ''} ${neighbor.last_name}`.trim();
+    return `${neighbor.pat_lname} ${neighbor.mat_lname || ''} ${neighbor.names}`.trim();
   };
 
   const tabsData = [
@@ -214,7 +220,9 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
       label: 'Deudas Activas',
       value: 'debts',
       icon: CurrencyDollarIcon,
-      badge: debts.filter((d) => d.status !== 'paid' && d.status !== 'cancelled').length,
+      badge: debts.filter(
+        (d) => d.status !== 'paid' && d.status !== 'cancelled',
+      ).length,
     },
     {
       label: 'Pagos Realizados',
@@ -225,24 +233,24 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
   ];
 
   return (
-    <Dialog open={open} handler={onClose} size="xl">
+    <Dialog open={open} handler={onClose} size='xl'>
       <DialogHeader>
         <div>
-          <Typography variant="h4">Detalles del Vecino</Typography>
-          <Typography variant="small" color="gray" className="font-normal">
+          <Typography variant='h4'>Detalles del Vecino</Typography>
+          <Typography variant='small' color='gray' className='font-normal'>
             {getFullName()}
           </Typography>
         </div>
       </DialogHeader>
-      <DialogBody className="overflow-auto max-h-[70vh]">
+      <DialogBody className='overflow-auto max-h-[70vh]'>
         {loading ? (
-          <div className="flex justify-center items-center py-10">
+          <div className='flex justify-center items-center py-10'>
             <ClipLoader size={50} />
           </div>
         ) : (
           <Tabs value={activeTab}>
             <TabsHeader
-              className="bg-blue-gray-50/50"
+              className='bg-blue-gray-50/50'
               indicatorProps={{
                 className: 'bg-blue-500 shadow-none',
               }}
@@ -254,15 +262,15 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
                   onClick={() => setActiveTab(value)}
                   className={activeTab === value ? 'text-white' : ''}
                 >
-                  <div className="flex items-center gap-2">
-                    <Icon className="w-5 h-5" />
+                  <div className='flex items-center gap-2'>
+                    <Icon className='w-5 h-5' />
                     {label}
                     {badge !== undefined && badge > 0 && (
                       <Chip
-                        size="sm"
+                        size='sm'
                         value={badge}
-                        color="blue"
-                        className="rounded-full"
+                        color='blue'
+                        className='rounded-full'
                       />
                     )}
                   </div>
@@ -271,55 +279,79 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
             </TabsHeader>
             <TabsBody>
               {/* Tab de Información Personal */}
-              <TabPanel value="info" className="p-0 pt-4">
+              <TabPanel value='info' className='p-0 pt-4'>
                 <Card>
                   <CardBody>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className='grid grid-cols-2 gap-4'>
                       <div>
-                        <Typography variant="small" color="blue-gray" className="font-semibold mb-1">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-semibold mb-1'
+                        >
                           Primer Nombre
                         </Typography>
-                        <Typography variant="paragraph" color="blue-gray">
-                          {neighbor?.first_name}
+                        <Typography variant='paragraph' color='blue-gray'>
+                          {neighbor?.names}
                         </Typography>
                       </div>
                       <div>
-                        <Typography variant="small" color="blue-gray" className="font-semibold mb-1">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-semibold mb-1'
+                        >
                           Segundo Nombre
                         </Typography>
-                        <Typography variant="paragraph" color="blue-gray">
-                          {neighbor?.second_name || '-'}
+                        <Typography variant='paragraph' color='blue-gray'>
+                          {neighbor?.mat_lname || '-'}
                         </Typography>
                       </div>
                       <div>
-                        <Typography variant="small" color="blue-gray" className="font-semibold mb-1">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-semibold mb-1'
+                        >
                           Apellido
                         </Typography>
-                        <Typography variant="paragraph" color="blue-gray">
-                          {neighbor?.last_name}
+                        <Typography variant='paragraph' color='blue-gray'>
+                          {neighbor?.pat_lname}
                         </Typography>
                       </div>
                       <div>
-                        <Typography variant="small" color="blue-gray" className="font-semibold mb-1">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-semibold mb-1'
+                        >
                           Cédula de Identidad
                         </Typography>
-                        <Typography variant="paragraph" color="blue-gray">
+                        <Typography variant='paragraph' color='blue-gray'>
                           {neighbor?.ci}
                         </Typography>
                       </div>
                       <div>
-                        <Typography variant="small" color="blue-gray" className="font-semibold mb-1">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-semibold mb-1'
+                        >
                           Teléfono
                         </Typography>
-                        <Typography variant="paragraph" color="blue-gray">
+                        <Typography variant='paragraph' color='blue-gray'>
                           {neighbor?.phone_number}
                         </Typography>
                       </div>
                       <div>
-                        <Typography variant="small" color="blue-gray" className="font-semibold mb-1">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-semibold mb-1'
+                        >
                           Email
                         </Typography>
-                        <Typography variant="paragraph" color="blue-gray">
+                        <Typography variant='paragraph' color='blue-gray'>
                           {neighbor?.email || '-'}
                         </Typography>
                       </div>
@@ -329,59 +361,71 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
               </TabPanel>
 
               {/* Tab de Medidores */}
-              <TabPanel value="meters" className="p-0 pt-4">
+              <TabPanel value='meters' className='p-0 pt-4'>
                 {meters.length === 0 ? (
                   <Card>
                     <CardBody>
-                      <Typography className="text-center" color="gray">
+                      <Typography className='text-center' color='gray'>
                         No hay medidores registrados para este vecino
                       </Typography>
                     </CardBody>
                   </Card>
                 ) : (
-                  <div className="space-y-3">
+                  <div className='space-y-3'>
                     {meters.map((meter) => (
                       <Card key={meter.id}>
                         <CardBody>
-                          <div className="flex justify-between items-start mb-3">
+                          <div className='flex justify-between items-start mb-3'>
                             <div>
-                              <Typography variant="h6" color="blue-gray">
+                              <Typography variant='h6' color='blue-gray'>
                                 {meter.label || `Medidor ${meter.meter_code}`}
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 Código: {meter.meter_code}
                               </Typography>
                             </div>
                             <Chip
-                              size="sm"
+                              size='sm'
                               value={meter.is_active ? 'Activo' : 'Inactivo'}
                               color={meter.is_active ? 'green' : 'red'}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className='grid grid-cols-2 gap-3'>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Fecha de Instalación
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 {formatDate(meter.installation_date)}
                               </Typography>
                             </div>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Último Mantenimiento
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 {formatDate(meter.last_maintenance_date)}
                               </Typography>
                             </div>
                           </div>
                           {meter.notes && (
-                            <div className="mt-3">
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                            <div className='mt-3'>
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Notas
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 {meter.notes}
                               </Typography>
                             </div>
@@ -394,100 +438,148 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
               </TabPanel>
 
               {/* Tab de Deudas */}
-              <TabPanel value="debts" className="p-0 pt-4">
+              <TabPanel value='debts' className='p-0 pt-4'>
                 {debts.length === 0 ? (
                   <Card>
                     <CardBody>
-                      <Typography className="text-center" color="gray">
+                      <Typography className='text-center' color='gray'>
                         No hay deudas activas para este vecino
                       </Typography>
                     </CardBody>
                   </Card>
                 ) : (
-                  <div className="space-y-3">
+                  <div className='space-y-3'>
                     {debts.map((debt) => (
-                      <Card key={debt.id} className={debt.is_overdue ? 'border-2 border-red-300' : ''}>
+                      <Card
+                        key={debt.id}
+                        className={
+                          debt.is_overdue ? 'border-2 border-red-300' : ''
+                        }
+                      >
                         <CardBody>
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex-1">
-                              <Typography variant="h6" color="blue-gray">
+                          <div className='flex justify-between items-start mb-3'>
+                            <div className='flex-1'>
+                              <Typography variant='h6' color='blue-gray'>
                                 {debt.reason}
                               </Typography>
-                              <Typography variant="small" color="gray">
-                                {debt.debt_type_name} {debt.period ? `- ${debt.period}` : ''}
+                              <Typography variant='small' color='gray'>
+                                {debt.debt_type_name}{' '}
+                                {debt.period ? `- ${debt.period}` : ''}
                               </Typography>
                             </div>
                             <Chip
-                              size="sm"
+                              size='sm'
                               value={STATUS_LABELS[debt.status] || debt.status}
-                              color={(STATUS_COLORS[debt.status] as any) || 'gray'}
+                              color={
+                                (STATUS_COLORS[debt.status] as any) || 'gray'
+                              }
                             />
                           </div>
 
-                          <div className="grid grid-cols-3 gap-3 mb-3">
+                          <div className='grid grid-cols-3 gap-3 mb-3'>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Monto Total
                               </Typography>
-                              <Typography variant="small" color="blue-gray" className="font-bold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-bold'
+                              >
                                 {formatCurrency(debt.amount)}
                               </Typography>
                             </div>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Pagado
                               </Typography>
-                              <Typography variant="small" color="green">
+                              <Typography variant='small' color='green'>
                                 {formatCurrency(debt.amount_paid)}
                               </Typography>
                             </div>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Saldo
                               </Typography>
-                              <Typography variant="small" color="red" className="font-bold">
+                              <Typography
+                                variant='small'
+                                color='red'
+                                className='font-bold'
+                              >
                                 {formatCurrency(debt.balance)}
                               </Typography>
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className='grid grid-cols-2 gap-3'>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Fecha de Emisión
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 {formatDate(debt.issue_date)}
                               </Typography>
                             </div>
                             <div>
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Fecha de Vencimiento
                               </Typography>
-                              <Typography variant="small" color={debt.is_overdue ? 'red' : 'gray'}>
-                                {formatDate(debt.due_date)} {debt.is_overdue && '(Vencido)'}
+                              <Typography
+                                variant='small'
+                                color={debt.is_overdue ? 'red' : 'gray'}
+                              >
+                                {formatDate(debt.due_date)}{' '}
+                                {debt.is_overdue && '(Vencido)'}
                               </Typography>
                             </div>
                           </div>
 
                           {(debt.late_fee > 0 || debt.discount > 0) && (
-                            <div className="grid grid-cols-2 gap-3 mt-3">
+                            <div className='grid grid-cols-2 gap-3 mt-3'>
                               {debt.late_fee > 0 && (
                                 <div>
-                                  <Typography variant="small" color="blue-gray" className="font-semibold">
+                                  <Typography
+                                    variant='small'
+                                    color='blue-gray'
+                                    className='font-semibold'
+                                  >
                                     Recargo por Mora
                                   </Typography>
-                                  <Typography variant="small" color="red">
+                                  <Typography variant='small' color='red'>
                                     {formatCurrency(debt.late_fee)}
                                   </Typography>
                                 </div>
                               )}
                               {debt.discount > 0 && (
                                 <div>
-                                  <Typography variant="small" color="blue-gray" className="font-semibold">
+                                  <Typography
+                                    variant='small'
+                                    color='blue-gray'
+                                    className='font-semibold'
+                                  >
                                     Descuento
                                   </Typography>
-                                  <Typography variant="small" color="green">
+                                  <Typography variant='small' color='green'>
                                     {formatCurrency(debt.discount)}
                                   </Typography>
                                 </div>
@@ -496,11 +588,15 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
                           )}
 
                           {debt.notes && (
-                            <div className="mt-3">
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                            <div className='mt-3'>
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Notas
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 {debt.notes}
                               </Typography>
                             </div>
@@ -510,17 +606,25 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
                     ))}
 
                     {/* Resumen de deudas */}
-                    <Card className="bg-blue-gray-50">
+                    <Card className='bg-blue-gray-50'>
                       <CardBody>
-                        <div className="flex justify-between items-center">
-                          <Typography variant="h6" color="blue-gray">
+                        <div className='flex justify-between items-center'>
+                          <Typography variant='h6' color='blue-gray'>
                             Total Adeudado
                           </Typography>
-                          <Typography variant="h5" color="red" className="font-bold">
+                          <Typography
+                            variant='h5'
+                            color='red'
+                            className='font-bold'
+                          >
                             {formatCurrency(
                               debts
-                                .filter((d) => d.status !== 'paid' && d.status !== 'cancelled')
-                                .reduce((sum, debt) => sum + debt.balance, 0)
+                                .filter(
+                                  (d) =>
+                                    d.status !== 'paid' &&
+                                    d.status !== 'cancelled',
+                                )
+                                .reduce((sum, debt) => sum + debt.balance, 0),
                             )}
                           </Typography>
                         </div>
@@ -531,61 +635,81 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
               </TabPanel>
 
               {/* Tab de Pagos */}
-              <TabPanel value="payments" className="p-0 pt-4">
+              <TabPanel value='payments' className='p-0 pt-4'>
                 {payments.length === 0 ? (
                   <Card>
                     <CardBody>
-                      <Typography className="text-center" color="gray">
+                      <Typography className='text-center' color='gray'>
                         No hay pagos registrados para este vecino
                       </Typography>
                     </CardBody>
                   </Card>
                 ) : (
-                  <div className="space-y-3">
+                  <div className='space-y-3'>
                     {payments.map((payment) => (
                       <Card key={payment.id}>
                         <CardBody>
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex-1">
-                              <Typography variant="h6" color="blue-gray">
+                          <div className='flex justify-between items-start mb-3'>
+                            <div className='flex-1'>
+                              <Typography variant='h6' color='blue-gray'>
                                 Pago #{payment.id}
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 Fecha: {formatDate(payment.payment_date)}
                               </Typography>
                             </div>
-                            <div className="text-right">
-                              <Typography variant="h5" color="green" className="font-bold">
+                            <div className='text-right'>
+                              <Typography
+                                variant='h5'
+                                color='green'
+                                className='font-bold'
+                              >
                                 {formatCurrency(payment.total_amount)}
                               </Typography>
                               {payment.payment_method && (
                                 <Chip
-                                  size="sm"
-                                  value={PAYMENT_METHOD_LABELS[payment.payment_method] || payment.payment_method}
-                                  color={(PAYMENT_METHOD_COLORS[payment.payment_method] as any) || 'gray'}
-                                  className="mt-1"
+                                  size='sm'
+                                  value={
+                                    PAYMENT_METHOD_LABELS[
+                                      payment.payment_method
+                                    ] || payment.payment_method
+                                  }
+                                  color={
+                                    (PAYMENT_METHOD_COLORS[
+                                      payment.payment_method
+                                    ] as any) || 'gray'
+                                  }
+                                  className='mt-1'
                                 />
                               )}
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3 mb-3">
+                          <div className='grid grid-cols-2 gap-3 mb-3'>
                             {payment.reference_number && (
                               <div>
-                                <Typography variant="small" color="blue-gray" className="font-semibold">
+                                <Typography
+                                  variant='small'
+                                  color='blue-gray'
+                                  className='font-semibold'
+                                >
                                   Número de Referencia
                                 </Typography>
-                                <Typography variant="small" color="gray">
+                                <Typography variant='small' color='gray'>
                                   {payment.reference_number}
                                 </Typography>
                               </div>
                             )}
                             {payment.received_by && (
                               <div>
-                                <Typography variant="small" color="blue-gray" className="font-semibold">
+                                <Typography
+                                  variant='small'
+                                  color='blue-gray'
+                                  className='font-semibold'
+                                >
                                   Recibido por
                                 </Typography>
-                                <Typography variant="small" color="gray">
+                                <Typography variant='small' color='gray'>
                                   {payment.received_by}
                                 </Typography>
                               </div>
@@ -593,11 +717,15 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
                           </div>
 
                           {payment.notes && (
-                            <div className="mb-3">
-                              <Typography variant="small" color="blue-gray" className="font-semibold">
+                            <div className='mb-3'>
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold'
+                              >
                                 Notas
                               </Typography>
-                              <Typography variant="small" color="gray">
+                              <Typography variant='small' color='gray'>
                                 {payment.notes}
                               </Typography>
                             </div>
@@ -605,36 +733,65 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
 
                           {/* Detalles de aplicación del pago */}
                           {payment.payment_details.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-blue-gray-100">
-                              <Typography variant="small" color="blue-gray" className="font-semibold mb-2">
+                            <div className='mt-3 pt-3 border-t border-blue-gray-100'>
+                              <Typography
+                                variant='small'
+                                color='blue-gray'
+                                className='font-semibold mb-2'
+                              >
                                 Aplicado a:
                               </Typography>
-                              <div className="space-y-2">
+                              <div className='space-y-2'>
                                 {payment.payment_details.map((detail) => (
-                                  <div key={detail.id} className="bg-blue-gray-50 p-2 rounded">
-                                    <div className="flex justify-between items-start">
-                                      <div className="flex-1">
-                                        <Typography variant="small" color="blue-gray" className="font-medium">
+                                  <div
+                                    key={detail.id}
+                                    className='bg-blue-gray-50 p-2 rounded'
+                                  >
+                                    <div className='flex justify-between items-start'>
+                                      <div className='flex-1'>
+                                        <Typography
+                                          variant='small'
+                                          color='blue-gray'
+                                          className='font-medium'
+                                        >
                                           {detail.debt_reason}
                                         </Typography>
-                                        <Typography variant="small" color="gray">
+                                        <Typography
+                                          variant='small'
+                                          color='gray'
+                                        >
                                           {detail.debt_type_name}
                                         </Typography>
                                       </div>
-                                      <Typography variant="small" color="green" className="font-bold">
+                                      <Typography
+                                        variant='small'
+                                        color='green'
+                                        className='font-bold'
+                                      >
                                         {formatCurrency(detail.amount_applied)}
                                       </Typography>
                                     </div>
-                                    {detail.previous_balance !== null && detail.new_balance !== null && (
-                                      <div className="flex gap-4 mt-1">
-                                        <Typography variant="small" color="gray">
-                                          Saldo anterior: {formatCurrency(detail.previous_balance)}
-                                        </Typography>
-                                        <Typography variant="small" color="gray">
-                                          Nuevo saldo: {formatCurrency(detail.new_balance)}
-                                        </Typography>
-                                      </div>
-                                    )}
+                                    {detail.previous_balance !== null &&
+                                      detail.new_balance !== null && (
+                                        <div className='flex gap-4 mt-1'>
+                                          <Typography
+                                            variant='small'
+                                            color='gray'
+                                          >
+                                            Saldo anterior:{' '}
+                                            {formatCurrency(
+                                              detail.previous_balance,
+                                            )}
+                                          </Typography>
+                                          <Typography
+                                            variant='small'
+                                            color='gray'
+                                          >
+                                            Nuevo saldo:{' '}
+                                            {formatCurrency(detail.new_balance)}
+                                          </Typography>
+                                        </div>
+                                      )}
                                   </div>
                                 ))}
                               </div>
@@ -645,20 +802,33 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
                     ))}
 
                     {/* Resumen de pagos */}
-                    <Card className="bg-green-50">
+                    <Card className='bg-green-50'>
                       <CardBody>
-                        <div className="flex justify-between items-center">
-                          <Typography variant="h6" color="blue-gray">
+                        <div className='flex justify-between items-center'>
+                          <Typography variant='h6' color='blue-gray'>
                             Total Pagado
                           </Typography>
-                          <Typography variant="h5" color="green" className="font-bold">
+                          <Typography
+                            variant='h5'
+                            color='green'
+                            className='font-bold'
+                          >
                             {formatCurrency(
-                              payments.reduce((sum, payment) => sum + payment.total_amount, 0)
+                              payments.reduce(
+                                (sum, payment) => sum + payment.total_amount,
+                                0,
+                              ),
                             )}
                           </Typography>
                         </div>
-                        <Typography variant="small" color="gray" className="mt-1">
-                          {payments.length} pago{payments.length !== 1 ? 's' : ''} registrado{payments.length !== 1 ? 's' : ''}
+                        <Typography
+                          variant='small'
+                          color='gray'
+                          className='mt-1'
+                        >
+                          {payments.length} pago
+                          {payments.length !== 1 ? 's' : ''} registrado
+                          {payments.length !== 1 ? 's' : ''}
                         </Typography>
                       </CardBody>
                     </Card>
@@ -670,7 +840,7 @@ const NeighborDetailModal: React.FC<NeighborDetailModalProps> = ({
         )}
       </DialogBody>
       <DialogFooter>
-        <Button variant="gradient" color="blue" onClick={onClose}>
+        <Button variant='gradient' color='blue' onClick={onClose}>
           <span>Cerrar</span>
         </Button>
       </DialogFooter>

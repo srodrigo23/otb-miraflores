@@ -52,9 +52,9 @@ const NewNeighborModalForm: React.FC<NewNeighborModalFormType> = ({
     Record<keyof InputsNewNeighborForm, string>
   > = async (form) => {
     const created = await onSubmit({
-      first_name: form.first_name.trim(),
-      second_name: emptyToNull(form.second_name),
-      last_name: form.last_name.trim(),
+      names: form.names.trim(),
+      mat_lname: emptyToNull(form.mat_lname),
+      pat_lname: form.pat_lname.trim(),
       ci: digitsToNumber(form.ci),
       phone_number: digitsToNumber(form.phone_number),
       email: emptyToNull(form.email),
@@ -96,71 +96,71 @@ const NewNeighborModalForm: React.FC<NewNeighborModalFormType> = ({
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <div>
               <Input
-                label='Primer Nombre *'
+                label='Nombres *'
                 crossOrigin={undefined}
-                {...register('first_name', {
+                {...register('names', {
                   required: 'Campo requerido',
                   pattern: {
                     value: NAME_PATTERN,
                     message: 'Solo letras y espacios',
                   },
                 })}
-                error={!!errors.first_name}
+                error={!!errors.names}
               />
-              {errors.first_name && (
+              {errors.names && (
                 <Typography
                   variant='small'
                   color='red'
                   className='mt-1 font-normal'
                 >
-                  {errors.first_name.message}
+                  {errors.names.message}
                 </Typography>
               )}
             </div>
 
             <div>
               <Input
-                label='Segundo Nombre'
+                label='Apellido Materno'
                 crossOrigin={undefined}
-                {...register('second_name', {
+                {...register('mat_lname', {
                   pattern: {
                     value: NAME_PATTERN,
                     message: 'Solo letras y espacios',
                   },
                 })}
-                error={!!errors.second_name}
+                error={!!errors.mat_lname}
               />
-              {errors.second_name && (
+              {errors.mat_lname && (
                 <Typography
                   variant='small'
                   color='red'
                   className='mt-1 font-normal'
                 >
-                  {errors.second_name.message}
+                  {errors.mat_lname.message}
                 </Typography>
               )}
             </div>
 
             <div className='sm:col-span-2'>
               <Input
-                label='Apellidos *'
+                label='Apellido Paterno *'
                 crossOrigin={undefined}
-                {...register('last_name', {
+                {...register('pat_lname', {
                   required: 'Campo requerido',
                   pattern: {
                     value: NAME_PATTERN,
                     message: 'Solo letras y espacios',
                   },
                 })}
-                error={!!errors.last_name}
+                error={!!errors.pat_lname}
               />
-              {errors.last_name && (
+              {errors.pat_lname && (
                 <Typography
                   variant='small'
                   color='red'
                   className='mt-1 font-normal'
                 >
-                  {errors.last_name.message}
+                  {errors.pat_lname.message}
                 </Typography>
               )}
             </div>

@@ -122,7 +122,7 @@ def get_collect_debt_payments(collect_debt_id: int, db: Session = Depends(get_db
   for payment in payments:
     # Obtener información del vecino
     neighbor = payment.neighbor
-    neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+    neighbor_name = neighbor.full_name
 
     # Obtener detalles del pago
     payment_details_list = []
@@ -247,7 +247,7 @@ def create_collect_debt_payment(
   db.refresh(db_payment)
 
   # Obtener nombre del vecino para la respuesta
-  neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+  neighbor_name = neighbor.full_name
 
   return {
     "id": db_payment.id,

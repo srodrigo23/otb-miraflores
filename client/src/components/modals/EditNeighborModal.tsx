@@ -25,9 +25,9 @@ const FIELDS: {
   inputMode?: 'text' | 'numeric' | 'tel' | 'email';
   type?: string;
 }[] = [
-  { field: 'first_name', label: 'Primer Nombre' },
-  { field: 'second_name', label: 'Segundo Nombre' },
-  { field: 'last_name', label: 'Apellido' },
+  { field: 'names', label: 'Nombres' },
+  { field: 'pat_lname', label: 'Apellido Paterno' },
+  { field: 'mat_lname', label: 'Apellido Materno' },
   { field: 'ci', label: 'Cédula de Identidad', inputMode: 'numeric' },
   { field: 'phone_number', label: 'Teléfono', inputMode: 'tel' },
   { field: 'email', label: 'Email', inputMode: 'email', type: 'email' },
@@ -60,9 +60,10 @@ const EditNeighborModal: React.FC<EditNeighborModalProps> = ({
   isSaving = false,
   canSave = true,
 }) => {
-  const fullName = `${neighbor?.first_name ?? ''} ${neighbor?.second_name ?? ''} ${neighbor?.last_name ?? ''}`
-    .replace(/\s+/g, ' ')
-    .trim();
+  const fullName =
+    `${neighbor?.names ?? ''} ${neighbor?.mat_lname ?? ''} ${neighbor?.pat_lname ?? ''}`
+      .replace(/\s+/g, ' ')
+      .trim();
 
   return (
     <Dialog

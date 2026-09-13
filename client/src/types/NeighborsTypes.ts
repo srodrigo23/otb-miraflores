@@ -9,9 +9,9 @@ import {
  * can be registered without CI, phone or email, and without any meter.
  */
 export type InputsNewNeighborForm = {
-  first_name: string;
-  second_name: string | null;
-  last_name: string;
+  names: string;
+  mat_lname: string | null;
+  pat_lname: string;
   ci: number | null;
   phone_number: number | null;
   email: string | null;

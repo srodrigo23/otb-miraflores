@@ -21,7 +21,6 @@ const DeleteMeasureConfirmationModal: React.FC<DeleteNeighborModalType> = ({
   measure,
   onConfirmDelete,
 }) => {
-
   return (
     <Dialog open={openModalState} handler={handleCloseModal} size='sm'>
       <DialogBody className='text-center'>
@@ -38,7 +37,7 @@ const DeleteMeasureConfirmationModal: React.FC<DeleteNeighborModalType> = ({
           ¿Estás seguro que deseas eliminar la lecturacion{' '}
           <span className='font-semibold'>
             {measure?.measure_date}
-            {/* {neighbor?.first_name} {neighbor?.second_name} {neighbor?.last_name} */}
+            {/* {neighbor?.names} {neighbor?.mat_lname} {neighbor?.pat_lname} */}
           </span>
           ?
         </Typography>

@@ -1,9 +1,6 @@
 import { Document, Page, Text, View } from '@react-pdf/renderer';
 
-import {
-  MeasureType,
-  MeterReadingType,
-} from '../interfaces/measuresIterfaces';
+import { MeasureType, MeterReadingType } from '../interfaces/measuresIterfaces';
 import { formatDate } from '../utils/dates';
 import { REPORT_COLORS, reportStyles } from './reportTheme';
 
@@ -19,14 +16,31 @@ const COLUMNS = [
   { key: 'index', header: 'N°', width: 26, align: 'center' as const },
   { key: 'section', header: 'Sección', width: 46, align: 'center' as const },
   { key: 'meter', header: 'Medidor', width: 68, align: 'left' as const },
-  { key: 'neighbor', header: 'Apellidos y Nombre', width: 168, align: 'left' as const },
+  {
+    key: 'neighbor',
+    header: 'Apellidos y Nombre',
+    width: 168,
+    align: 'left' as const,
+  },
   { key: 'previous', header: 'Lect. Ant.', width: 52, align: 'right' as const },
-  { key: 'current', header: 'Lectura Actual', width: 78, align: 'center' as const, blank: true },
-  { key: 'notes', header: 'Observaciones', width: 101, align: 'left' as const, blank: true },
+  {
+    key: 'current',
+    header: 'Lectura Actual',
+    width: 78,
+    align: 'center' as const,
+    blank: true,
+  },
+  {
+    key: 'notes',
+    header: 'Observaciones',
+    width: 101,
+    align: 'left' as const,
+    blank: true,
+  },
 ];
 
 const getFullName = (reading: MeterReadingType) =>
-  `${reading.neighbor_last_name || ''} ${reading.neighbor_first_name || ''} ${reading.neighbor_second_name || ''}`
+  `${reading.neighbor_pat_lname || ''} ${reading.neighbor_mat_lname || ''} ${reading.neighbor_names || ''}`
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -97,12 +111,18 @@ export const MeterReadingsSheet: React.FC<{
           // wrap={false} keeps a row from being split across two pages
           <View key={reading.id} style={reportStyles.row} wrap={false}>
             <Text
-              style={[reportStyles.cell, { width: COLUMNS[0].width, textAlign: 'center' }]}
+              style={[
+                reportStyles.cell,
+                { width: COLUMNS[0].width, textAlign: 'center' },
+              ]}
             >
               {index + 1}
             </Text>
             <Text
-              style={[reportStyles.cell, { width: COLUMNS[1].width, textAlign: 'center' }]}
+              style={[
+                reportStyles.cell,
+                { width: COLUMNS[1].width, textAlign: 'center' },
+              ]}
             >
               {reading.section || '-'}
             </Text>
@@ -113,7 +133,10 @@ export const MeterReadingsSheet: React.FC<{
               {getFullName(reading) || '-'}
             </Text>
             <Text
-              style={[reportStyles.cell, { width: COLUMNS[4].width, textAlign: 'right' }]}
+              style={[
+                reportStyles.cell,
+                { width: COLUMNS[4].width, textAlign: 'right' },
+              ]}
             >
               {reading.previous_reading}
             </Text>

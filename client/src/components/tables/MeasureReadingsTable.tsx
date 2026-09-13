@@ -29,7 +29,7 @@ const STATUS_LABELS: { [key: string]: string } = {
 const EMPTY_VALUE = '-';
 
 const getFullName = (reading: MeterReadingType) =>
-  `${reading.neighbor_last_name || ''} ${reading.neighbor_first_name || ''} ${reading.neighbor_second_name || ''}`.trim();
+  `${reading.neighbor_pat_lname || ''} ${reading.neighbor_mat_lname || ''} ${reading.neighbor_names || ''}`.trim();
 
 /** Regular cell content: every column that is plain text renders through this */
 const CellText: React.FC<{ children: React.ReactNode; bold?: boolean }> = ({
@@ -130,7 +130,9 @@ const COLUMNS: ReadingColumn[] = [
           type='number'
           min={0}
           value={editing.draft.current_reading}
-          onChange={(e) => editing.updateDraft({ current_reading: e.target.value })}
+          onChange={(e) =>
+            editing.updateDraft({ current_reading: e.target.value })
+          }
           containerProps={{ className: '!min-w-0 !w-28' }}
           autoFocus
         />
@@ -269,80 +271,78 @@ const MeasureReadingsTable: React.FC<{
           keeps it usable if an ancestor ever loses its height. */}
       <div className='flex min-h-[320px] flex-1 flex-col'>
         <div className='min-h-0 flex-1 overflow-auto border border-blue-gray-100 rounded-lg'>
-            {readings?.length === 0 ? (
-              <div className='flex items-center justify-center h-full'>
-                <Typography variant='small' color='gray'>
-                  No hay lecturas registradas para esta medición
-                </Typography>
-              </div>
-            ) : (
-              <table className='w-full min-w-max table-auto text-left'>
-                <thead className='sticky top-0 bg-blue-gray-50 z-10'>
-                  <tr>
-                    {COLUMNS.map(({ key, header }) => (
-                      <th
-                        key={key}
-                        className='border-b border-blue-gray-100 bg-blue-gray-50 p-2 sm:p-3'
+          {readings?.length === 0 ? (
+            <div className='flex items-center justify-center h-full'>
+              <Typography variant='small' color='gray'>
+                No hay lecturas registradas para esta medición
+              </Typography>
+            </div>
+          ) : (
+            <table className='w-full min-w-max table-auto text-left'>
+              <thead className='sticky top-0 bg-blue-gray-50 z-10'>
+                <tr>
+                  {COLUMNS.map(({ key, header }) => (
+                    <th
+                      key={key}
+                      className='border-b border-blue-gray-100 bg-blue-gray-50 p-2 sm:p-3'
+                    >
+                      <Typography
+                        variant='small'
+                        color='blue-gray'
+                        className='font-bold'
                       >
-                        <Typography
-                          variant='small'
-                          color='blue-gray'
-                          className='font-bold'
-                        >
-                          {header}
-                        </Typography>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {readings.map((reading, index) => {
-                    const isLast = index === readings.length - 1;
-                    // Tighter rows on phones fit a few more meters per screen
-                    const classes = isLast
-                      ? 'p-2 sm:p-3'
-                      : 'p-2 sm:p-3 border-b border-blue-gray-50';
+                        {header}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {readings.map((reading, index) => {
+                  const isLast = index === readings.length - 1;
+                  // Tighter rows on phones fit a few more meters per screen
+                  const classes = isLast
+                    ? 'p-2 sm:p-3'
+                    : 'p-2 sm:p-3 border-b border-blue-gray-50';
 
-                    const isEditing = editingId === reading.id;
-                    const editing: RowEditing = {
-                      isEditing,
-                      isReadOnly,
-                      isSaving: isEditing && isSaving,
-                      draft,
-                      updateDraft: (patch) =>
-                        setDraft((current) => ({ ...current, ...patch })),
-                      start: () => startEditing(reading),
-                      confirm: () => confirmEditing(reading),
-                      cancel: cancelEditing,
-                    };
+                  const isEditing = editingId === reading.id;
+                  const editing: RowEditing = {
+                    isEditing,
+                    isReadOnly,
+                    isSaving: isEditing && isSaving,
+                    draft,
+                    updateDraft: (patch) =>
+                      setDraft((current) => ({ ...current, ...patch })),
+                    start: () => startEditing(reading),
+                    confirm: () => confirmEditing(reading),
+                    cancel: cancelEditing,
+                  };
 
-                    return (
-                      <tr
-                        key={reading.id}
-                        className={
-                          isEditing
-                            ? 'bg-blue-50/50'
-                            : 'hover:bg-blue-gray-50/50'
-                        }
-                        // Enter confirms and Escape cancels: this table is filled
-                        // in by keyboard, one meter after another
-                        onKeyDown={(e) => {
-                          if (!isEditing) return;
-                          if (e.key === 'Enter') confirmEditing(reading);
-                          if (e.key === 'Escape') cancelEditing();
-                        }}
-                      >
-                        {COLUMNS.map(({ key, cell }) => (
-                          <td key={key} className={classes}>
-                            {cell(reading, index, editing)}
-                          </td>
-                        ))}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+                  return (
+                    <tr
+                      key={reading.id}
+                      className={
+                        isEditing ? 'bg-blue-50/50' : 'hover:bg-blue-gray-50/50'
+                      }
+                      // Enter confirms and Escape cancels: this table is filled
+                      // in by keyboard, one meter after another
+                      onKeyDown={(e) => {
+                        if (!isEditing) return;
+                        if (e.key === 'Enter') confirmEditing(reading);
+                        if (e.key === 'Escape') cancelEditing();
+                      }}
+                    >
+                      {COLUMNS.map(({ key, cell }) => (
+                        <td key={key} className={classes}>
+                          {cell(reading, index, editing)}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </>

@@ -30,9 +30,9 @@ interface AssistanceType {
 
 interface NeighborType {
   id: number;
-  first_name: string;
-  second_name: string;
-  last_name: string;
+  names: string;
+  mat_lname: string;
+  pat_lname: string;
   ci: string;
   phone_number: string;
   email: string;
@@ -78,7 +78,7 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
     if (!meet) return;
 
     setLoading(true);
-    
+
     try {
       // Cargar vecinos y asistencias en paralelo
       const [neighborsResponse, assistancesResponse] = await Promise.all([
@@ -96,18 +96,18 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
       });
 
       // Combinar vecinos con sus asistencias
-      const combinedData: NeighborWithAssistance[] = (neighborsData.data || []).map(
-        (neighbor: NeighborType) => {
-          const assistance = assistanceMap.get(neighbor.id);
-          return {
-            ...neighbor,
-            assistance,
-            is_present: assistance?.is_present || false,
-            is_on_time: assistance?.is_on_time || false,
-            notes: assistance?.notes || '',
-          };
-        }
-      );
+      const combinedData: NeighborWithAssistance[] = (
+        neighborsData.data || []
+      ).map((neighbor: NeighborType) => {
+        const assistance = assistanceMap.get(neighbor.id);
+        return {
+          ...neighbor,
+          assistance,
+          is_present: assistance?.is_present || false,
+          is_on_time: assistance?.is_on_time || false,
+          notes: assistance?.notes || '',
+        };
+      });
 
       setNeighbors(combinedData);
     } catch (error) {
@@ -124,8 +124,8 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
     // Actualizar UI optimísticamente
     setNeighbors((prev) =>
       prev.map((n) =>
-        n.id === neighbor.id ? { ...n, is_present: newValue } : n
-      )
+        n.id === neighbor.id ? { ...n, is_present: newValue } : n,
+      ),
     );
 
     setSaving(neighbor.id);
@@ -159,8 +159,8 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
       // Revertir el cambio en caso de error
       setNeighbors((prev) =>
         prev.map((n) =>
-          n.id === neighbor.id ? { ...n, is_present: !newValue } : n
-        )
+          n.id === neighbor.id ? { ...n, is_present: !newValue } : n,
+        ),
       );
     } finally {
       setSaving(null);
@@ -178,8 +178,8 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
     // Actualizar UI optimísticamente
     setNeighbors((prev) =>
       prev.map((n) =>
-        n.id === neighbor.id ? { ...n, is_on_time: newValue } : n
-      )
+        n.id === neighbor.id ? { ...n, is_on_time: newValue } : n,
+      ),
     );
 
     setSaving(neighbor.id);
@@ -195,20 +195,23 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
       toast.error('Error al actualizar la puntualidad');
       setNeighbors((prev) =>
         prev.map((n) =>
-          n.id === neighbor.id ? { ...n, is_on_time: !newValue } : n
-        )
+          n.id === neighbor.id ? { ...n, is_on_time: !newValue } : n,
+        ),
       );
     } finally {
       setSaving(null);
     }
   };
 
-  const handleNotesChange = async (neighbor: NeighborWithAssistance, notes: string) => {
+  const handleNotesChange = async (
+    neighbor: NeighborWithAssistance,
+    notes: string,
+  ) => {
     if (!neighbor.assistance) return;
 
     // Actualizar UI
     setNeighbors((prev) =>
-      prev.map((n) => (n.id === neighbor.id ? { ...n, notes } : n))
+      prev.map((n) => (n.id === neighbor.id ? { ...n, notes } : n)),
     );
   };
 
@@ -233,7 +236,7 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
   };
 
   const getFullName = (neighbor: NeighborType) => {
-    return `${neighbor.first_name} ${neighbor.second_name || ''} ${neighbor.last_name}`.trim();
+    return `${neighbor.pat_lname} ${neighbor.mat_lname || ''} ${neighbor.names}`.trim();
   };
 
   const formatDateTime = (dateString: string | null) => {
@@ -252,63 +255,93 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
   const onTimeCount = neighbors.filter((n) => n.is_on_time).length;
 
   return (
-    <Dialog open={open} handler={onClose} size="xl">
+    <Dialog open={open} handler={onClose} size='xl'>
       <DialogHeader>
-        <div className="w-full">
-          <div className="flex justify-between items-start">
+        <div className='w-full'>
+          <div className='flex justify-between items-start'>
             <div>
-              <Typography variant="h4">Registro de Asistencia - {meet?.title}</Typography>
-              <Typography variant="small" color="gray" className="font-normal">
+              <Typography variant='h4'>
+                Registro de Asistencia - {meet?.title}
+              </Typography>
+              <Typography variant='small' color='gray' className='font-normal'>
                 Fecha: {meet?.meet_date ? formatDateTime(meet.meet_date) : ''}
               </Typography>
             </div>
-            <div className="text-right">
-              <Typography variant="small" color="blue-gray" className="font-semibold">
+            <div className='text-right'>
+              <Typography
+                variant='small'
+                color='blue-gray'
+                className='font-semibold'
+              >
                 Presentes: {presentCount} / {neighbors.length}
               </Typography>
-              <Typography variant="small" color="green" className="font-semibold">
+              <Typography
+                variant='small'
+                color='green'
+                className='font-semibold'
+              >
                 Puntuales: {onTimeCount}
               </Typography>
             </div>
           </div>
         </div>
       </DialogHeader>
-      <DialogBody className="overflow-auto max-h-[60vh]">
+      <DialogBody className='overflow-auto max-h-[60vh]'>
         {loading ? (
-          <div className="flex justify-center items-center py-10">
+          <div className='flex justify-center items-center py-10'>
             <ClipLoader size={50} />
           </div>
         ) : neighbors.length === 0 ? (
-          <Typography className="text-center py-10" color="gray">
+          <Typography className='text-center py-10' color='gray'>
             No hay vecinos registrados en el sistema
           </Typography>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-max table-auto text-left">
+          <div className='overflow-x-auto'>
+            <table className='w-full min-w-max table-auto text-left'>
               <thead>
                 <tr>
-                  <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 w-12">
-                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                  <th className='border-b border-blue-gray-100 bg-blue-gray-50 p-4 w-12'>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-semibold'
+                    >
                       #
                     </Typography>
                   </th>
-                  <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                  <th className='border-b border-blue-gray-100 bg-blue-gray-50 p-4'>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-semibold'
+                    >
                       Vecino
                     </Typography>
                   </th>
-                  <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 text-center">
-                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                  <th className='border-b border-blue-gray-100 bg-blue-gray-50 p-4 text-center'>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-semibold'
+                    >
                       Presente
                     </Typography>
                   </th>
-                  <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 text-center">
-                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                  <th className='border-b border-blue-gray-100 bg-blue-gray-50 p-4 text-center'>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-semibold'
+                    >
                       Puntual
                     </Typography>
                   </th>
-                  <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                    <Typography variant="small" color="blue-gray" className="font-semibold">
+                  <th className='border-b border-blue-gray-100 bg-blue-gray-50 p-4'>
+                    <Typography
+                      variant='small'
+                      color='blue-gray'
+                      className='font-semibold'
+                    >
                       Notas
                     </Typography>
                   </th>
@@ -317,7 +350,9 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
               <tbody>
                 {neighbors.map((neighbor, index) => {
                   const isLast = index === neighbors.length - 1;
-                  const classes = isLast ? 'p-4' : 'p-4 border-b border-blue-gray-50';
+                  const classes = isLast
+                    ? 'p-4'
+                    : 'p-4 border-b border-blue-gray-50';
                   const isSaving = saving === neighbor.id;
 
                   return (
@@ -328,15 +363,27 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
                       } ${isSaving ? 'opacity-50' : ''}`}
                     >
                       <td className={classes}>
-                        <Typography variant="small" color="blue-gray" className="font-normal">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-normal'
+                        >
                           {index + 1}
                         </Typography>
                       </td>
                       <td className={classes}>
-                        <Typography variant="small" color="blue-gray" className="font-medium">
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-medium'
+                        >
                           {getFullName(neighbor)}
                         </Typography>
-                        <Typography variant="small" color="gray" className="font-normal">
+                        <Typography
+                          variant='small'
+                          color='gray'
+                          className='font-normal'
+                        >
                           CI: {neighbor.ci}
                         </Typography>
                       </td>
@@ -346,7 +393,7 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
                           onChange={() => handleTogglePresent(neighbor)}
                           disabled={isSaving}
                           crossOrigin={undefined}
-                          color="green"
+                          color='green'
                         />
                       </td>
                       <td className={`${classes} text-center`}>
@@ -355,18 +402,20 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
                           onChange={() => handleToggleOnTime(neighbor)}
                           disabled={isSaving || !neighbor.assistance}
                           crossOrigin={undefined}
-                          color="blue"
+                          color='blue'
                         />
                       </td>
                       <td className={classes}>
                         <Input
                           value={neighbor.notes}
-                          onChange={(e) => handleNotesChange(neighbor, e.target.value)}
+                          onChange={(e) =>
+                            handleNotesChange(neighbor, e.target.value)
+                          }
                           onBlur={() => handleNotesBlur(neighbor)}
                           disabled={isSaving || !neighbor.assistance}
-                          placeholder="Agregar notas..."
+                          placeholder='Agregar notas...'
                           crossOrigin={undefined}
-                          className="!min-w-[200px]"
+                          className='!min-w-[200px]'
                         />
                       </td>
                     </tr>
@@ -377,14 +426,14 @@ const AssistanceModal: React.FC<AssistanceModalProps> = ({
           </div>
         )}
       </DialogBody>
-      <DialogFooter className="flex justify-between">
+      <DialogFooter className='flex justify-between'>
         <div>
-          <Typography variant="small" color="gray">
-            Total vecinos: {neighbors.length} | Presentes: {presentCount} | Ausentes:{' '}
-            {neighbors.length - presentCount}
+          <Typography variant='small' color='gray'>
+            Total vecinos: {neighbors.length} | Presentes: {presentCount} |
+            Ausentes: {neighbors.length - presentCount}
           </Typography>
         </div>
-        <Button variant="gradient" color="blue" onClick={onClose}>
+        <Button variant='gradient' color='blue' onClick={onClose}>
           <span>Cerrar</span>
         </Button>
       </DialogFooter>

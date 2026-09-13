@@ -1,26 +1,26 @@
 // import { Typography } from "@material-tailwind/react";
-import { NeighborWithDetailsType } from "../../interfaces/neighborsInterfaces";
+import { NeighborWithDetailsType } from '../../interfaces/neighborsInterfaces';
 
 const NeighborDataCard: React.FC<{
-  neighborData: NeighborWithDetailsType|undefined;
+  neighborData: NeighborWithDetailsType | undefined;
 }> = ({ neighborData }) => {
   // const meters = neighborData?.meters ?? [];
   return (
     <div className='flex items-center justify-center gap-4 w-full'>
       <div className='w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-lg font-bold shadow-md shrink-0'>
-        {neighborData?.first_name?.[0]}
-        {neighborData?.last_name?.[0]}
+        {neighborData?.pat_lname?.[0]}
+        {neighborData?.names?.[0]}
       </div>
       <div className='min-w-0 w-fit'>
         <div className='text-xl lg:text-2xl font-semibold truncate'>
-          {neighborData?.first_name} {neighborData?.second_name}{' '}
-          {neighborData?.last_name}
+          {neighborData?.pat_lname} {neighborData?.mat_lname}{' '}
+          {neighborData?.names}
         </div>
         {/* <div className='flex items-center gap-3 mt-1'> */}
-          {/* <Typography variant='small' color='gray'>
+        {/* <Typography variant='small' color='gray'>
             CI: {neighborData?.ci ?? '-'}
           </Typography> */}
-          {/* {meters.length > 1 && (
+        {/* {meters.length > 1 && (
             <Typography variant='small' color='gray' className='text-xs'>
               {meters.length} medidores
             </Typography>

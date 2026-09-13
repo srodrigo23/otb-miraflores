@@ -28,9 +28,9 @@ import EditNeighborModal from '../modals/EditNeighborModal';
 type FieldErrors = NeighborFieldErrors;
 
 const EDITABLE_FIELDS = [
-  'first_name',
-  'second_name',
-  'last_name',
+  'names',
+  'mat_lname',
+  'pat_lname',
   'ci',
   'phone_number',
   'email',
@@ -94,7 +94,7 @@ export const NeighborDetails: React.FC<{
   }, [data, toUpdateDataNeighbor]);
 
   const sanitize = (field: keyof UpdateNeighborPayloadType, raw: string) => {
-    if (['first_name', 'second_name', 'last_name'].includes(field)) {
+    if (['names', 'mat_lname', 'pat_lname'].includes(field)) {
       return nameRegex.test(raw) ? raw : null;
     }
     if (['ci', 'phone_number'].includes(field)) {
@@ -118,23 +118,23 @@ export const NeighborDetails: React.FC<{
   const validate = (): boolean => {
     const newErrors: FieldErrors = {};
 
-    if (!toUpdateDataNeighbor?.first_name?.trim()) {
-      newErrors.first_name = 'El primer nombre es requerido';
-    } else if (!nameRegex.test(toUpdateDataNeighbor.first_name)) {
-      newErrors.first_name = 'Solo se permiten letras y espacios';
+    if (!toUpdateDataNeighbor?.names?.trim()) {
+      newErrors.names = 'Los nombres son requeridos';
+    } else if (!nameRegex.test(toUpdateDataNeighbor.names)) {
+      newErrors.names = 'Solo se permiten letras y espacios';
     }
 
-    if (!toUpdateDataNeighbor?.last_name?.trim()) {
-      newErrors.last_name = 'El apellido es requerido';
-    } else if (!nameRegex.test(toUpdateDataNeighbor.last_name)) {
-      newErrors.last_name = 'Solo se permiten letras y espacios';
+    if (!toUpdateDataNeighbor?.pat_lname?.trim()) {
+      newErrors.pat_lname = 'El apellido es requerido';
+    } else if (!nameRegex.test(toUpdateDataNeighbor.pat_lname)) {
+      newErrors.pat_lname = 'Solo se permiten letras y espacios';
     }
 
     if (
-      toUpdateDataNeighbor?.second_name &&
-      !nameRegex.test(toUpdateDataNeighbor.second_name)
+      toUpdateDataNeighbor?.mat_lname &&
+      !nameRegex.test(toUpdateDataNeighbor.mat_lname)
     ) {
-      newErrors.second_name = 'Solo se permiten letras y espacios';
+      newErrors.mat_lname = 'Solo se permiten letras y espacios';
     }
 
     if (norm(toUpdateDataNeighbor?.ci) && !digitsRegex.test(norm(toUpdateDataNeighbor?.ci))) {
@@ -255,7 +255,7 @@ export const NeighborDetails: React.FC<{
       <NeighborDebtsPayments
         neighborId={data?.id}
         neighbor={{
-          fullName: `${data?.last_name ?? ''} ${data?.first_name ?? ''} ${data?.second_name ?? ''}`
+          fullName: `${data?.pat_lname ?? ''} ${data?.names ?? ''} ${data?.mat_lname ?? ''}`
             .replace(/\s+/g, ' ')
             .trim(),
           ci: data?.ci ? String(data.ci) : '',

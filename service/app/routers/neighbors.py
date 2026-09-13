@@ -196,7 +196,7 @@ def _neighbor_debts_response(neighbor, debts) -> dict:
   """
   Shared payload for both debt listings
   """
-  neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+  neighbor_name = neighbor.full_name
   return {
     "neighbor_id": neighbor.id,
     "neighbor_name": neighbor_name,

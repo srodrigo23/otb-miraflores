@@ -165,7 +165,7 @@ def read_meet_assistances(meet_id: int, db: Session = Depends(get_db)):
   assistances_data = []
   for assistance in assistances:
     neighbor = assistance.neighbor
-    neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+    neighbor_name = neighbor.full_name
 
     assistances_data.append({
       "id": assistance.id,
@@ -208,7 +208,7 @@ def create_meet_assistance(meet_id: int, assistance: schemas.AssistanceBase, db:
 
   # Obtener nombre del vecino para la respuesta
   neighbor = db_assistance.neighbor
-  neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+  neighbor_name = neighbor.full_name
 
   return {
     "id": db_assistance.id,
@@ -238,7 +238,7 @@ def update_assistance(assistance_id: int, assistance: schemas.AssistanceUpdate, 
 
   # Obtener nombre del vecino para la respuesta
   neighbor = db_assistance.neighbor
-  neighbor_name = f"{neighbor.first_name} {neighbor.second_name or ''} {neighbor.last_name}".strip()
+  neighbor_name = neighbor.full_name
 
   return {
     "id": db_assistance.id,

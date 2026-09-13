@@ -83,7 +83,7 @@ def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterRea
   #   NeighborMeter, MeterReading.meter_id == NeighborMeter.id
   # ).join(
   #   Neighbor, NeighborMeter.neighbor_id == Neighbor.id
-  # ).order_by(Neighbor.last_name, Neighbor.first_name).all()
+  # ).order_by(Neighbor.pat_lname, Neighbor.names).all()
   return db.query(MeterReading).filter(
     MeterReading.measure_id == measure_id
   ).join(
@@ -92,7 +92,7 @@ def get_meter_readings_by_measure(db: Session, measure_id: int) -> list[MeterRea
     NeighborMeter.neighbor
   ).options(
     contains_eager(MeterReading.meter).contains_eager(NeighborMeter.neighbor)
-  ).order_by(Neighbor.last_name, Neighbor.first_name).all()
+  ).order_by(Neighbor.pat_lname, Neighbor.names).all()
 
 
 def get_meter_reading(db: Session, measure_id: int, reading_id: int):

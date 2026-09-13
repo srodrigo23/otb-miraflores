@@ -13,9 +13,9 @@ export const filterNeighbors = (
 
   return neighbors.filter((neighbor) =>
     [
-      neighbor.first_name,
-      neighbor.second_name,
-      neighbor.last_name,
+      neighbor.names,
+      neighbor.mat_lname,
+      neighbor.pat_lname,
       neighbor.ci,
       neighbor.phone_number,
       neighbor.email,
@@ -29,6 +29,6 @@ export const filterNeighbors = (
 
 /** "Apellido Nombres" — the order the OTB register lists people in. */
 export const fullName = (neighbor: NeighborType) =>
-  [neighbor.last_name, neighbor.first_name, neighbor.second_name]
+  [neighbor.pat_lname, neighbor.mat_lname, neighbor.names]
     .filter(Boolean)
     .join(' ');

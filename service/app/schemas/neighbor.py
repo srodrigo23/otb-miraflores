@@ -13,18 +13,18 @@ class NeighborCreate(BaseModel):
   Only the names are required, matching the model: a neighbor may be on the
   register without a CI or a phone on record. Meters are registered apart.
   """
-  first_name: str = Field(min_length=1)
-  second_name: str | None = None
-  last_name: str = Field(min_length=1)
+  names: str = Field(min_length=1)
+  pat_lname: str = Field(min_length=1)
+  mat_lname: str | None = None
   ci: int | None = None
   phone_number: int | None = None
   email: EmailStr | None = None
 
 
 class NeighborUpdate(BaseModel):
-  first_name: str
-  second_name: str | None=None
-  last_name: str
+  names: str
+  pat_lname: str
+  mat_lname: str | None=None
   ci: int | None=None
   phone_number: int | None=None
   email: str | None=None
@@ -32,9 +32,9 @@ class NeighborUpdate(BaseModel):
 
 class Neighbor(BaseModel):
   id: int
-  first_name: str
-  second_name: str | None = None
-  last_name: str
+  names: str
+  pat_lname: str
+  mat_lname: str | None = None
   email: str | None = None
   ci: int | None = None
   phone_number: int | None = None

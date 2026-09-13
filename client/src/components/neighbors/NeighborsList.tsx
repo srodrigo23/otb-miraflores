@@ -10,7 +10,7 @@ import { NeighborType } from '../../interfaces/neighborsInterfaces';
 import { NeighborsViewProps } from '../../types/NeighborsTypes';
 
 const getInitials = (n: NeighborType) =>
-  `${n.first_name?.[0] ?? ''}${n.last_name?.[0] ?? ''}`.toUpperCase();
+  `${n.pat_lname?.[0] ?? ''}${n.names?.[0] ?? ''}`.toUpperCase();
 
 export const NeighborList: React.FC<NeighborsViewProps> = ({
   neighbors,
@@ -52,12 +52,12 @@ export const NeighborList: React.FC<NeighborsViewProps> = ({
 
                   <div className='min-w-0 flex-1'>
                     <p className='truncate text-sm text-blue-gray-600'>
-                      {[neighbor.first_name, neighbor.second_name]
+                      {[neighbor.pat_lname, neighbor.mat_lname]
                         .filter(Boolean)
                         .join(' ')}
                     </p>
                     <p className='truncate font-semibold text-blue-gray-900'>
-                      {neighbor.last_name}
+                      {neighbor.names}
                     </p>
                     {/* {contact && (
                         <span className='mt-0.5 flex items-center gap-1 truncate text-xs text-blue-gray-500'>

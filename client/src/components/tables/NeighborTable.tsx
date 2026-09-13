@@ -8,12 +8,12 @@ import { fullName } from '../../utils/neighbors';
 import { NUMERIC } from '../../utils/format';
 import { EmptyState } from '../shared/EmptyState';
 
-type SortField = 'id' | 'last_name' | 'ci' | 'phone_number' | 'email';
+type SortField = 'id' | 'pat_lname' | 'ci' | 'phone_number' | 'email';
 type SortOrder = 'asc' | 'desc';
 
 const TABLE_HEAD = [
   { label: 'Num.', field: 'id' as SortField, sortable: true },
-  { label: 'Nombre Completo', field: 'last_name' as SortField, sortable: true },
+  { label: 'Nombre Completo', field: 'pat_lname' as SortField, sortable: true },
   { label: 'CI', field: 'ci' as SortField, sortable: true },
   { label: 'Celular', field: 'phone_number' as SortField, sortable: true },
   // { label: 'Correo', field: 'email' as SortField, sortable: true },
@@ -22,7 +22,7 @@ const TABLE_HEAD = [
 
 /** The name column sorts by surname, matching how the register is ordered. */
 const sortValue = (neighbor: NeighborType, field: SortField) =>
-  field === 'last_name' ? fullName(neighbor) : neighbor[field];
+  field === 'pat_lname' ? fullName(neighbor) : neighbor[field];
 
 const NeighborTable: React.FC<NeighborsViewProps> = ({
   neighbors,

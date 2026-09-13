@@ -24,7 +24,7 @@ export const useNewNeighbor = () => {
     if (result?.ok) {
       const created = result.data as NeighborType;
       toast.success(
-        `Vecino ${created.last_name} ${created.first_name} creado exitosamente`,
+        `Vecino ${created.pat_lname} ${created.names} creado exitosamente`,
       );
       return true;
     }

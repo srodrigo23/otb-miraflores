@@ -104,7 +104,7 @@ export const MeterSelectorTabs: React.FC<MeterSelectorTabsProps> = ({
       >
         <div className='flex shrink-0 items-center gap-2'>
           <Switch
-            crossOrigin={undefined}
+            crossOrigin={undefined} 
             color='green'
             checked={isSelectedActive}
             onChange={(e) => handleToggle(e.target.checked)}

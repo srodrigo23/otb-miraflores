@@ -102,7 +102,7 @@ def get_debts_by_measure(db: Session, measure_id: int) -> list[DebtItem]:
   """
   return _debts_query(db).filter(
     MeterReading.measure_id == measure_id
-  ).order_by(Neighbor.last_name, Neighbor.first_name).all()
+  ).order_by(Neighbor.pat_lname, Neighbor.names).all()
 
 
 def get_neighbor_debts(db: Session, neighbor_id: int, only_pending: bool = True) -> list[DebtItem]:

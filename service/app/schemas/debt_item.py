@@ -38,14 +38,14 @@ class DebtItemDetail(BaseModel):
   )
 
   # Neighbor information
-  neighbor_first_name: str | None = Field(
-    default=None, validation_alias=AliasPath("neighbor", "first_name")
+  neighbor_names: str | None = Field(
+    default=None, validation_alias=AliasPath("neighbor", "names")
   )
-  neighbor_second_name: str | None = Field(
-    default=None, validation_alias=AliasPath("neighbor", "second_name")
+  neighbor_mat_lname: str | None = Field(
+    default=None, validation_alias=AliasPath("neighbor", "mat_lname")
   )
-  neighbor_last_name: str | None = Field(
-    default=None, validation_alias=AliasPath("neighbor", "last_name")
+  neighbor_pat_lname: str | None = Field(
+    default=None, validation_alias=AliasPath("neighbor", "pat_lname")
   )
 
   created_at: datetime

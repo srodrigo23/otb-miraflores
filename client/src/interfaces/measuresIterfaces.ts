@@ -36,8 +36,8 @@ export interface MeterReadingType {
   created_at: string;
   updated_at: string;
   
-  neighbor_first_name: string | null;
-  neighbor_second_name: string | null;
-  neighbor_last_name: string | null;
+  neighbor_names: string | null;
+  neighbor_mat_lname: string | null;
+  neighbor_pat_lname: string | null;
   
 }
