@@ -21,7 +21,7 @@ const TABLE_HEAD: {
   { label: 'Monto', field: 'amount', align: 'right' },
   { label: 'Fecha', field: 'paid_at' },
   { label: 'Hora' },
-  { label: 'Observaciones', align: 'left' },
+  { label: 'Periodo', align: 'left' },
 ];
 
 const EMPTY_VALUE = '-';
@@ -137,7 +137,7 @@ const PaymentsTable: React.FC<{ payments: PaymentRecord[] }> = ({
                       color='blue-gray'
                       className='font-normal text-center'
                     >
-                      {payment.collector_name}
+                      {payment.collector_name || EMPTY_VALUE}
                     </Typography>
                   </td>
                   <td className={classes}>
@@ -155,7 +155,7 @@ const PaymentsTable: React.FC<{ payments: PaymentRecord[] }> = ({
                       color='blue-gray'
                       className={`font-normal text-center ${NUMERIC}`}
                     >
-                      {formatDate(payment.paid_at)}
+                      {payment.paid_at ? formatDate(payment.paid_at) : EMPTY_VALUE}
                     </Typography>
                   </td>
                   <td className={classes}>
@@ -164,7 +164,7 @@ const PaymentsTable: React.FC<{ payments: PaymentRecord[] }> = ({
                       color='blue-gray'
                       className={`font-normal text-center ${NUMERIC}`}
                     >
-                      {formatTime(payment.paid_at)}
+                      {payment.paid_at ? formatTime(payment.paid_at) : EMPTY_VALUE}
                     </Typography>
                   </td>
                   <td className={classes}>
@@ -173,7 +173,7 @@ const PaymentsTable: React.FC<{ payments: PaymentRecord[] }> = ({
                       color='blue-gray'
                       className='font-normal'
                     >
-                      {payment.notes || EMPTY_VALUE}
+                      {payment.period} <span className={NUMERIC}>{payment.year}</span>
                     </Typography>
                   </td>
                 </tr>

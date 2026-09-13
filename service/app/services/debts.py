@@ -267,3 +267,43 @@ def get_neighbor_statement(db: Session, neighbor_id: int) -> list[dict]:
 
   # Newest year first: what is owed now is what the neighbor came to check
   return [by_year[year] for year in sorted(by_year, reverse=True)]
+
+
+def get_payments(db: Session) -> list[dict]:
+  """
+  Every payment, newest first, flattened for the payments screen.
+
+  Ordered by id and not by paid_at: the seeded history has no date, and those
+  would all collapse together at one end of the list.
+  """
+  payments = db.query(Payment).join(
+    Payment.debt_item
+  ).join(
+    DebtItem.meter_reading
+  ).join(
+    MeterReading.meter
+  ).join(
+    MeterReading.measure
+  ).join(
+    Payment.neighbor
+  ).options(
+    contains_eager(Payment.debt_item)
+      .contains_eager(DebtItem.meter_reading)
+      .contains_eager(MeterReading.meter),
+    contains_eager(Payment.neighbor),
+  ).order_by(Payment.id.desc()).all()
+
+  return [
+    {
+      "id": payment.id,
+      "receipt": format_receipt_number(payment.id),
+      "meter_code": payment.debt_item.meter_reading.meter.meter_code,
+      "neighbor_name": payment.neighbor.full_name,
+      "period": payment.debt_item.meter_reading.measure.period or "",
+      "year": payment.debt_item.meter_reading.measure.year or 0,
+      "collector_name": payment.received_by,
+      "amount": payment.amount,
+      "paid_at": payment.paid_at,
+    }
+    for payment in payments
+  ]

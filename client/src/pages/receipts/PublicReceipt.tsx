@@ -231,12 +231,12 @@ const PublicReceipt = () => {
                 : `Tiene ${currency(receipt.total_pending)} por pagar`}
             </h2>
           </div>
-          <p className='mt-1 text-sm text-blue-gray-600'>
+          {/* <p className='mt-1 text-sm text-blue-gray-600'>
             Total pagado a la fecha:{' '}
             <span className={`font-semibold ${NUMERIC}`}>
               {currency(receipt.total_paid)}
             </span>
-          </p>
+          </p> */}
         </section>
 
         {/* One block per year, newest first */}

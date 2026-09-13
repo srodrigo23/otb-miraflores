@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine, Base
 from app.core.settings import settings
 
-from app.routers import neighbors, measures, meters, debt_payments, public_receipts #, meets, measures, collect_debts, debts
+from app.routers import neighbors, measures, meters, debt_payments, public_receipts, payments #, meets, measures, collect_debts, debts
 from app.routers import auth
 from . import models # for create models
 
@@ -34,6 +34,7 @@ app.include_router(measures.router)
 app.include_router(meters.router)
 app.include_router(debt_payments.router)
 app.include_router(public_receipts.router)
+app.include_router(payments.router)
 # app.include_router(collect_debts.router)
 # app.include_router(debts.router)
 

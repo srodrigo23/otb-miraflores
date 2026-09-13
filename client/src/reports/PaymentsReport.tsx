@@ -19,7 +19,7 @@ const COLUMNS = [
   { key: 'amount', header: 'Monto', width: 74, align: 'right' as const },
   { key: 'date', header: 'Fecha', width: 66, align: 'center' as const },
   { key: 'time', header: 'Hora', width: 44, align: 'center' as const },
-  { key: 'notes', header: 'Observaciones', width: 160, align: 'left' as const },
+  { key: 'period', header: 'Periodo', width: 160, align: 'left' as const },
 ];
 
 const rangeLabel = (from: string, to: string) => {
@@ -90,7 +90,7 @@ export const PaymentsReport: React.FC<{
               {payment.neighbor_name}
             </Text>
             <Text style={[reportStyles.cell, { width: COLUMNS[3].width }]}>
-              {payment.collector_name}
+              {payment.collector_name || '-'}
             </Text>
             <Text
               style={[
@@ -106,7 +106,7 @@ export const PaymentsReport: React.FC<{
                 { width: COLUMNS[5].width, textAlign: 'center' },
               ]}
             >
-              {formatDate(payment.paid_at)}
+              {payment.paid_at ? formatDate(payment.paid_at) : '-'}
             </Text>
             <Text
               style={[
@@ -114,10 +114,10 @@ export const PaymentsReport: React.FC<{
                 { width: COLUMNS[6].width, textAlign: 'center' },
               ]}
             >
-              {formatTime(payment.paid_at)}
+              {payment.paid_at ? formatTime(payment.paid_at) : '-'}
             </Text>
             <Text style={[reportStyles.cell, { width: COLUMNS[7].width }]}>
-              {payment.notes || '-'}
+              {`${payment.period} ${payment.year}`}
             </Text>
           </View>
         ))}

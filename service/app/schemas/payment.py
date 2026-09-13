@@ -19,6 +19,24 @@ class NextReceiptNumber(BaseModel):
   receipt_number: str
 
 
+class PaymentRecord(BaseModel):
+  """
+  A payment as the payments screen lists it: flattened, with the meter and the
+  neighbor already resolved so the table reads no relationships.
+  """
+  id: int
+  receipt: str
+  meter_code: str
+  neighbor_name: str
+  period: str
+  year: int
+  # Who collected it. Null for the seeded history, taken on paper
+  collector_name: str | None = None
+  amount: int  # In cents
+  # Null for the seeded history: the sheets carry no date
+  paid_at: datetime | None = None
+
+
 class Payment(BaseModel):
   """A settled debt, as the receipt and the ledger need it"""
   model_config = ConfigDict(from_attributes=True)
