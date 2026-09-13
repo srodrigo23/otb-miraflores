@@ -1,7 +1,15 @@
-import { useState } from 'react';
-import { Typography, Chip, IconButton, Input } from '@material-tailwind/react';
+import { useMemo, useState } from 'react';
+import {
+  Typography,
+  Chip,
+  IconButton,
+  Input,
+  Option,
+  Select,
+} from '@material-tailwind/react';
 import {
   CheckIcon,
+  ChevronUpDownIcon,
   PencilSquareIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
@@ -11,6 +19,7 @@ import {
   ReadingUpdateType,
 } from '../../interfaces/measuresIterfaces';
 
+import { METER_SECTIONS } from '../../constants';
 import { color } from '../../types/commonTypes';
 
 // Keys match MeterReadingStatus in the backend (app/enums.py)
@@ -69,6 +78,8 @@ type ReadingColumn = {
   key: string;
   /** Header label */
   header: string;
+  /** Clicking the header reorders the sheet by meter code */
+  sortable?: boolean;
   /** Row renderer. `index` is the position in the list, used by the numbering column */
   cell: (
     reading: MeterReadingType,
@@ -104,6 +115,7 @@ const COLUMNS: ReadingColumn[] = [
   {
     key: 'meter',
     header: 'Medidor',
+    sortable: true,
     cell: (reading) => (
       <CellText>{reading.meter_number || EMPTY_VALUE}</CellText>
     ),
@@ -217,6 +229,24 @@ const COLUMNS: ReadingColumn[] = [
 
 const EMPTY_DRAFT: ReadingDraft = { current_reading: '', notes: '' };
 
+/**
+ * Options of the section filter, as one flat list.
+ *
+ * Material Tailwind's Select resolves the label of the selected value by
+ * walking its children: a loose <Option> next to a mapped array leaves it
+ * unable to find the match, and the field renders blank. "ALL" and not an
+ * empty string for the same reason — an empty value reads as nothing selected.
+ */
+const ALL_SECTIONS = 'ALL';
+
+const SECTION_OPTIONS = [
+  { value: ALL_SECTIONS, label: 'Todas las secciones' },
+  ...METER_SECTIONS.map((section) => ({
+    value: section,
+    label: `Sección ${section}`,
+  })),
+];
+
 const MeasureReadingsTable: React.FC<{
   readings: MeterReadingType[];
   /** Persists the row. Without it the edit only lives in this component */
@@ -227,12 +257,34 @@ const MeasureReadingsTable: React.FC<{
   /** Hides the edit action, e.g. once the measure is closed */
   isReadOnly?: boolean;
 }> = ({ readings, onSaveReading, isReadOnly = false }) => {
+  const [section, setSection] = useState<string>(ALL_SECTIONS);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   // Only one row is editable at a time: opening another one closes the current
   const [editingId, setEditingId] = useState<number | null>(null);
   const [draft, setDraft] = useState<ReadingDraft>(EMPTY_DRAFT);
   // Keeps the row open while the request is in flight, so a failed save does
   // not silently drop what was typed
   const [isSaving, setIsSaving] = useState(false);
+
+  /**
+   * The sheet is walked meter by meter in the field, so it is ordered by code
+   * and narrowed to the section being visited.
+   */
+  const visibleReadings = useMemo(() => {
+    const filtered =
+      section === ALL_SECTIONS
+        ? readings
+        : readings.filter((reading) => reading.section === section);
+
+    const direction = sortOrder === 'asc' ? 1 : -1;
+    return [...filtered].sort(
+      (a, b) =>
+        (a.meter_number ?? '').localeCompare(b.meter_number ?? '') * direction,
+    );
+  }, [readings, section, sortOrder]);
+
+  const toggleSort = () =>
+    setSortOrder((order) => (order === 'asc' ? 'desc' : 'asc'));
 
   const startEditing = (reading: MeterReadingType) => {
     setEditingId(reading.id);
@@ -269,37 +321,68 @@ const MeasureReadingsTable: React.FC<{
       {/* Fills whatever the header leaves, instead of a fixed height that
           overflowed small screens and wasted room on large ones. The floor
           keeps it usable if an ancestor ever loses its height. */}
-      <div className='flex min-h-[320px] flex-1 flex-col'>
+      <div className='flex min-h-[320px] flex-1 flex-col gap-2'>
+        <div className='flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
+          <div className='w-full sm:w-48 text-black'>
+            <Select
+              label='Sección'
+              value={section}
+              onChange={(value) => setSection(value ?? ALL_SECTIONS)}
+            >
+              {SECTION_OPTIONS.map(({ value, label }) => (
+                <Option key={value} value={value}>
+                  {label}
+                </Option>
+              ))}
+            </Select>
+          </div>
+          <Typography variant='small' color='blue-gray' className='font-normal'>
+            {visibleReadings.length} de {readings.length} lecturas
+          </Typography>
+        </div>
+
         <div className='min-h-0 flex-1 overflow-auto border border-blue-gray-100 rounded-lg'>
-          {readings?.length === 0 ? (
-            <div className='flex items-center justify-center h-full'>
+          {visibleReadings.length === 0 ? (
+            <div className='flex items-center justify-center h-full px-4 text-center'>
               <Typography variant='small' color='gray'>
-                No hay lecturas registradas para esta medición
+                {readings.length === 0
+                  ? 'No hay lecturas registradas para esta medición'
+                  : `No hay lecturas en la sección ${section}`}
               </Typography>
             </div>
           ) : (
             <table className='w-full min-w-max table-auto text-left'>
               <thead className='sticky top-0 bg-blue-gray-50 z-10'>
                 <tr>
-                  {COLUMNS.map(({ key, header }) => (
+                  {COLUMNS.map(({ key, header, sortable }) => (
                     <th
                       key={key}
-                      className='border-b border-blue-gray-100 bg-blue-gray-50 p-2 sm:p-3'
+                      onClick={() => sortable && toggleSort()}
+                      className={`border-b border-blue-gray-100 bg-blue-gray-50 p-2 sm:p-3 ${
+                        sortable
+                          ? 'cursor-pointer transition-colors hover:bg-blue-gray-100'
+                          : ''
+                      }`}
                     >
-                      <Typography
-                        variant='small'
-                        color='blue-gray'
-                        className='font-bold'
-                      >
-                        {header}
-                      </Typography>
+                      <div className='flex items-center gap-1'>
+                        <Typography
+                          variant='small'
+                          color='blue-gray'
+                          className='font-bold'
+                        >
+                          {header}
+                        </Typography>
+                        {sortable && (
+                          <ChevronUpDownIcon className='h-4 w-4 text-blue-500' />
+                        )}
+                      </div>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {readings.map((reading, index) => {
-                  const isLast = index === readings.length - 1;
+                {visibleReadings.map((reading, index) => {
+                  const isLast = index === visibleReadings.length - 1;
                   // Tighter rows on phones fit a few more meters per screen
                   const classes = isLast
                     ? 'p-2 sm:p-3'
