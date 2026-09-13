@@ -1,9 +1,9 @@
 from sqlalchemy import func
-from sqlalchemy.orm import Session, contains_eager
+from sqlalchemy.orm import Session, contains_eager, joinedload
 
 from datetime import datetime
 
-from app.models import DebtItem, MeterReading, NeighborMeter, Neighbor, Payment
+from app.models import DebtItem, Measure, MeterReading, NeighborMeter, Neighbor, Payment
 from app.enums import DebtOrigin, DebtStatus, MeterReadingStatus
 import app.services.neighbor_meters as neighbor_meters
 
@@ -200,3 +200,70 @@ def cancel_debt(db: Session, debt: DebtItem, notes: str | None = None) -> DebtIt
   db.commit()
   db.refresh(debt)
   return debt
+
+
+def get_payment_by_reference(db: Session, reference: str) -> Payment | None:
+  """The payment a scanned receipt QR points at"""
+  return db.query(Payment).filter(Payment.reference == reference).first()
+
+
+def get_neighbor_statement(db: Session, neighbor_id: int) -> list[dict]:
+  """
+  Where a neighbor stands, grouped by year.
+
+  Cancelled debts are left out: they were annulled precisely so they stop
+  counting as owed. Debts with no amount never reached the neighbor either.
+  """
+  debts = db.query(DebtItem).filter(
+    DebtItem.neighbor_id == neighbor_id,
+    DebtItem.status != DebtStatus.CANCELLED,
+    DebtItem.amount > 0,
+  ).join(
+    DebtItem.meter_reading
+  ).join(
+    MeterReading.meter
+  ).join(
+    MeterReading.measure
+  ).options(
+    contains_eager(DebtItem.meter_reading)
+      .contains_eager(MeterReading.meter),
+    joinedload(DebtItem.payment),
+  ).order_by(Measure.year.desc(), NeighborMeter.meter_code).all()
+
+  by_year: dict[int, dict] = {}
+  for debt in debts:
+    measure = debt.meter_reading.measure
+    year = measure.year or 0
+    payment = debt.payment
+    is_paid = debt.status == DebtStatus.PAID
+
+    bucket = by_year.setdefault(year, {
+      "year": year,
+      "paid_amount": 0,
+      "pending_amount": 0,
+      "paid_count": 0,
+      "pending_count": 0,
+      "debts": [],
+    })
+
+    if is_paid:
+      bucket["paid_amount"] += debt.amount
+      bucket["paid_count"] += 1
+    else:
+      bucket["pending_amount"] += debt.amount
+      bucket["pending_count"] += 1
+
+    bucket["debts"].append({
+      "id": debt.id,
+      "period": measure.period or "",
+      "year": year,
+      "meter_code": debt.meter_reading.meter.meter_code,
+      "consumption": debt.consumption or 0,
+      "amount": debt.amount,
+      "status": debt.status,
+      "receipt_number": format_receipt_number(payment.id) if payment else None,
+      "paid_at": payment.paid_at if payment else None,
+    })
+
+  # Newest year first: what is owed now is what the neighbor came to check
+  return [by_year[year] for year in sorted(by_year, reverse=True)]

@@ -12,6 +12,7 @@ import { AuthProvider } from './context/AuthContext.tsx';
 import ProtectedRoute from './components/shared/ProtectedRoute.tsx';
 
 import { Login } from './pages/login/Login.tsx';
+import PublicReceipt from './pages/receipts/PublicReceipt.tsx';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // import NeighborDetails from './pages/neighbors/NeighborDetails.tsx';
 import NeighborsLayout from './layouts/NeighborsLayout.tsx';
@@ -29,6 +30,10 @@ createRoot(document.getElementById('root')!).render(
             {/* <Route element={<App />}/> */}
 
             <Route path='/login' element={<Login />} />
+
+            {/* Outside ProtectedRoute on purpose: this is where a scanned
+                receipt QR lands, and whoever scans it is not logged in */}
+            <Route path='/recibos/:reference' element={<PublicReceipt />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path='/' element={<Navigate to='vecinos' replace />} />
