@@ -64,28 +64,29 @@ export const PayDebtModal: React.FC<{
             payment is happening now, and the receipt number is the correlative
             the database will assign. There is nothing to choose */}
         <div className='flex flex-col gap-4'>
-          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
-            <Input
+          <div className='flex flex-row gap-3'>
+            {/* <Input
               label='Forma de pago'
               crossOrigin={undefined}
               value='Efectivo'
               readOnly
               className='!bg-blue-gray-50/60'
-            />
-            <Input
-              label='Fecha'
-              crossOrigin={undefined}
-              value={shownDate}
-              readOnly
-              className='!bg-blue-gray-50/60'
-            />
-            <Input
-              label='Hora'
-              crossOrigin={undefined}
-              value={shownTime}
-              readOnly
-              className='!bg-blue-gray-50/60'
-            />
+            /> */}
+              <Input
+                label='Fecha'
+                crossOrigin={undefined}
+                value={shownDate}
+                readOnly
+                className='!bg-blue-gray-50/60'
+              />
+              <Input
+                label='Hora'
+                crossOrigin={undefined}
+                value={shownTime}
+                readOnly
+                className='!bg-blue-gray-50/60'
+              />
+            
           </div>
 
           <Input
@@ -111,7 +112,6 @@ export const PayDebtModal: React.FC<{
             </span>
           </div>
         </div>
-
       </DialogBody>
 
       <DialogFooter className='flex flex-col-reverse gap-2 pt-0 sm:flex-row'>

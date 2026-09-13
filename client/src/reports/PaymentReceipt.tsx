@@ -283,7 +283,7 @@ const ReceiptBody: React.FC<{
       <Image style={styles.qr} src={payment.qrDataUrl} />
       <Text style={styles.qrHint}>
         Escanea para ver este recibo en línea.{'\n'}
-        Ref. {payment.reference}
+        {/* Ref. {payment.reference} */}
       </Text>
     </View>
 
