@@ -22,7 +22,7 @@ export type ReceiptPayment = {
   /** ISO datetime stamped by the server when the payment was stored */
   date: string;
   method: string;
-  /** Random stand-in for the UUID the backend will issue */
+  /** UUID minted with the payment; what the QR resolves to */
   reference: string;
   qrDataUrl: string;
 };

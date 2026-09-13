@@ -13,14 +13,10 @@ export const toQrDataUrl = (text: string) =>
   });
 
 /**
- * Reference the QR points at.
+ * Where the QR sends whoever scans it: the public view of this receipt.
  *
- * Placeholder: a random number stands in for the UUID the backend will mint
- * when the payment is actually registered.
+ * The reference is the UUID the API minted with the payment, not something the
+ * browser invents: the QR has to survive being scanned months later.
  */
-export const createReceiptReference = () =>
-  String(Math.floor(Math.random() * 1_000_000_000)).padStart(9, '0');
-
-/** Where the QR sends whoever scans it: the public view of this receipt */
 export const receiptPublicUrl = (reference: string) =>
   `${window.location.origin}/recibos/${reference}`;

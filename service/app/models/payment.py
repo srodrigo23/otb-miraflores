@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
+from uuid import uuid4
 
 from app.db.database import Base
 
@@ -30,8 +31,16 @@ class Payment(Base):
   # Mirrors debt.amount at the time it was settled, in cents
   amount = Column(Integer, nullable=False)
 
-  # There is no receipt column: the receipt number IS this row's id, so it is
-  # correlative by construction and cannot be typed in wrong or repeated
+  # There is no receipt number column: the receipt number IS this row's id, so
+  # it is correlative by construction and cannot be typed in wrong or repeated.
+  #
+  # The reference is the other half: an opaque id for the QR printed on the
+  # receipt, so whoever scans it cannot guess another neighbor's receipt by
+  # counting, which the correlative would let them do
+  reference = Column(
+    String(36), unique=True, nullable=False, default=lambda: str(uuid4())
+  )
+
   received_by = Column(String(100))  # Persona que recibio el pago
 
   created_at = Column(DateTime, default=datetime.utcnow)

@@ -15,6 +15,8 @@ export type CreatedPayment = {
   paid_at: string | null;
   /** The id, zero padded by the API. This is the receipt number */
   receipt_number: string;
+  /** Opaque id the receipt QR points at */
+  reference: string;
 };
 /** Detail the API sends back on a rejected payment, e.g. an already paid debt */
 type ApiError = { detail?: string };

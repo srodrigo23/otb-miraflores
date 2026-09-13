@@ -29,6 +29,8 @@ export interface LedgerDebt {
 export interface LedgerPayment {
   id: number;
   receipt: string;
+  /** Opaque id the receipt QR points at */
+  reference: string;
   /** ISO date, e.g. "2026-05-12" */
   date: string;
   period: string;

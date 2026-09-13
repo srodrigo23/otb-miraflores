@@ -68,6 +68,8 @@ class MeterLedgerPayment(BaseModel):
   """A settled debt, as the neighbor's meter view lists it"""
   id: int
   receipt: str
+  # Opaque id the receipt QR points at
+  reference: str
   # Null for the seeded history, settled on paper before the system existed
   date: str | None = None
   period: str

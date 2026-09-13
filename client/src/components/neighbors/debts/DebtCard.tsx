@@ -11,11 +11,7 @@ import {
   type ReceiptNeighbor,
 } from '../../../reports/PaymentReceipt';
 import { openReport, reportFileName } from '../../../reports/openReport';
-import {
-  createReceiptReference,
-  receiptPublicUrl,
-  toQrDataUrl,
-} from '../../../reports/qrDataUrl';
+import { receiptPublicUrl, toQrDataUrl } from '../../../reports/qrDataUrl';
 import { ReadingInterval } from './ReadingInterval';
 import { PayDebtModal } from './PayDebtModal';
 import { usePayDebt } from '../../../hooks/neighbors/usePayDebt';
@@ -65,13 +61,13 @@ export const DebtCard: React.FC<{
    * failures.
    */
   const handleConfirmPayment = async () => {
-    const reference = createReceiptReference();
-
     const payment = await payDebt(debt.id, { received_by: null });
     if (payment === null) return;
 
     setIsConfirmOpen(false);
-    const qrDataUrl = await toQrDataUrl(receiptPublicUrl(reference));
+    // The QR carries the reference the API minted, so scanning the paper still
+    // resolves to this payment long after it was issued
+    const qrDataUrl = await toQrDataUrl(receiptPublicUrl(payment.reference));
 
     await openReport(
       <PaymentReceipt
@@ -84,7 +80,7 @@ export const DebtCard: React.FC<{
           // The moment the server stamped, not the one the browser guessed
           date: payment.paid_at ?? new Date().toISOString(),
           method: PAYMENT_METHOD_LABEL,
-          reference,
+          reference: payment.reference,
           qrDataUrl,
         }}
       />,

@@ -184,6 +184,7 @@ def get_neighbor_meter_ledgers(db: Session, neighbor_id: int) -> list[dict]:
           payments.append({
             "id": payment.id,
             "receipt": f"{payment.id:06d}",
+            "reference": payment.reference,
             "date": payment.paid_at.isoformat() if payment.paid_at else None,
             "period": period,
             "amount": payment.amount,

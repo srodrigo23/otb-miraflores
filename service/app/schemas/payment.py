@@ -28,6 +28,8 @@ class Payment(BaseModel):
   neighbor_id: int
   paid_at: datetime | None = None
   amount: int  # In cents
+  # Opaque id the receipt QR points at
+  reference: str
   received_by: str | None = None
   created_at: datetime
 
