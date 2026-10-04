@@ -1,46 +1,52 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from .services import crud
-from app.db.database import engine, Base
 from app.core.settings import settings
 
-from app.routers import neighbors, measures, meters, debt_payments, public_receipts, payments #, meets, measures, collect_debts, debts
-from app.routers import auth
-from . import models # for create models
+# from .services import crud
+from app.db.database import Base, engine
+from app.routers import (
+    auth,
+    debt_payments,
+    measures,
+    meters,
+    neighbors,
+    payments,
+    public_receipts,
+)  # , meets, measures, collect_debts, debts
+
+from . import models  # for create models
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 # config for CORS
 origins = [
-  settings.CLIENT_URL_DEV,
-  settings.CLIENT_URL_PROD,
-  "http://192.168.100.6:5173"
+    settings.CLIENT_URL_DEV,
+    settings.CLIENT_URL_PROD,
+    "http://192.168.100.6:5173",
 ]
 
 app.add_middleware(
-  CORSMiddleware,
-  allow_origins=origins,
-  allow_credentials=True,
-  allow_methods=["*"],
-  allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
 app.include_router(neighbors.router)
-# app.include_router(meets.router)
-app.include_router(measures.router) 
+app.include_router(measures.router)
 app.include_router(meters.router)
 app.include_router(debt_payments.router)
 app.include_router(public_receipts.router)
 app.include_router(payments.router)
-# app.include_router(collect_debts.router)
-# app.include_router(debts.router)
 
 @app.get("/")
 async def root():
-  return {"message": "Hello World"}
+    return {"message": "Hello World"}
+
 
 # def create_access_token(data: dict):
 #   to_encode = data.copy()
@@ -48,16 +54,16 @@ async def root():
 #   to_encode.update({"exp": expire})
 #   return jwt.encode(to_encode, settings.ALGORITHM, algorithm=settings.ALGORITHM)
 
-  
+
 # @app.post("/login")
 # def login(data:LoginRequest, response: Response, db: Session= Depends(get_db)):
 #   user = crud.get_user_by_username(db=db, username=data.username)
 #   if user is not None:
 #     if user.verify_password(data.password):
 #       response.status_code = status.HTTP_202_ACCEPTED
-      
+
 #       token = create_access_token({"sub": data.username})
-      
+
 #       response.set_cookie(
 #         key="access_token",
 #         value=token,
@@ -69,7 +75,7 @@ async def root():
 #   return {
 #     'success':False
 #   }
-  
+
 # @app.get("/me")
 # def get_me(access_token: str = Cookie(None)):
 #   if not access_token:
@@ -80,4 +86,3 @@ async def root():
 #     return {"username": username}
 #   except JWTError:
 #     raise HTTPException(status_code=401, detail="Invalid token")
-  

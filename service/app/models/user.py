@@ -3,7 +3,7 @@ import bcrypt
 from sqlalchemy import Column, Integer, String, Enum, Boolean
 from app.db.database import Base
 
-from ..enums import UserType
+from app.enums import UserType
 
 class User(Base):
   

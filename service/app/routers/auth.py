@@ -24,7 +24,10 @@ def login(credentials: LoginSchema, response: Response, db: Session = Depends(ge
   set_auth_cookie(response=response, token=token)
   return user
 
-@router.get('/me', response_model=schema.User)
+@router.get(
+  '/me', 
+  response_model=schema.User
+)
 def me(current_user=Depends(get_current_user)):
   return current_user
 
