@@ -9,7 +9,7 @@ from app.dependencies import get_current_user, require_roles
 # from app.models.user import User
 from app.enums import UserType
 from app.schemas import schema as schemas
-from app.services import neighbor
+from app.services import neighbor as neighbor_service
 
 router = APIRouter(
     prefix="/neighbors",
@@ -44,7 +44,7 @@ def create_neighbor(
     dependencies=[Depends(require_roles(UserType.ADMIN))],
 )
 def read_neighbors(db: Session = Depends(get_db)):
-    neighbors = neighbor.get_neighbors(db=db)
+    neighbors = neighbor_service.get_neighbors(db=db)
     return neighbors if len(neighbors) > 0 else []
     # if len(neig):
     #   return {
@@ -62,7 +62,7 @@ def read_neighbors(db: Session = Depends(get_db)):
     dependencies=[Depends(require_roles(UserType.ADMIN))],
 )
 def read_neighbor_detail(neighbor_id: int, db: Session = Depends(get_db)):
-    neighbor = neighbor.get_neighbor_by_id(db, neighbor_id=neighbor_id)
+    neighbor = neighbor_service.get_neighbor_by_id(db, neighbor_id=neighbor_id)
     if not neighbor:
         raise HTTPException(status_code=404, detail="Neighbor not found")
     # NeighborDetail reads straight off the ORM object, meters included
@@ -77,7 +77,9 @@ def read_neighbor_detail(neighbor_id: int, db: Session = Depends(get_db)):
 def update_neighbor(
     neighbor_id: int, neighbor: schemas.NeighborUpdate, db: Session = Depends(get_db)
 ):
-    db_neighbor = neighbor.update_neighbor(db, neighbor_id=neighbor_id, neighbor=neighbor)
+    db_neighbor = neighbor_service.update_neighbor(
+        db, neighbor_id=neighbor_id, neighbor=neighbor
+    )
     if db_neighbor is None:
         raise HTTPException(status_code=404, detail="Neighbor not found")
     return db_neighbor
@@ -85,7 +87,7 @@ def update_neighbor(
 
 @router.delete("/{neighbor_id}", dependencies=[Depends(require_roles(UserType.ADMIN))])
 def delete_neighbor(neighbor_id: int, db: Session = Depends(get_db)):
-    success = neighbor.delete_neighbor(db, neighbor_id=neighbor_id)
+    success = neighbor_service.delete_neighbor(db, neighbor_id=neighbor_id)
     if not success:
         raise HTTPException(status_code=404, detail="Neighbor not found")
     return {"message": "Neighbor deleted successfully", "id": neighbor_id}
@@ -100,7 +102,7 @@ def get_neighbor_meters(neighbor_id: int, db: Session = Depends(get_db)):
     """
     Obtiene los medidores de un vecino con su historial de consumo y sus deudas
     """
-    neighbor = neighbor.get_neighbor(db, neighbor_id=neighbor_id)
+    neighbor = neighbor_service.get_neighbor(db, neighbor_id=neighbor_id)
     if neighbor is None:
         raise HTTPException(status_code=404, detail="Neighbor not found")
 
@@ -125,7 +127,7 @@ def create_neighbor_meter(
     /meters/next-codes, and between that read and this write another collector
     may have taken it.
     """
-    if neighbor.get_neighbor(db, neighbor_id=neighbor_id) is None:
+    if neighbor_service.get_neighbor(db, neighbor_id=neighbor_id) is None:
         raise HTTPException(status_code=404, detail="Neighbor not found")
 
     code = meter.meter_code.strip().upper()
@@ -156,19 +158,20 @@ def create_neighbor_meter(
 
 
 @router.get(
-    "/{neighbor_id}/payments", dependencies=[Depends(require_roles(UserType.ADMIN))]
+    "/{neighbor_id}/payments", 
+    dependencies=[Depends(require_roles(UserType.ADMIN))]
 )
 def get_neighbor_payments(neighbor_id: int, db: Session = Depends(get_db)):
     """
     Obtiene todos los pagos realizados por un vecino con sus detalles
     """
     # Verificar que el vecino existe
-    neighbor = neighbor.get_neighbor(db, neighbor_id=neighbor_id)
+    neighbor = neighbor_service.get_neighbor(db, neighbor_id=neighbor_id)
     if neighbor is None:
         raise HTTPException(status_code=404, detail="Neighbor not found")
 
     # Obtener pagos
-    payments = neighbor.get_neighbor_payments(db, neighbor_id=neighbor_id)
+    payments = neighbor_service.get_neighbor_payments(db, neighbor_id=neighbor_id)
 
     # Formatear respuesta con detalles de cada pago
     payments_data = []
@@ -233,7 +236,7 @@ def get_neighbor_active_debts(neighbor_id: int, db: Session = Depends(get_db)):
     """
     Obtiene las deudas pendientes de un vecino
     """
-    neighbor = neighbor.get_neighbor(db, neighbor_id=neighbor_id)
+    neighbor = neighbor_service.get_neighbor(db, neighbor_id=neighbor_id)
     if neighbor is None:
         raise HTTPException(status_code=404, detail="Neighbor not found")
 
@@ -252,7 +255,7 @@ def get_neighbor_all_debts(neighbor_id: int, db: Session = Depends(get_db)):
     """
     Obtiene todas las deudas de un vecino, incluyendo las pagadas
     """
-    neighbor = neighbor.get_neighbor(db, neighbor_id=neighbor_id)
+    neighbor = neighbor_service.get_neighbor(db, neighbor_id=neighbor_id)
     if neighbor is None:
         raise HTTPException(status_code=404, detail="Neighbor not found")
 

@@ -4,7 +4,7 @@ from app.models.neighbor import Neighbor
 from app.models.user import User
 from app.schemas import schema as schemas
 
-# from app.models.neighbor_meter import NeighborMeter
+from app.models.neighbor_meter import NeighborMeter
 
 
 def get_neighbor(db: Session, neighbor_id: int):
