@@ -29,13 +29,15 @@ def create_neighbor(
     db: Session = Depends(get_db),
 ):
     # Both are optional, so each one is only checked when it was provided
-    if neighbor.email and neighbor.get_neighbor_by_email(db, email=neighbor.email):
+    if neighbor.email and neighbor_service.get_neighbor_by_email(
+        db, email=neighbor.email
+    ):
         raise HTTPException(status_code=400, detail="El correo ya está registrado")
 
-    if neighbor.ci and neighbor.get_neighbor_by_ci(db, ci=neighbor.ci):
+    if neighbor.ci and neighbor_service.get_neighbor_by_ci(db, ci=neighbor.ci):
         raise HTTPException(status_code=400, detail="La cédula ya está registrada")
 
-    return neighbor.create_neighbor(db=db, neighbor=neighbor)
+    return neighbor_service.create_neighbor(db=db, neighbor=neighbor)
 
 
 @router.get(
