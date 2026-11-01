@@ -6,18 +6,15 @@ export const ReadingInterval: React.FC<{
   currentReading: number;
   consumption: number;
 }> = ({ previousReading, currentReading, consumption }) => (
-  <div className='flex items-center gap-2 rounded-md bg-blue-gray-50/70 px-2.5 py-1.5'>
-    <span className={`text-sm text-blue-gray-600 ${NUMERIC}`}>
-      {previousReading}
-    </span>
-    <span aria-hidden className='text-blue-gray-300'>
-      →
-    </span>
-    <span className={`text-sm font-semibold text-blue-gray-800 ${NUMERIC}`}>
-      {currentReading}
-    </span>
-    <span className={`ml-auto text-sm font-bold text-cyan-800 ${NUMERIC}`}>
-      {consumption} m³
-    </span>
-  </div>
+  // Label/value pairs; where it sits in the card is the parent's call
+  <dl
+    className={`grid grid-cols-[auto_auto] justify-start gap-x-3 text-sm text-blue-gray-500 ${NUMERIC}`}
+  >
+    <dt>Lec. anterior</dt>
+    <dd className='font-semibold text-blue-gray-800'>{previousReading}</dd>
+    <dt>Lec. actual</dt>
+    <dd className='font-semibold text-blue-gray-800'>{currentReading}</dd>
+    <dt>Consumo</dt>
+    <dd className='font-bold text-cyan-800'>{consumption} m³</dd>
+  </dl>
 );

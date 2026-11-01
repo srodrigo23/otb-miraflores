@@ -34,7 +34,9 @@ export const MeterLedgerPanel: React.FC<{
         pendingDebts.length === 0 ? (
           <EmptyState message='Este medidor no tiene deudas pendientes.' />
         ) : (
-          <div className='flex flex-col gap-2'>
+          // As many columns as fit: a wide panel lays the cards side by side
+          // instead of stretching each one across the empty width
+          <div className='grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-2'>
             {pendingDebts.map((debt) => (
               <DebtCard
                 key={debt.id}
@@ -75,7 +77,7 @@ export const MeterLedgerPanel: React.FC<{
                 {icon}
                 <span className='text-sm font-semibold'>{label}</span>
                 <span
-                  className={`rounded-full bg-blue-gray-100 px-1.5 text-xs text-blue-gray-700 ${NUMERIC}`}
+                  className={`rounded-full bg-red-400 px-2.5 text-lg text-white ${NUMERIC}`}
                 >
                   {count}
                 </span>

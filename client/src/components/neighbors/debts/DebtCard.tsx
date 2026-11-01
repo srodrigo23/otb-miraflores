@@ -25,7 +25,7 @@ const PAYMENT_METHOD_LABEL = 'Efectivo';
  * class names, so `bg-${color}-50` would never be generated
  */
 const DEBT_STATUS: Record<DebtStatus, { label: string; badge: string }> = {
-  PENDING: { label: 'Pendiente', badge: 'bg-amber-50 text-amber-800' },
+  PENDING: { label: 'Pendiente', badge: 'bg-yellow-800 text-white' },
   PAID: { label: 'Pagada', badge: 'bg-green-50 text-green-800' },
   CANCELLED: { label: 'Anulada', badge: 'bg-blue-gray-50 text-blue-gray-700' },
 };
@@ -91,45 +91,50 @@ export const DebtCard: React.FC<{
   };
 
   return (
-    <article className='rounded-lg border border-blue-gray-100 bg-white p-3 transition-shadow hover:shadow-md'>
-      <header className='mb-2 flex items-start justify-between gap-3'>
-        <div>
-          <h4 className='text-sm font-bold leading-tight text-blue-gray-800'>
-            {debt.period}
-          </h4>
-          <span className={`text-xs text-blue-gray-500 ${NUMERIC}`}>
+    <article className='flex flex-col gap-2 rounded-lg border border-blue-gray-100 bg-white p-3 transition-shadow hover:shadow-md'>
+      <header className='flex items-start justify-between gap-2'>
+        {/* Period and year share a line and wrap only when the card is narrow */}
+        <h4 className='flex min-w-0 flex-wrap items-baseline gap-x-1.5 text-sm font-bold leading-tight text-blue-gray-800'>
+          {debt.period}
+          <span className={`text-xs font-normal text-blue-gray-500 ${NUMERIC}`}>
             {debt.year}
           </span>
-        </div>
-        {/* The amount is the whole story now: it is owed in full or it is settled */}
-        <div
-          className={`text-lg font-bold ${NUMERIC} ${
-            isPending ? 'text-amber-800' : 'text-blue-gray-400 line-through'
-          }`}
-        >
-          {currency(debt.amount)}
-        </div>
-      </header>
-
-      <ReadingInterval
-        previousReading={debt.previous_reading}
-        currentReading={debt.current_reading}
-        consumption={debt.consumption}
-      />
-
-      <footer className='mt-2 flex items-center justify-between gap-2'>
+        </h4>
         <span
-          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${status.badge}`}
+          className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${status.badge}`}
         >
           {status.label}
         </span>
+      </header>
+
+      {/* Phone: readings take 2/3 and the amount 1/3 of one row, Pagar full
+          width below. Wider: readings on the left, amount and Pagar stacked in
+          a right column sized to its content */}
+      <footer className='grid grid-cols-3 items-center gap-2 sm:grid-cols-[1fr_auto] sm:items-end'>
+        <div className='col-span-2 sm:col-span-1 sm:row-span-2'>
+          <ReadingInterval
+            previousReading={debt.previous_reading}
+            currentReading={debt.current_reading}
+            consumption={debt.consumption}
+          />
+        </div>
+        {/* The amount is the whole story now: it is owed in full or it is settled */}
+        <p
+          // In a third of a phone-wide card "Bs" wraps above the figure
+          // instead of overflowing
+          className={`text-right text-2xl font-bold leading-none sm:text-3xl ${NUMERIC} ${
+            isPending ? 'text-gray-900' : 'text-blue-gray-400 line-through'
+          }`}
+        >
+          {currency(debt.amount)}
+        </p>
         {/* A settled debt has nothing left to charge */}
         {isPending && (
           <Button
-            size='sm'
-            color='green'
-            variant='outlined'
-            className='py-1'
+            size='lg'
+            color='red'
+            variant='filled'
+            className='col-span-3 py-1 sm:col-span-1'
             onClick={() => setIsPayOpen(true)}
           >
             Pagar
