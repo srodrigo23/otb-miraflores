@@ -43,7 +43,6 @@ class Payment(BaseModel):
 
   id: int
   debt_item_id: int
-  neighbor_id: int
   paid_at: datetime | None = None
   amount: int  # In cents
   # Opaque id the receipt QR points at

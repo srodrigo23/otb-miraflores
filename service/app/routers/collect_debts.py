@@ -6,6 +6,8 @@ from ..schemas import schema as schemas
 from ..services import crud
 from ..db.database import get_db
 
+#TODO this code is not being used
+
 router = APIRouter(
   prefix="/collect-debts", 
   tags=['Collect Debts'], 

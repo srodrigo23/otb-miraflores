@@ -174,8 +174,6 @@ def pay_debt(db: Session, debt: DebtItem, data) -> Payment:
   """
   payment = Payment(
     debt_item_id=debt.id,
-    # Taken from the debt so the two can never point at different neighbors
-    neighbor_id=debt.neighbor_id,
     # The server clock decides when: the payment is happening right now, and
     # letting the client say otherwise would date a receipt at will
     paid_at=datetime.now(),
@@ -285,12 +283,12 @@ def get_payments(db: Session) -> list[dict]:
   ).join(
     MeterReading.measure
   ).join(
-    Payment.neighbor
+    DebtItem.neighbor
   ).options(
     contains_eager(Payment.debt_item)
       .contains_eager(DebtItem.meter_reading)
       .contains_eager(MeterReading.meter),
-    contains_eager(Payment.neighbor),
+    contains_eager(Payment.debt_item).contains_eager(DebtItem.neighbor),
   ).order_by(Payment.id.desc()).all()
 
   return [
@@ -298,7 +296,7 @@ def get_payments(db: Session) -> list[dict]:
       "id": payment.id,
       "receipt": format_receipt_number(payment.id),
       "meter_code": payment.debt_item.meter_reading.meter.meter_code,
-      "neighbor_name": payment.neighbor.full_name,
+      "neighbor_name": payment.debt_item.neighbor.full_name,
       "period": payment.debt_item.meter_reading.measure.period or "",
       "year": payment.debt_item.meter_reading.measure.year or 0,
       "collector_name": payment.received_by,

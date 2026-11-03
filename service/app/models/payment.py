@@ -19,10 +19,6 @@ class Payment(Base):
   debt_item_id = Column(
     Integer, ForeignKey("debt_items.id"), unique=True, nullable=False
   )
-  # Reachable through the debt, kept here so a neighbor's payments can be
-  # listed without walking every debt. Always set from the debt, never from
-  # the request, so the two cannot disagree
-  neighbor_id = Column(Integer, ForeignKey("neighbors.id"), nullable=False)
 
   # Date and time the payment was taken, in one column. Nullable because the
   # seeded history carries neither: those debts were settled on paper before
@@ -46,5 +42,4 @@ class Payment(Base):
   created_at = Column(DateTime, default=datetime.utcnow)
 
   # Relaciones
-  neighbor = relationship("Neighbor")
   debt_item = relationship("DebtItem", back_populates="payment")

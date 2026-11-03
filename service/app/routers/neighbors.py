@@ -158,7 +158,7 @@ def create_neighbor_meter(
         db, neighbor_id=neighbor_id, meter=meter
     )
 
-
+#TODO remove this
 @router.get(
     "/{neighbor_id}/payments", 
     dependencies=[Depends(require_roles(UserType.ADMIN))]

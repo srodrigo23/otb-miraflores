@@ -32,7 +32,7 @@ def read_public_receipt(reference: str, db: Session = Depends(get_db)):
   measure = reading.measure
   previous_reading = neighbor_meters.get_previous_reading(db, reading)
 
-  years = debts_service.get_neighbor_statement(db, neighbor_id=payment.neighbor_id)
+  years = debts_service.get_neighbor_statement(db, neighbor_id=debt.neighbor_id)
 
   return {
     "receipt_number": debts_service.format_receipt_number(payment.id),
@@ -47,7 +47,7 @@ def read_public_receipt(reference: str, db: Session = Depends(get_db)):
     "previous_reading": previous_reading,
     "current_reading": reading.current_reading or 0,
 
-    "neighbor": {"full_name": payment.neighbor.full_name},
+    "neighbor": {"full_name": debt.neighbor.full_name},
 
     "total_paid": sum(y["paid_amount"] for y in years),
     "total_pending": sum(y["pending_amount"] for y in years),
