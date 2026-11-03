@@ -11,7 +11,7 @@ export const PaymentCard: React.FC<{ payment: LedgerPayment }> = ({
         <h4
           className={`text-sm font-bold leading-tight text-blue-gray-800 ${NUMERIC}`}
         >
-          {payment.receipt}
+          REC. {payment.receipt}
         </h4>
         <span className='text-xs text-blue-gray-500'>
           {formatDate(payment.date)}

@@ -1,0 +1,22 @@
+name: db-backup-otb-miraflores-supabase
+
+services:
+  db:
+    build: .
+    image: otb-backup:local
+    container_name: otb-backup-local
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-54323}:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  db_data:
